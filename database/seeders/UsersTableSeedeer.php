@@ -21,57 +21,9 @@ class UsersTableSeedeer extends Seeder
         $superadmin->name = 'Superadmin';
         $superadmin->save();
 
-        $RekananRole = new Role();
-        $RekananRole->name = 'Rekanan';
-        $RekananRole->save();
-
-        $DirekturRole = new Role();
-        $DirekturRole->name = 'Direktur Teknik';
-        $DirekturRole->save();
-
-        $ManajerDistribusiRole = new Role();
-        $ManajerDistribusiRole->name = 'Manajer Distribusi';
-        $ManajerDistribusiRole->save();
-
-        $ManajerPengawasRole = new Role();
-        $ManajerPengawasRole->name = 'Manajer Pengawas';
-        $ManajerPengawasRole->save();
-
-        $AdminDistribusiRole = new Role();
-        $AdminDistribusiRole->name = 'Admin Distribusi';
-        $AdminDistribusiRole->save();
-
-        $AsistenManajerPengawasRole = new Role();
-        $AsistenManajerPengawasRole->name = 'Asisten Manajer Pengawas';
-        $AsistenManajerPengawasRole->save();
-
-        $AsistenManajerDistribusiRole = new Role();
-        $AsistenManajerDistribusiRole->name = 'Asisten Manajer Distribusi';
-        $AsistenManajerDistribusiRole->save();
-
-        $HumasRole = new Role();
-        $HumasRole->name = 'Humas';
-        $HumasRole->save();
-
-        $KeuanganRole = new Role();
-        $KeuanganRole->name = 'Keuangan';
-        $KeuanganRole->save();
-
-        $StaffPengawasRole = new Role();
-        $StaffPengawasRole->name = 'Staf Pengawas';
-        $StaffPengawasRole->save();
-
-        $StaffDistribusiRole = new Role();
-        $StaffDistribusiRole->name = 'Staf Distribusi';
-        $StaffDistribusiRole->save();
-
-        $roleManajerPerencaan = new Role();
-        $roleManajerPerencaan->name = 'Manajer Perencanaan';
-        $roleManajerPerencaan->save();
-
-        $roleAsistenManajerPerencaan = new Role();
-        $roleAsistenManajerPerencaan->name = 'Asisten Manajer Perencanaan';
-        $roleAsistenManajerPerencaan->save();
+        $adminRole = new Role();
+        $adminRole->name = 'admin';
+        $adminRole->save();
 
         $superadmin = Role::where('slug', 'superadmin')->first();
 
@@ -84,6 +36,18 @@ class UsersTableSeedeer extends Seeder
         $superadminUser->save();
 
         $superadminUser->role()->attach($superadmin);
+
+        $admin = Role::where('slug', 'admin')->first();
+
+        $adminUser = new User();
+        $adminUser->name = 'admin';
+        $adminUser->username = 'admin';
+        $adminUser->email = 'admin@admin.com';
+        $adminUser->password = bcrypt('secret');
+        // $adminUser->icon = 'default-icon.png';
+        $adminUser->save();
+
+        $adminUser->role()->attach($admin);
 
         // ------------ Task
 
@@ -102,75 +66,40 @@ class UsersTableSeedeer extends Seeder
         $taskSatuan->description = 'Manajemen Satuan';
         $taskSatuan->save();
 
-        $taskJenis = new Task();
-        $taskJenis->name = 'Jenis';
-        $taskJenis->description = 'Manajemen Jenis';
-        $taskJenis->save();
+        $taskElement = new Task();
+        $taskElement->name = 'Element';
+        $taskElement->description = 'Manajemen Element';
+        $taskElement->save();
 
-        $taskKategori = new Task();
-        $taskKategori->name = 'Kategori';
-        $taskKategori->description = 'Manajemen Kategori';
-        $taskKategori->save();
+        $taskGroup = new Task();
+        $taskGroup->name = 'Group';
+        $taskGroup->description = 'Manajemen Group';
+        $taskGroup->save();
 
-        $taskItem = new Task();
-        $taskItem->name = 'Item';
-        $taskItem->description = 'Manajemen Item';
-        $taskItem->save();
+        $taskJenisData = new Task();
+        $taskJenisData->name = 'Jenis Data';
+        $taskJenisData->description = 'Manajemen Jenis Data';
+        $taskJenisData->save();
 
-        $taskDepartemen = new Task();
-        $taskDepartemen->name = 'Departemen';
-        $taskDepartemen->description = 'Manajemen Departemen';
-        $taskDepartemen->save();
+        $taskJenisUnit = new Task();
+        $taskJenisUnit->name = 'Jenis Unit';
+        $taskJenisUnit->description = 'Manajemen Jenis Unit';
+        $taskJenisUnit->save();
 
-        $taskWilayah = new Task();
-        $taskWilayah->name = 'Wilayah';
-        $taskWilayah->description = 'Manajemen Wilayah';
-        $taskWilayah->save();
+        $taskUnit = new Task();
+        $taskUnit->name = 'Unit';
+        $taskUnit->description = 'Manajemen Unit';
+        $taskUnit->save();
 
-        $taskDivisi = new Task();
-        $taskDivisi->name = 'Divisi';
-        $taskDivisi->description = 'Manajemen Divisi';
-        $taskDivisi->save();
+        $taskSubUnit = new Task();
+        $taskSubUnit->name = 'Sub Unit';
+        $taskSubUnit->description = 'Manajemen Sub Unit';
+        $taskSubUnit->save();
 
-        $taskJabatan = new Task();
-        $taskJabatan->name = 'Jabatan';
-        $taskJabatan->description = 'Manajemen Jabatan';
-        $taskJabatan->save();
-
-        $taskKaryawan = new Task();
-        $taskKaryawan->name = 'Karyawan';
-        $taskKaryawan->description = 'Manajemen Karyawan';
-        $taskKaryawan->save();
-
-        $taskRekanan = new Task();
-        $taskRekanan->name = 'Rekanan';
-        $taskRekanan->description = 'Manajemen Rekanan';
-        $taskRekanan->save();
-
-        $taskAduan = new Task();
-        $taskAduan->name = 'Aduan';
-        $taskAduan->description = 'Manajemen Aduan';
-        $taskAduan->save();
-
-        $taskSetting = new Task();
-        $taskSetting->name = 'Setting';
-        $taskSetting->description = 'Manajemen Setting';
-        $taskSetting->save();
-
-        $taskPenunjukanPekerjaan = new Task();
-        $taskPenunjukanPekerjaan->name = 'Penunjukan Pekerjaan';
-        $taskPenunjukanPekerjaan->description = 'Manajemen Penunjukan Pekerjaan';
-        $taskPenunjukanPekerjaan->save();
-
-        $taskPelaksanaanPekerjaan = new Task();
-        $taskPelaksanaanPekerjaan->name = 'Pelaksanaan Pekerjaan';
-        $taskPelaksanaanPekerjaan->description = 'Manajemen Pelaksanaan Pekerjaan';
-        $taskPelaksanaanPekerjaan->save();
-
-        $tagihan = new Task();
-        $tagihan->name = 'Tagihan';
-        $tagihan->description = 'Manajemen Tagihan';
-        $tagihan->save();
+        $taskLegenda = new Task();
+        $taskLegenda->name = 'Legenda';
+        $taskLegenda->description = 'Manajemen Legenda';
+        $taskLegenda->save();
 
         $tasks = Task::all();
 
@@ -198,6 +127,25 @@ class UsersTableSeedeer extends Seeder
 
             foreach ($data as $induk) {
                 $Permission = Permission::Create($induk);
+            }
+        }
+
+        $taskElementPermissiion = Task::where('name', 'Element')->first();
+
+        if ($taskElementPermissiion) {
+            $dataElement = array(
+
+                [
+                    'name'    => 'Download ' . $name,
+                    'task_id' =>  $taskElement->id
+                ],
+                [
+                    'name'    => 'Import ' . $name,
+                    'task_id' =>  $taskElement->id
+                ],
+            );
+            foreach ($dataElement as $element) {
+                $Permission = Permission::Create($element);
             }
         }
     }

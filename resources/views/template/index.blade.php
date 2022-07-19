@@ -79,6 +79,13 @@
                                             @if (isset($header['input']))
                                                 @if ($header['input'] == 'rupiah')
                                                     <td>Rp. {{ format_uang($item[$header['name']]) }}</td>
+                                                @elseif ($header['input'] == 'warna')
+                                                    <td width="200">
+                                                        <span
+                                                            style='background-color:{{ $item[$header['name']] }}; color:white; width:100%; display:block;''
+                                                            class="badge badge-pill mb-1">
+                                                            {{ $item[$header['name']] }}</span>
+                                                    </td>
                                                 @elseif ($header['input'] == 'date')
                                                     <td>
                                                         @if ($item[$header['name']] != null || $item[$header['name']] != '')

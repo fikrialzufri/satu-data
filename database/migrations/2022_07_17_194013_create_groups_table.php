@@ -18,6 +18,7 @@ class CreateGroupsTable extends Migration
             $table->string('kode');
             $table->string('slug');
             $table->string('nama');
+            $table->string('warna');
             $table->longText('keterangan')->nullable();
             $table->longText('dokumentasi')->nullable();
             $table->enum('setuju', ['Y', 'N'])->default('N');

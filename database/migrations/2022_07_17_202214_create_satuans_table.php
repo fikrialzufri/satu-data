@@ -13,7 +13,7 @@ class CreateSatuansTable extends Migration
      */
     public function up()
     {
-        Schema::create('satuans', function (Blueprint $table) {
+        Schema::create('satuan', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama');
             $table->string('slug');
