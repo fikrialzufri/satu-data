@@ -40,8 +40,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Element
     Route::resource('element', ElementController::class);
-    Route::resource('jenis-data', JenisDataController::class);
-    Route::resource('jenis-unit', JenisUnitController::class);
+    Route::resource('jenis_data', JenisDataController::class);
+    Route::resource('jenis_unit', JenisUnitController::class);
     Route::resource('group', GroupController::class);
     Route::resource('unit', UnitController::class);
     Route::resource('legenda', LegendaController::class);

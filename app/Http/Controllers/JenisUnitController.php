@@ -11,7 +11,7 @@ class JenisUnitController extends Controller
 
     public function __construct()
     {
-        $this->route = 'jenis-unit';
+        $this->route = 'jenis_unit';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
@@ -29,6 +29,10 @@ class JenisUnitController extends Controller
                 'name'    => 'warna',
                 'input'    => 'warna',
                 'alias'    => 'Warna',
+            ],
+            [
+                'name'    => 'total_unit',
+                'alias'    => 'Total',
             ],
         ];
     }

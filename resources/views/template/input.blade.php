@@ -1,9 +1,9 @@
 <div class="form-group form-textinput" id="form_{{ $item['name'] }}">
-
-    <div>
-        <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
-    </div>
-
+    @if ($item['input'] !== 'hidden')
+        <div>
+            <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
+        </div>
+    @endif
     @if (!isset($item['input']))
         <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
             class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
@@ -73,6 +73,14 @@
                 class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
                 @if ($store == 'update') value="{{ format_uang($data[$item['name']]) }}" @else value="{{ old($item['name']) }}" @endif>
         </div>
+
+
+    @endif
+    @if ($item['input'] == 'hidden')
+        <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+            placeholder="{{ $item['alias'] }}"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
 
 
     @endif

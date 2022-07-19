@@ -2,8 +2,7 @@
     <div class="sidebar-header">
         <a class="header-brand" href="{{ route('home') }}">
             <div class="logo-img">
-                <img height="40" src="{{ asset('img/logomenu.png') }}" class="header-brand-img"
-                    title="SIP PDAM Samarinda">
+                <img height="40" src="{{ asset('img/logomenu.png') }}" class="header-brand-img" title="SIP Satu Data">
             </div>
         </a>
         <div class="sidebar-action"><i class="ik ik-arrow-left-circle"></i></div>
@@ -37,14 +36,14 @@
                 @endcan
                 @canany('view-satuan')
                     <div class="nav-lavel">{{ __('Element') }} </div>
-                    <div class="nav-item {{ $segment1 == 'jenis-unit' ? 'active' : '' }}">
-                        <a href="{{ route('jenis-unit.index') }}">
+                    <div class="nav-item {{ $segment1 == 'jenis_unit' ? 'active' : '' }}">
+                        <a href="{{ route('jenis_unit.index') }}">
                             <i class="ik ik-box"></i>
                             <span>{{ __('Jenis Unit') }}</span>
                         </a>
                     </div>
-                    <div class="nav-item {{ $segment1 == 'jenis-data' ? 'active' : '' }}">
-                        <a href="{{ route('jenis-data.index') }}">
+                    <div class="nav-item {{ $segment1 == 'jenis_data' ? 'active' : '' }}">
+                        <a href="{{ route('jenis_data.index') }}">
                             <i class="ik ik-box"></i>
                             <span>{{ __('Jenis Data') }}</span>
                         </a>

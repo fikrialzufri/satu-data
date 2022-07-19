@@ -26,4 +26,20 @@ class JenisUnit extends Model
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function hasUnit()
+    {
+        return $this->hasMany(Unit::class, 'jenis_unit_id');
+    }
+
+    public function getTotalUnitAttribute()
+    {
+        $total = "";
+        if ($this->hasUnit) {
+
+            $total = $this->hasUnit()->count() . " Unit Terkait";
+        }
+
+        return $total;
+    }
 }

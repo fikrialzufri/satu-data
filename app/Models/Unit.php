@@ -27,4 +27,50 @@ class Unit extends Model
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function hasJenisUnit()
+    {
+        return $this->hasOne(JenisUnit::class, 'id', 'jenis_unit_id');
+    }
+
+    public function getJenisUnitAttribute()
+    {
+        if ($this->hasJenisUnit) {
+            return $this->hasJenisUnit->nama;
+        }
+    }
+    public function getJenisUnitWarnaAttribute()
+    {
+        if ($this->hasJenisUnit) {
+            return $this->hasJenisUnit->warna;
+        }
+    }
+
+    public function hasUser()
+    {
+        return $this->hasOne(User::class, 'id');
+    }
+
+    public function getUsernameAttribute()
+    {
+        if ($this->hasUser) {
+            return $this->hasUser->username;
+        }
+    }
+
+    public function hasElement()
+    {
+        return $this->hasMany(Element::class, 'unit_id');
+    }
+
+    public function getTotalElementAttribute()
+    {
+        $total = "";
+        if ($this->hasElement) {
+
+            $total = $this->hasElement()->count();
+        }
+
+        return $total;
+    }
 }

@@ -18,15 +18,18 @@ class CreateUnitsTable extends Migration
             $table->string('nama');
             $table->string('slug');
             $table->string('nama_singkat');
-            $table->string('latitude');
-            $table->string('longitude');
-            $table->string('logo');
-            $table->string('email');
+            $table->string('lat_long');
+            $table->string('logo')->nullable();
+            $table->string('email')->nullable();
+            $table->string('telepon', 13)->nullable();
             $table->text('alamat')->nullable();
+            $table->text('detail_alamat')->nullable();
             $table->longText('keterangan')->nullable();
             $table->string('jenis_unit_id')->references('id')->on('jenis_unit')->onDelete('cascade');
             $table->enum('tampil', ['Y', 'N'])->default('Y');
             $table->enum('akun', ['Y', 'N'])->default('Y');
+            $table->enum('setuju', ['Y', 'N'])->default('Y');
+            $table->string('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Str;
@@ -28,5 +29,28 @@ class Element extends Model
     {
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
+    }
+
+    public function hasJenisData()
+    {
+        return $this->hasOne(JenisData::class, 'id', 'jenis_data_id');
+    }
+
+    public function getJenisDataAttribute()
+    {
+        if ($this->hasJenisData) {
+            return $this->hasJenisData->nama;
+        }
+    }
+    public function hasGroup()
+    {
+        return $this->hasOne(Group::class, 'id', 'group_id');
+    }
+
+    public function getGroupAttribute()
+    {
+        if ($this->hasGroup) {
+            return $this->hasGroup->nama;
+        }
     }
 }
