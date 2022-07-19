@@ -139,7 +139,7 @@
                                                     @endforeach
                                                 @endif
                                                 @can('edit-' . $route)
-                                                    <a href="{{ route($route . '.edit', $item->id) }}"
+                                                    <a href="{{ route($route . '.edit', $item->id) }}?unit_id={{ $item->unit_id }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
                                                         <i class="nav-icon fas fa-edit"></i> Ubah</a>
