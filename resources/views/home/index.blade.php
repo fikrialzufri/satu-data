@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row">
             <!-- page statustic chart start -->
-            <div class="col-xl-4 col-md-6">
+            {{-- <div class="col-xl-4 col-md-6">
                 <div class="card card-red text-white">
                     <div class="card-block">
                         <div class="row align-items-center">
@@ -52,12 +52,12 @@
                         <div id="Widget-line-chart3" class="chart-line chart-shadow"></div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="col-md-12 col-xl-12">
                 <div class="card sale-card">
                     <div class="card-header">
-                        <h3>Daftar Aduan Tahun ini</h3>
+                        <h3>Grafik Tahun ini</h3>
                     </div>
                     <div class="card-block text-center">
                         <div id="line_chart" class="chart-shadow"></div>
