@@ -1,13 +1,14 @@
-@if ($item['input'] == 'warna')
-    {{ old($item['name']) }}
-    <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
-        id="text-field" class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} warna"
-        @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) === old($item['name']) ? $item['default'] : old($item['name']) }}" @endif>
+@if ($item['input'] == 'hidden')
+    <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
+        class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+        @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
 @else
     <div class="form-group form-textinput" id="form_{{ $item['name'] }}">
-        <div>
-            <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
-        </div>
+        @if ($item['input'] !== 'hidden')
+            <div>
+                <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
+            </div>
+        @endif
         @if (!isset($item['input']))
             <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
                 placeholder="{{ $item['alias'] }}"
@@ -81,15 +82,16 @@
 
 
         @endif
-        @if ($item['input'] == 'hidden')
-            <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                placeholder="{{ $item['alias'] }}"
-                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
+
+        @if ($item['input'] == 'warna')
+            {{ old($item['name']) }}
+            <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+                placeholder="{{ $item['alias'] }}" id="text-field"
+                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} warna"
+                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) === old($item['name']) ? $item['default'] : old($item['name']) }}" @endif>
 
 
         @endif
-
         @if ($item['input'] == 'radio')
             <div class="form-radio">
                 @foreach ($item['value'] as $key => $val)
@@ -176,8 +178,9 @@
     </span>
 @endif
 </div>
-
 @endif
+
+
 @push('head')
     @if (isset($item['input']))
         @if ($item['input'] == 'datetimepicker')
