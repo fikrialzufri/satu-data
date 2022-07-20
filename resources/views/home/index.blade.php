@@ -148,9 +148,9 @@
                 "hideBulletsCount": 50,
                 "lineThickness": 3,
                 "lineColor": "#2ed8b6",
-                "title": "Aduan",
+                "title": "Data Dasar",
                 "useLineColorForBulletBorder": true,
-                "valueField": "aduan",
+                "valueField": "datadasar",
                 "balloonText": "[[title]]<br /><b style='font-size: 130%'>[[value]]</b>"
             }, {
                 "id": "g2",
@@ -162,9 +162,9 @@
                 "hideBulletsCount": 50,
                 "lineThickness": 3,
                 "lineColor": "#e95753",
-                "title": "Pekerjaan",
+                "title": "Pegawasai",
                 "useLineColorForBulletBorder": true,
-                "valueField": "pekerjaan",
+                "valueField": "pegawai",
                 "balloonText": "[[title]]<br /><b style='font-size: 130%'>[[value]]</b>"
             }],
             "chartCursor": {
