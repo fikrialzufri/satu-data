@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Satuan;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
+use Str;
 
 class SatuanSeeder extends Seeder
 {
@@ -14,44 +16,29 @@ class SatuanSeeder extends Seeder
      */
     public function run()
     {
-        $satuanPsc = new Satuan();
-        $satuanPsc->nama = 'Pcs';
-        $satuanPsc->save();
+        $faker = Faker::create();
+        $listSatuan = [
+            ['nama' => 'Orang', 'warna' => $faker->hexColor()],
+            ['nama' => 'Rupiah', 'warna' => $faker->hexColor()],
+            ['nama' => '(%) Persen', 'warna' => $faker->hexColor()],
+            ['nama' => 'Unit', 'warna' => $faker->hexColor()],
+            ['nama' => 'Daerah', 'warna' => $faker->hexColor()],
+            ['nama' => 'KM', 'warna' => $faker->hexColor()],
+            ['nama' => 'Dokumen', 'warna' => $faker->hexColor()],
+        ];
 
-        $satuanLusin = new Satuan();
-        $satuanLusin->nama = 'Lusin';
-        $satuanLusin->save();
+        foreach ($listSatuan as $key => $value) {
+            $nama = $value['nama'];
+            $warna = $value['warna'];
 
-        $satuanMeter = new Satuan();
-        $satuanMeter->nama = 'Meter';
-        $satuanMeter->save();
+            $Satuan[$key] = Satuan::whereSlug(Str::slug($nama))->first();
 
-        $satuanKg = new Satuan();
-        $satuanKg->nama = 'Kg';
-        $satuanKg->save();
-
-        $satuanCm = new Satuan();
-        $satuanCm->nama = 'Cm';
-        $satuanCm->save();
-
-        $satuanLiter = new Satuan();
-        $satuanLiter->nama = 'Liter';
-        $satuanLiter->save();
-
-        $satuanTitik = new Satuan();
-        $satuanTitik->nama = 'Titik';
-        $satuanTitik->save();
-
-        $satuanLs = new Satuan();
-        $satuanLs->nama = 'LS';
-        $satuanLs->save();
-
-        $satuanBuah = new Satuan();
-        $satuanBuah->nama = 'Buah';
-        $satuanBuah->save();
-
-        $satuanLs = new Satuan();
-        $satuanLs->nama = '121';
-        $satuanLs->save();
+            if (!$Satuan[$key]) {
+                $Satuan[$key] = new Satuan();
+                $Satuan[$key]->nama = $nama;
+                $Satuan[$key]->warna = $warna;
+                $Satuan[$key]->save();
+            }
+        }
     }
 }

@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Login | PDAM SAMARINDA</title>
+    <title>Login | Satu Data</title>
     <meta name="description" content="">
-    <meta name="keywords" content="PDAM SAMARINDA">
+    <meta name="keywords" content="Satu Data">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/x-icon" />
@@ -53,8 +53,8 @@
                 <div class="col-xl-4 col-lg-4 col-md-4 m-auto">
                     <div class="authentication-form mx-auto">
                         <div class="logo-centered">
-                            <a href="http://radmin.rakibhstu.com"><img height="100"
-                                    src="{{ asset('img/logo.png') }}" alt="RADMIN"></a>
+                            <a href="#"><img width="90%" src="{{ asset('img/logo.png') }}"
+                                    alt="RADMIN"></a>
                         </div>
                         <p>Welcome back! </p>
                         <form method="POST" action="{{ route('login') }}">
@@ -109,12 +109,7 @@
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyAiIdOVXPc1C90tWcDrpG984rzidIgU9Kk",
-            authDomain: "pdam-work-order.firebaseapp.com",
-            projectId: "pdam-work-order",
-            storageBucket: "pdam-work-order.appspot.com",
-            messagingSenderId: "167105139450",
-            appId: "1:167105139450:web:cf92428440b90382686f43"
+
         };
 
         // Initialize Firebase

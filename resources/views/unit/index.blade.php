@@ -57,14 +57,15 @@
                         <table class="table table-bordered " id="example">
                             <thead>
                                 <tr>
-                                    <th width="5%">No</th>
+                                    <th width="5%" class="text-center">No</th>
                                     @foreach ($configHeaders as $key => $header)
                                         @if (isset($header['alias']))
-                                            <th>{{ ucfirst($header['alias']) }}</th>
+                                            <th class="text-center">{{ ucfirst($header['alias']) }}</th>
                                         @else
-                                            <th>{{ ucfirst($header['name']) }}</th>
+                                            <th class="text-center">{{ ucfirst($header['name']) }}</th>
                                         @endif
                                     @endforeach
+                                    <th class="text-center">Element</th>
                                     @canany(['edit-' . $route, 'delete-' . $route])
                                         <th class="text-center">Aksi</th>
                                     @endcan
@@ -74,29 +75,66 @@
                                 @forelse ($data as $index => $item)
 
                                     <tr>
-                                        <td>{{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
+                                        <td class="text-center">
+                                            {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
                                         @foreach ($configHeaders as $key => $header)
                                             @if (isset($header['input']))
                                                 @if ($header['input'] == 'rupiah')
-                                                    <td>Rp. {{ format_uang($item[$header['name']]) }}</td>
+                                                    <td class="text-center">Rp. {{ format_uang($item[$header['name']]) }}
+                                                    </td>
                                                 @elseif ($header['input'] == 'warna')
                                                     <td width="200">
                                                         <span
                                                             style='background-color:{{ $item[$header['name']] }}; color:white; width:100%; display:block;''
                                                             class="badge badge-pill mb-1">
                                                             {{ $item[$header['name']] }}</span>
-                                                    </td>
+                                                    </td class="text-center">
                                                 @elseif ($header['input'] == 'date')
-                                                    <td>
+                                                    <td class="text-center">
                                                         @if ($item[$header['name']] != null || $item[$header['name']] != '')
                                                             {{ tanggal_indonesia($item[$header['name']]) }}
                                                         @endif
                                                     </td>
                                                 @endif
+                                            @elseif ($header['name'] === 'nama_singkat')
+                                                <td class="text-left">
+                                                    <b>{{ $item->nama_singkat }}</b>
+                                                    <br>
+                                                    {{ $item->nama }}
+                                                </td>
+                                            @elseif ($header['name'] === 'jenis_unit')
+                                                <td class="text-center">
+
+                                                    <div style='background-color:{{ $item->jenis_unit_warna }}; color:white; width:100%; '
+                                                        class="badge badge-pill mb-1 d-flex justify-content-between">
+
+                                                        <i class="fa fa-info"></i>
+                                                        <span>
+
+                                                            {{ $item[$header['name']] }}
+                                                        </span>
+                                                        <span></span>
+                                                    </div>
+                                                </td>
                                             @else
-                                                <td>{{ $item[$header['name']] }}</td>
+                                                <td class="text-center">{{ $item[$header['name']] }}</td>
                                             @endif
                                         @endforeach
+                                        <td>
+                                            <a href="{{ route('element.index') }}?unit_id={{ $item->id }}">
+
+                                                <div style='background-color:#19b159; color:white; width:100%; '
+                                                    class="badge badge-pill mb-1 d-flex justify-content-between">
+
+                                                    <i class="fa fa-plus"></i>
+                                                    <span>
+
+                                                        {{ $item->total_element }} Element Data
+                                                    </span>
+                                                    <span></span>
+                                                </div>
+                                            </a>
+                                        </td>
                                         @canany(['edit-' . $route, 'delete-' . $route])
                                             <td class="text-center">
                                                 @if (isset($button))

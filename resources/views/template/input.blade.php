@@ -1,9 +1,9 @@
 <div class="form-group form-textinput" id="form_{{ $item['name'] }}">
-
-    <div>
-        <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
-    </div>
-
+    @if ($item['input'] !== 'hidden')
+        <div>
+            <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
+        </div>
+    @endif
     @if (!isset($item['input']))
         <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
             class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
@@ -76,6 +76,23 @@
 
 
     @endif
+    @if ($item['input'] == 'hidden')
+        <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+            placeholder="{{ $item['alias'] }}"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
+
+
+    @endif
+    @if ($item['input'] == 'warna')
+        {{ old($item['name']) }}
+        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+            placeholder="{{ $item['alias'] }}" id="text-field"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} warna"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) === old($item['name']) ? $item['default'] : old($item['name']) }}" @endif>
+
+
+    @endif
     @if ($item['input'] == 'radio')
         <div class="form-radio">
             @foreach ($item['value'] as $key => $val)
@@ -135,7 +152,11 @@
 </textarea>
     @endif
 
-    @if ($item['input'] == 'text' || $item['input'] == 'number' || $item['input'] == 'email' || $item['input'] == 'password' || $item['input'] == 'time')
+    @if ($item['input'] == 'text' ||
+        $item['input'] == 'number' ||
+        $item['input'] == 'email' ||
+        $item['input'] == 'password' ||
+        $item['input'] == 'time')
         <div>
             <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
                 @if ($item['input'] == 'password') autocomplete="on" @else placeholder="{{ $item['alias'] }}" @endif
@@ -164,10 +185,57 @@
                 href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         @endif
     @endif
+    @if (isset($item['input']))
+        @if ($item['input'] == 'warna')
+            <link rel="stylesheet"
+                href="{{ asset('plugins/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('plugins/jquery-minicolors/jquery.minicolors.css') }}">
+            <link rel="stylesheet" href="{{ asset('plugins/datedropper/datedropper.min.css') }}">
+        @endif
+    @endif
 @endpush
 
 @push('scriptdinamis')
     <script script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"></script>
+
+    @if (isset($item['input']))
+        @if ($item['input'] == 'warna')
+            <script src="{{ asset('plugins/moment/moment.js') }}"></script>
+            <script src="{{ asset('plugins/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+            <script src="{{ asset('plugins/jquery-minicolors/jquery.minicolors.min.js') }}"></script>
+
+            <script>
+                $('.warna').each(function() {
+                    //
+                    // Dear reader, it's actually very easy to initialize MiniColors. For example:
+                    //
+                    //  $(selector).minicolors();
+                    //
+                    // The way I've done it below is just for the demo, so don't get confused
+                    // by it. Also, data- attributes aren't supported at this time...they're
+                    // only used for this demo.
+                    //
+                    $(this).minicolors({
+                        control: $(this).attr('data-control') || 'hue',
+                        defaultValue: $(this).attr('data-defaultValue') || '',
+                        format: $(this).attr('data-format') || 'hex',
+                        keywords: $(this).attr('data-keywords') || '',
+                        inline: $(this).attr('data-inline') === 'true',
+                        letterCase: $(this).attr('data-letterCase') || 'lowercase',
+                        opacity: $(this).attr('data-opacity'),
+                        position: $(this).attr('data-position') || 'bottom left',
+                        swatches: $(this).attr('data-swatches') ? $(this).attr('data-swatches').split('|') : [],
+                        change: function(value, opacity) {
+                            if (!value) return;
+                            if (opacity) value += ', ' + opacity;
+                        },
+                        theme: 'bootstrap'
+                    });
+
+                });
+            </script>
+        @endif
+    @endif
     <script type="text/javascript">
         $(function() {
             @if (isset($item['input']))
