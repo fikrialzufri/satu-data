@@ -162,7 +162,7 @@
                 "hideBulletsCount": 50,
                 "lineThickness": 3,
                 "lineColor": "#e95753",
-                "title": "Pegawasai",
+                "title": "Pegawai",
                 "useLineColorForBulletBorder": true,
                 "valueField": "pegawai",
                 "balloonText": "[[title]]<br /><b style='font-size: 130%'>[[value]]</b>"
