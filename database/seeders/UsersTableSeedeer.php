@@ -35,7 +35,7 @@ class UsersTableSeedeer extends Seeder
         $superadminUser->name = 'Superadmin';
         $superadminUser->username = 'Superadmin';
         $superadminUser->email = 'Superadmin@admin.com';
-        $superadminUser->password = bcrypt('secret');
+        $superadminUser->password = bcrypt('samarinda');
         // $superadminUser->icon = 'default-icon.png';
         $superadminUser->save();
 
