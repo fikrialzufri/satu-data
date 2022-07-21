@@ -246,7 +246,7 @@
                     legenda_id: legenda
                 },
                 success: function(response) {
-                    console.log(response);
+
                 }
             });
         });
