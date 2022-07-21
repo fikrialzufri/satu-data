@@ -33,11 +33,14 @@
                         <form action="" role="form" id="form" enctype="multipart/form-data">
                             <div class="row">
                                 @foreach ($searches as $key => $item)
-                                    <div class="col-lg-2">
-
-                                        <label for="{{ $item['name'] }}">{{ ucfirst($item['alias']) }}</label>
+                                    @if ($item['input'] != 'hidden')
+                                        <div class="col-lg-2">
+                                            <label for="{{ $item['name'] }}">{{ ucfirst($item['alias']) }}</label>
+                                            @include('template.formsearch')
+                                        </div>
+                                    @else
                                         @include('template.formsearch')
-                                    </div>
+                                    @endif
                                 @endforeach
 
                                 <div class="col-lg-3">
@@ -65,7 +68,15 @@
                                             <th class="text-center">{{ ucfirst($header['name']) }}</th>
                                         @endif
                                     @endforeach
-
+                                    <td class="text-center" width="10%">
+                                        {{ $subYear }}
+                                    </td>
+                                    <td class="text-center" width="10%">
+                                        {{ $year }}
+                                    </td>
+                                    <td class="text-center">
+                                        Nilai & Legenda
+                                    </td>
                                     @canany(['edit-' . $route, 'delete-' . $route])
                                         <th class="text-center">Aksi</th>
                                     @endcan
@@ -114,7 +125,31 @@
                                                 <td class="text-center">{{ $item[$header['name']] }}</td>
                                             @endif
                                         @endforeach
+                                        <td>
+                                            {{ $item->hasSubElementTahun($subYear) }}
+                                        </td>
+                                        <td>
+                                            <div class="form-group ">
 
+                                                <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
+                                                    type="text" class="form-control numberOnly nilai"
+                                                    value="{{ $item->hasSubElementTahun($year) }}">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group ">
+                                                <select name="legenda" class="selected2 form-control cmblegenda"
+                                                    id="legenda_{{ $item->id }}">
+                                                    @foreach ($listLegenda as $legenda)
+                                                        <option value="{{ $legenda->id }}"
+                                                            @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
+                                                            @else
+                                                            {{ $legenda->nama == 'Tetap' ? 'selected' : 'bebel' }} @endif>
+                                                            {{ $legenda->nama }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </td>
                                         @canany(['edit-' . $route, 'delete-' . $route])
                                             <td class="text-center">
                                                 @if (isset($button))
@@ -174,15 +209,46 @@
 @push('script')
     <!-- DataTables -->
     <script src="{{ asset('plugins/DataTables/datatables.js') }}"></script>
+    <script script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"></script>
+
     <script>
-        // $('#example').DataTable({
-        //   "paging": true,
-        //   "lengthChange": true,
-        //   "searching": true,
-        //   "ordering": true,
-        //   "info": true,
-        //   "autoWidth": true,
-        //   "pageLength": 20,
-        // });
+        $('.cmblegenda').select2({
+            width: '100%'
+        });
+
+        $(document).on('keypress', '.numberOnly', function(event) {
+            if (event.which < 46 ||
+                event.which > 59) {
+                event.preventDefault();
+            } // prevent if not number/dot
+
+            if (event.which == 46 &&
+                $(this).val().indexOf('.') != -1) {
+                event.preventDefault();
+            } // prevent if already dot
+        })
+
+        $(".nilai").on('keyup', function(e) {
+            var id = $(this).attr("data-id");
+            var tahun = $(this).attr("data-tahun");
+            var value = $(this).val();
+            var legenda = $("#legenda_" + id).val();
+
+            // ajakan ajax
+            $.ajax({
+                url: "{{ route('elemen.update.nilai') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    id: id,
+                    tahun: tahun,
+                    value: value,
+                    legenda_id: legenda
+                },
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        });
     </script>
 @endpush

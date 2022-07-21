@@ -48,6 +48,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('unit', UnitController::class);
     Route::resource('legenda', LegendaController::class);
 
+    // update nilai
+    Route::post('/elementnilai', [SubElementController::class, 'nilai'])->name('elemen.update.nilai');
     // ubah profile
     Route::get('/ubahuser', [UserController::class, 'ubah'])->name('user.ubah');
     Route::put('/simpanuser', [UserController::class, 'simpan'])->name('user.simpan');

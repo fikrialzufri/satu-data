@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Element;
+use App\Models\Legenda;
 use App\Models\SubElement;
+use App\Models\SubElementTahun;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
@@ -24,8 +26,6 @@ class SubElementController extends Controller
 
     public function configHeaders()
     {
-        $subYear = Carbon::now()->subYears(1)->format('Y');
-
         return [
             [
                 'name'    => 'kode',
@@ -38,28 +38,57 @@ class SubElementController extends Controller
             [
                 'name'    => 'satuan',
                 'alias'    => 'Satuan',
-            ],
-            [
-                'name'    => 'tahun_lalu',
-                'alias'    => $subYear,
-            ],
+            ]
         ];
     }
     public function configSearch()
     {
-        return [
-            [
-                'name'    => 'nama',
-                'input'    => 'text',
-                'alias'    => 'Nama',
-                'value'    => null
-            ],
-            [
-                'name'    => 'tahun',
-                'input'    => 'year',
-                'alias'    => 'Tahun',
-            ],
-        ];
+        $Element_id = request()->get('element_id');
+        $checkElement = Element::where('id', $Element_id)->first();
+        if ($checkElement) {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'hidden',
+                    'alias'    => 'element_id',
+                    'value' => $Element_id,
+                ],
+            ];
+        } else {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'combo',
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element'),
+                    'validasi'    => ['required']
+                ],
+            ];
+        }
     }
     public function configForm()
     {
@@ -219,7 +248,7 @@ class SubElementController extends Controller
             $hasilSearch[$val['name']] = $search[$key];
 
             if ($search[$key]) {
-                if ($val['input'] != 'daterange') {
+                if ($val['input'] != 'daterange' && $val['input'] != 'year') {
                     # code...
                     $searchValues[$key] = preg_split('/\s+/', $search[$key], -1, PREG_SPLIT_NO_EMPTY);
 
@@ -264,18 +293,6 @@ class SubElementController extends Controller
                     if (count($queryArray) > 0) {
                         $query->where($queryArray);
                     }
-                } else {
-                    $date = explode(' - ', request()->input($val['name']));
-                    $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
-                    $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
-                    $query = $query->whereBetween(DB::raw('DATE(' . $val['name'] . ')'), array($start, $end));
-
-                    $export .= 'from=' . $start . '&to=' . $end;
-                    $countAll = $countAll + 1;
-                }
-
-                if ($countAll == 0) {
-                    $query->where('id',  "");
                 }
             }
             $export .= $val['name'] . '=' . $search[$key] . '&';
@@ -292,7 +309,8 @@ class SubElementController extends Controller
             }
         }
         $Element_id = request()->get('element_id');
-        if ($Element_id) {
+        $checkElement = Element::where('id', $Element_id)->first();
+        if ($checkElement) {
             $query = $query->where('element_id', $Element_id);
             $Element = Element::find($Element_id);
             if ($Element) {
@@ -309,11 +327,24 @@ class SubElementController extends Controller
         }
         //mendapilkan data model setelah query pencarian
         if ($paginate) {
+            // return $data = $query->toSql();
             $data = $query->paginate($paginate);
         } else {
             $data = $query->get();
         }
+        $listLegenda = Legenda::orderBy('nama')->get();
 
+        $year = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $year = request()->get('tahun');
+        }
+
+
+        $subYear = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('tahun') != null) {
+            $subYear = request()->get('tahun') - 1;
+        }
         // return $button;
         $template = 'subelement.index';
         // return  $data;
@@ -321,6 +352,9 @@ class SubElementController extends Controller
         return view($template,  compact(
             "title",
             "Element_id",
+            'listLegenda',
+            'subYear',
+            'year',
             "data",
             'searches',
             'hasilSearch',
@@ -371,6 +405,7 @@ class SubElementController extends Controller
                 $title = "Tambah " . ucwords($this->route) . " - " . $unit;
             }
         }
+
 
         return view('template.form', compact(
             'title',
@@ -434,19 +469,11 @@ class SubElementController extends Controller
         $relationId = [];
 
         //check extra form
-        if ($this->extraFrom) {
-            foreach ($this->extraFrom as $key => $item) {
-                $fileId = $item . '_id';
-                $relationId[$fileId] = $data->$fileId;
-            }
-        }
         // return $request;
         $getRequest = $this->getRequest($request, $id, $relationId);
         $messages = $getRequest['messages'];
-        $relation = $getRequest['relation'];
         $validation = $getRequest['validasi'];
         $form = $getRequest['form'];
-
 
         //validasi
         $this->validate(
@@ -455,114 +482,36 @@ class SubElementController extends Controller
             $messages
         );
         //post ke model
-        // $this->model()->transaction();
-        foreach ($form as $index => $item) {
+        DB::beginTransaction();
 
-            if (preg_match("/-image/i", $index)) {
-                $route =  $this->route;
-                $file =  str_replace("-image", "", $index);
-                if ($request->hasFile($file)) {
-                    $nama_gambar = Str::slug($route) . '-' . Str::Random(15) . '.' . $request->file($file)->getClientOriginalExtension();
-
-                    $path = public_path('storage/' . $route . '/' . $nama_gambar);
-
-                    if (!Storage::disk('public')->exists($route)) {
-                        Storage::disk('public')->makeDirectory($route);
-                    }
-                    if (!Storage::disk('public')->exists($route . '/thumbnail')) {
-                        Storage::disk('public')->makeDirectory($route . '/thumbnail');
-                    }
-
-                    // delete gambar original
-                    if (Storage::disk('public')->exists($route . '/' . $data->$file)) {
-                        Storage::disk('public')->delete($route . '/' . $data->$file);
-                    }
-
-                    $gambar_original = Image::make($request->file($file))->save($path);
-                    Storage::disk('public')->put($route . '/' . $nama_gambar, $gambar_original);
-
-                    // delete gambar thumbnail
-                    if (Storage::disk('public')->exists($route . '/thumbnail' . '/' . $data->$file)) {
-                        Storage::disk('public')->delete($route . '/thumbnail' . '/' . $data->$file);
-                    }
-                    $thumbnail = Image::make($request->file($file))->resize(720, 720)->save($path);
-                    Storage::disk('public')->put($route . '/thumbnail' . '/' . $nama_gambar, $thumbnail);
-
-                    $data->$file = $nama_gambar;
-                }
-                continue;
+        try {
+            DB::commit();
+            foreach ($form as $index => $item) {
+                $data->$index = $item;
             }
-            if ($index === "password") {
-                $item = bcrypt($item);
-            }
-            if ($this->manyToMany) {
-                # code...
-                if (in_array(str_replace('_id', '', $index), $this->manyToMany)) {
-                    $manyToMany = str_replace('_id', '', $index);
-                    continue;
-                }
-            }
-            if ($this->oneToMany) {
-                if (in_array(str_replace('_id', '', $index), $this->oneToMany)) {
-                    $oneToMany = str_replace('_id', '', $index);
-                    continue;
-                }
-            }
+            $data->save();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+        }
+    }
 
-            $data->$index = $item;
+    public function nilai(Request $request)
+    {
+        $subElement = SubElementTahun::where('sub_element_id', $request->id)->where('tahun',  $request->tahun)->first();
+
+        if (!$subElement) {
+            $subElement = new SubElementTahun;
         }
 
-        if (isset($relation)) {
-            $firstColumn = [];
-            if (isset($this->extraFrom)) {
+        $subElement->sub_element_id = $request->id;
+        $subElement->tahun = $request->tahun;
+        $subElement->nilai = $request->value;
+        $subElement->legenda_id = $request->legenda_id;
+        $subElement->save();
 
-                foreach ($relation as $key => $value) {
-                    $relationsFields = $key . '_id';
-                    $relationModels = '\\App\Models\\' . ucfirst($key);
-                    $relationModels = new $relationModels;
-                    $relationModels = $relationModels->find($data->$relationsFields);
-                    if ($relationModels) {
-                        foreach ($value as $colom => $val) {
-                            if ($colom === "password") {
-                                $val = bcrypt($val);
-                            }
-                            if (in_array(str_replace('_id', '', $colom), $this->manyToMany)) {
-                                $manyToMany = str_replace('_id', '', $colom);
-                                $valueMany[$manyToMany] = $val;
-                                continue;
-                            }
-                            $relationModels->$colom = $val;
-                        }
-                        $relationModels->save();
-                        if (isset($manyToMany)) {
-                            $relationModels->$manyToMany()->sync($valueMany);
-                        }
-                    }
-                }
-            }
-        }
-
-        $data->save();
-
-        if (isset($this->manyToMany)) {
-            if (!isset($this->extraFrom)) {
-                foreach ($this->manyToMany as  $value) {
-                    $hasRalation = 'has' . ucfirst($value);
-                    $valueField = $data->$hasRalation()->sync($form[$value]);
-                }
-            }
-        }
-
-        if (isset($this->oneToMany)) {
-            foreach ($this->oneToMany as $index => $value) {
-                $hasRalation = 'has' . ucfirst($value);
-                $idRelation = $value . '_id';
-
-                $valueField = $data->$hasRalation()->sync($form[$idRelation]);
-            }
-        }
-
-        return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+        return $this->sendResponse($subElement, "sukses", 200);
     }
     public function model()
     {

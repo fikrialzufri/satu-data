@@ -30,11 +30,22 @@
             @endif
         </select>
     @endif
+    @if ($item['input'] == 'year')
+        <input type="text" id="year" name="{{ $item['name'] }}" value="{{ $hasilSearch[$item['name']] }}"
+            class="form-control">
+    @endif
+    @if ($item['input'] == 'hidden')
+        <input type="hidden" name="{{ $item['name'] }}" value="{{ $hasilSearch[$item['name']] }}">
+    @endif
     @if ($item['input'] == 'daterange')
         <input type="text" id="daterange" name="{{ $item['name'] }}" value="{{ $hasilSearch[$item['name']] }}"
             class="form-control">
     @endif
-    @if ($item['input'] == 'text' || $item['input'] == 'number' || $item['input'] == 'date' || $item['input'] == 'email' || $item['input'] == 'password')
+    @if ($item['input'] == 'text' ||
+        $item['input'] == 'number' ||
+        $item['input'] == 'date' ||
+        $item['input'] == 'email' ||
+        $item['input'] == 'password')
         <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
             class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
             value="{{ $hasilSearch[$item['name']] }}">
@@ -45,29 +56,32 @@
     @if ($item['input'] == 'daterange')
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     @endif
+    @if ($item['input'] == 'year')
+        <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet" />
+    @endif
 @endpush
 
 @push('script')
-    <script script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"> </script>
+    <script script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"></script>
     <script>
         @if (isset($item['input']))
             @if ($item['input'] == 'combo')
                 $(function() {
-                var cmbName = `#cmb{{ $item['name'] }}`;
-                var aliasName = `{{ $item['alias'] }}`;
-                $(cmbName).select2({
-                placeholder: '--- Pilih ' + aliasName + ' ---',
-                width: '100%'
-                });
+                    var cmbName = `#cmb{{ $item['name'] }}`;
+                    var aliasName = `{{ $item['alias'] }}`;
+                    $(cmbName).select2({
+                        placeholder: '--- Pilih ' + aliasName + ' ---',
+                        width: '100%'
+                    });
 
                 });
             @endif
         @endif
     </script>
     @if ($item['input'] == 'daterange')
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+        {{-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> --}}
+        <script type="text/javascript" src="{{ asset('dist/js/moment.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('dist/js/daterangepicker.min.js') }}"></script>
         @if (!$hasilSearch[$item['name']])
             <script type="text/javascript">
                 $(document).ready(function() {
@@ -84,5 +98,22 @@
                 $('#daterange').daterangepicker()
             </script>
         @endif
+    @endif
+
+    @if ($item['input'] == 'year')
+        <script type="text/javascript" src="{{ asset('dist/js/moment.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('dist/js/bootstrap-datepicker.js') }}"></script>
+
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                $("#year").datepicker({
+                    format: " yyyy", // Notice the Extra space at the beginning
+                    viewMode: "years",
+                    minViewMode: "years"
+                });
+            })
+        </script>
     @endif
 @endpush
