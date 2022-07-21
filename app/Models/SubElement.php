@@ -31,4 +31,16 @@ class SubElement extends Model
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function hasSatuan()
+    {
+        return $this->hasOne(Satuan::class, 'id', 'satuan_id');
+    }
+
+    public function getSatuanAttribute()
+    {
+        if ($this->hasSatuan) {
+            return $this->hasSatuan->nama;
+        }
+    }
 }

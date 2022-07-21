@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Element;
 use App\Models\SubElement;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
+use DB;
+use Carbon\Carbon;
 
 class SubElementController extends Controller
 {
@@ -21,19 +24,25 @@ class SubElementController extends Controller
 
     public function configHeaders()
     {
+        $subYear = Carbon::now()->subYears(1)->format('Y');
+
         return [
             [
+                'name'    => 'kode',
+                'alias'    => 'Kode',
+            ],
+            [
                 'name'    => 'nama',
-                'alias'    => 'Nama Element',
+                'alias'    => 'Nama',
             ],
             [
-                'name'    => 'group',
-                'alias'    => 'Group',
+                'name'    => 'satuan',
+                'alias'    => 'Satuan',
             ],
             [
-                'name'    => 'jenis_data',
-                'alias'    => 'Jenis Data',
-            ]
+                'name'    => 'tahun_lalu',
+                'alias'    => $subYear,
+            ],
         ];
     }
     public function configSearch()
@@ -42,19 +51,23 @@ class SubElementController extends Controller
             [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Element',
+                'alias'    => 'Nama',
                 'value'    => null
+            ],
+            [
+                'name'    => 'tahun',
+                'input'    => 'year',
+                'alias'    => 'Tahun',
             ],
         ];
     }
     public function configForm()
     {
 
-        $unit_id =  $unit_id = request()->get('unit_id');
-        $listUnit = [];
-        $checkUnit = Unit::where('id', $unit_id)->first();
+        $Element_id =  $Element_id = request()->get('element_id');
+        $checkElement = Element::where('id', $Element_id)->first();
 
-        if ($checkUnit) {
+        if ($checkElement) {
             return [
                 [
                     'name'    => 'kode',
@@ -70,34 +83,38 @@ class SubElementController extends Controller
                 ],
 
                 [
-                    'name'    => 'group_id',
+                    'name'    => 'satuan_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
+                    'alias'    => 'Satuan',
+                    'value' => $this->combobox('Satuan'),
                     'validasi'    => ['required'],
                 ],
-                [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
-                ],
+
                 [
                     'name'    => 'keterangan',
                     'input'    => 'textarea',
                     'alias'    => 'Keterangan',
                 ],
                 [
-                    'name'    => 'dokumentasi',
+                    'name'    => 'sumber_data',
                     'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
+                    'alias'    => 'Sumber Data',
                 ],
                 [
-                    'name'    => 'unit_id',
+                    'name'    => 'metode_perhitungan',
+                    'input'    => 'textarea',
+                    'alias'    => 'Metode Perhitungan',
+                ],
+                [
+                    'name'    => 'meta_data',
+                    'input'    => 'textarea',
+                    'alias'    => 'Meta Data',
+                ],
+                [
+                    'name'    => 'element_id',
                     'input'    => 'hidden',
-                    'alias'    => 'unit_id',
-                    'value' => $unit_id,
+                    'alias'    => 'element_id',
+                    'value' => $Element_id,
                 ],
             ];
         } else {
@@ -115,35 +132,34 @@ class SubElementController extends Controller
                     'validasi'    => ['required', 'unique', 'min:1'],
                 ],
                 [
-                    'name'    => 'unit_id',
+                    'name'    => 'element_id',
                     'input'    => 'combo',
-                    'alias'    => 'Unit',
-                    'value' => $this->combobox('Unit'),
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element'),
                     'validasi'    => ['required']
                 ],
                 [
-                    'name'    => 'group_id',
+                    'name'    => 'satuan_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
+                    'alias'    => 'Satuan',
+                    'value' => $this->combobox('Satuan'),
                     'validasi'    => ['required'],
                 ],
-                [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
-                ],
+
                 [
                     'name'    => 'keterangan',
                     'input'    => 'textarea',
                     'alias'    => 'Keterangan',
                 ],
                 [
-                    'name'    => 'dokumentasi',
+                    'name'    => 'sumber_data',
                     'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
+                    'alias'    => 'Sumber Data',
+                ],
+                [
+                    'name'    => 'metode_perhitungan',
+                    'input'    => 'textarea',
+                    'alias'    => 'Metode Perhitungan',
                 ],
             ];
         }
@@ -275,13 +291,13 @@ class SubElementController extends Controller
                 $query->where('user_id', Auth::user()->id);
             }
         }
-        $unit_id = request()->get('unit_id');
-        if ($unit_id) {
-            $query = $query->where('unit_id', $unit_id);
-            $unit = Unit::find($unit_id);
-            if ($unit) {
-                $unit = $unit->nama;
-                $title =  ucwords($this->route) . " - " . $unit;
+        $Element_id = request()->get('element_id');
+        if ($Element_id) {
+            $query = $query->where('element_id', $Element_id);
+            $Element = Element::find($Element_id);
+            if ($Element) {
+                $Element = $Element->nama;
+                $title =  ucwords($this->route) . " - " . $Element;
             }
         }
         if ($this->sort) {
@@ -299,12 +315,12 @@ class SubElementController extends Controller
         }
 
         // return $button;
-        $template = 'element.index';
+        $template = 'subelement.index';
         // return  $data;
 
         return view($template,  compact(
             "title",
-            "unit_id",
+            "Element_id",
             "data",
             'searches',
             'hasilSearch',
@@ -386,20 +402,167 @@ class SubElementController extends Controller
         DB::beginTransaction();
         try {
             DB::commit();
-            $element = new Element();
-            $element->kode = $request->kode;
-            $element->nama = $request->nama;
-            $element->group_id = $request->group_id;
-            $element->jenis_data_id = $request->jenis_data_id;
-            $element->keterangan = $request->keterangan;
-            $element->dokumentasi = $request->dokumentasi;
-            $element->unit_id = $request->unit_id;
-            $element->save();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
+            $subElement = new SubElement();
+            $subElement->kode = $request->kode;
+            $subElement->nama = $request->nama;
+            $subElement->keterangan = $request->keterangan;
+            $subElement->sumber_data = $request->sumber_data;
+            $subElement->metode_perhitungan = $request->metode_perhitungan;
+            $subElement->meta_data = $request->meta_data;
+            $subElement->element_id = $request->element_id;
+            $subElement->satuan_id = $request->satuan_id;
+            $subElement->save();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
         }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        //open model
+        $data = $this->model()->find($id);
+        //get dari post form
+        $relationId = [];
+
+        //check extra form
+        if ($this->extraFrom) {
+            foreach ($this->extraFrom as $key => $item) {
+                $fileId = $item . '_id';
+                $relationId[$fileId] = $data->$fileId;
+            }
+        }
+        // return $request;
+        $getRequest = $this->getRequest($request, $id, $relationId);
+        $messages = $getRequest['messages'];
+        $relation = $getRequest['relation'];
+        $validation = $getRequest['validasi'];
+        $form = $getRequest['form'];
+
+
+        //validasi
+        $this->validate(
+            $request,
+            $validation,
+            $messages
+        );
+        //post ke model
+        // $this->model()->transaction();
+        foreach ($form as $index => $item) {
+
+            if (preg_match("/-image/i", $index)) {
+                $route =  $this->route;
+                $file =  str_replace("-image", "", $index);
+                if ($request->hasFile($file)) {
+                    $nama_gambar = Str::slug($route) . '-' . Str::Random(15) . '.' . $request->file($file)->getClientOriginalExtension();
+
+                    $path = public_path('storage/' . $route . '/' . $nama_gambar);
+
+                    if (!Storage::disk('public')->exists($route)) {
+                        Storage::disk('public')->makeDirectory($route);
+                    }
+                    if (!Storage::disk('public')->exists($route . '/thumbnail')) {
+                        Storage::disk('public')->makeDirectory($route . '/thumbnail');
+                    }
+
+                    // delete gambar original
+                    if (Storage::disk('public')->exists($route . '/' . $data->$file)) {
+                        Storage::disk('public')->delete($route . '/' . $data->$file);
+                    }
+
+                    $gambar_original = Image::make($request->file($file))->save($path);
+                    Storage::disk('public')->put($route . '/' . $nama_gambar, $gambar_original);
+
+                    // delete gambar thumbnail
+                    if (Storage::disk('public')->exists($route . '/thumbnail' . '/' . $data->$file)) {
+                        Storage::disk('public')->delete($route . '/thumbnail' . '/' . $data->$file);
+                    }
+                    $thumbnail = Image::make($request->file($file))->resize(720, 720)->save($path);
+                    Storage::disk('public')->put($route . '/thumbnail' . '/' . $nama_gambar, $thumbnail);
+
+                    $data->$file = $nama_gambar;
+                }
+                continue;
+            }
+            if ($index === "password") {
+                $item = bcrypt($item);
+            }
+            if ($this->manyToMany) {
+                # code...
+                if (in_array(str_replace('_id', '', $index), $this->manyToMany)) {
+                    $manyToMany = str_replace('_id', '', $index);
+                    continue;
+                }
+            }
+            if ($this->oneToMany) {
+                if (in_array(str_replace('_id', '', $index), $this->oneToMany)) {
+                    $oneToMany = str_replace('_id', '', $index);
+                    continue;
+                }
+            }
+
+            $data->$index = $item;
+        }
+
+        if (isset($relation)) {
+            $firstColumn = [];
+            if (isset($this->extraFrom)) {
+
+                foreach ($relation as $key => $value) {
+                    $relationsFields = $key . '_id';
+                    $relationModels = '\\App\Models\\' . ucfirst($key);
+                    $relationModels = new $relationModels;
+                    $relationModels = $relationModels->find($data->$relationsFields);
+                    if ($relationModels) {
+                        foreach ($value as $colom => $val) {
+                            if ($colom === "password") {
+                                $val = bcrypt($val);
+                            }
+                            if (in_array(str_replace('_id', '', $colom), $this->manyToMany)) {
+                                $manyToMany = str_replace('_id', '', $colom);
+                                $valueMany[$manyToMany] = $val;
+                                continue;
+                            }
+                            $relationModels->$colom = $val;
+                        }
+                        $relationModels->save();
+                        if (isset($manyToMany)) {
+                            $relationModels->$manyToMany()->sync($valueMany);
+                        }
+                    }
+                }
+            }
+        }
+
+        $data->save();
+
+        if (isset($this->manyToMany)) {
+            if (!isset($this->extraFrom)) {
+                foreach ($this->manyToMany as  $value) {
+                    $hasRalation = 'has' . ucfirst($value);
+                    $valueField = $data->$hasRalation()->sync($form[$value]);
+                }
+            }
+        }
+
+        if (isset($this->oneToMany)) {
+            foreach ($this->oneToMany as $index => $value) {
+                $hasRalation = 'has' . ucfirst($value);
+                $idRelation = $value . '_id';
+
+                $valueField = $data->$hasRalation()->sync($form[$idRelation]);
+            }
+        }
+
+        return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
     }
     public function model()
     {

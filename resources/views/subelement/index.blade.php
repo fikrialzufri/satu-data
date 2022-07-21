@@ -1,5 +1,5 @@
 @extends('template.app')
-@section('title', ucwords(str_replace([':', '_', '-', '*'], ' ', $title)))
+@section('title', ucwords(str_replace([':', '_', '*'], ' ', $title)))
 @section('content')
 
     <div class="container-fluid">
@@ -8,13 +8,13 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h3 class="card-title">Daftar {{ ucwords(str_replace([':', '_', '-', '*'], ' ', $title)) }}
+                        <h3 class="card-title">Daftar {{ ucwords(str_replace([':', '_', '*'], ' ', $title)) }}
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
                             @if ($tambah == 'true')
                                 @canany(['edit-' . $route, 'delete-' . $route])
-                                    <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
+                                    <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
                                         class="btn btn-sm btn-primary float-right text-light">
                                         <i class="fa fa-plus"></i> Tambah Data
                                     </a>
@@ -58,7 +58,6 @@
                             <thead>
                                 <tr>
                                     <th width="5%" class="text-center">No</th>
-                                    <th class="text-center">Element</th>
                                     @foreach ($configHeaders as $key => $header)
                                         @if (isset($header['alias']))
                                             <th class="text-center">{{ ucfirst($header['alias']) }}</th>
@@ -78,21 +77,6 @@
                                     <tr>
                                         <td class="text-center">
                                             {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
-                                        <td>
-                                            <a href="{{ route('sub_element.index') }}?element_id={{ $item->id }}">
-
-                                                <div style='background-color:#19b159; color:white; width:100%; '
-                                                    class="badge badge-pill mb-1 d-flex justify-content-between">
-
-                                                    <i class="fa fa-plus"></i>
-                                                    <span>
-
-                                                        {{ $item->total_sub_element }} Element Data
-                                                    </span>
-                                                    <span></span>
-                                                </div>
-                                            </a>
-                                        </td>
                                         @foreach ($configHeaders as $key => $header)
                                             @if (isset($header['input']))
                                                 @if ($header['input'] == 'rupiah')

@@ -8,6 +8,7 @@ use App\Http\Controllers\JenisUnitController;
 use App\Http\Controllers\LegendaController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SatuanController;
+use App\Http\Controllers\SubElementController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -40,6 +41,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Element
     Route::resource('element', ElementController::class);
+    Route::resource('sub_element', SubElementController::class);
     Route::resource('jenis_data', JenisDataController::class);
     Route::resource('jenis_unit', JenisUnitController::class);
     Route::resource('group', GroupController::class);
