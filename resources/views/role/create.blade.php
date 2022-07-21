@@ -32,11 +32,12 @@
                                 @endif
                             </div>
                             <div class="form-group">
-                                <table class="table table-bordered table-striped" border='10' style=" text-align:center;">
+                                <table class="table table-bordered table-striped" border='10'>
                                     <thead>
                                         <tr>
                                             <th scope="col" rowspan="2" class="text-center"
-                                                style="vertical-align:middle">Tugas</th>
+                                                style="vertical-align:middle">
+                                                Tugas</th>
                                             <th scope="col" colspan="5" class="text-center">Hak Akses</th>
                                         </tr>
                                         <tr>
@@ -44,22 +45,7 @@
 
                                                 Pilih Semua
                                             </th>
-                                            <th scope="col" class="text-center">
-
-                                                Tambah
-                                            </th>
-                                            <th scope="col" class="text-center">
-
-                                                Hapus
-                                            </th>
-                                            <th scope="col" class="text-center">
-
-                                                Edit
-                                            </th>
-                                            <th scope="col" class="text-center">
-
-                                                Lihat
-                                            </th>
+                                            <th scope="col" colspan="5" class="text-center">Modul</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -72,16 +58,18 @@
                                                     <input type="checkbox" name="izin" value="{{ $task->slug }}"
                                                         class="checkAll checkAll{{ $task->slug }}" />
                                                 </th>
-                                                @foreach ($task->permissions as $permission)
-                                                    <td class="{{ $task->slug }}">
-                                                        <div class=" hak{{ $task->slug }}">
-                                                            <input type="checkbox" name="izin_akses[]"
-                                                                value="{{ $permission->id }}"
-                                                                class="check{{ $task->slug }} hakakses"
-                                                                id="{{ $permission->name }}" />
-                                                        </div>
-                                                    </td>
-                                                @endforeach
+                                                <th>
+                                                    @foreach ($task->permissions as $permission)
+                                                        <input type="checkbox" name="izin_akses[]"
+                                                            value="{{ $permission->id }}"
+                                                            class="check{{ $task->slug }} hakakses"
+                                                            id="{{ $permission->name }}" />
+                                                        <span class="pr-3 ">
+
+                                                            {{ $permission->slug }}
+                                                        </span>
+                                                    @endforeach
+                                                </th>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -108,12 +96,6 @@
     @push('script')
         <script>
             $(function() {
-                $("#nama").keypress(function() {
-                    $("#nama").removeClass("is-invalid");
-                    $("#textNama").html("");
-                });
-
-
                 $(".checkAll").on('change', function() {
                     if ($(this).is(':checked')) {
                         $(".check" + this.value).prop('checked', true);
@@ -127,16 +109,41 @@
 
                     var countChecked = $('.' + classParent + ':checked').length;
 
-                    var parentClass = $(this).closest('td').attr('class');
+                    var parentClass = $(this).attr('class');
 
-                    if (countChecked == 4) {
-                        $(".checkAll" + parentClass).prop('checked', true);
+                    var parentClassAll = classParent.replace("check", "");
+
+                    if (countChecked == $('.' + classParent).length) {
+                        $('.checkAll' + parentClassAll).prop('checked', true);
                     } else {
-                        $(".checkAll" + parentClass).prop('checked', false);
+                        $('.checkAll' + parentClassAll).prop('checked', false);
                     }
+
                 });
 
+                var arrayClassParent = $(".hakakses")
+                    .map(function() {
+                        var header = $(this).attr('class');
+                        return header.replace(" hakakses", "");
 
+                    }).toArray();
+                // var classParentEdit = headerEdit.replace(" hakakses", "");
+
+                // var countCheckedEdit = $('.' + classParentEdit + ':checked').length;
+                var uniqueNames = [];
+                $.each(arrayClassParent, function(i, el) {
+                    if ($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+                });
+
+                $.each(uniqueNames, function(index, value) {
+                    var countChecked = $('.' + value + ':checked').length;
+
+                    var parentClass = $('.' + value).closest('td').attr('class');
+                    if (countChecked == 4) {
+
+                        $(".checkAll" + parentClass).prop('checked', true);
+                    }
+                });
             });
         </script>
     @endpush

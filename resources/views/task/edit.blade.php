@@ -21,7 +21,8 @@
                                     <label for="nama" class=" form-control-label">Nama {{ $title }}</label>
                                 </div>
                                 <div>
-                                    <input type="text" name="name" id="nama" placeholder="Nama {{ $title }}"
+                                    <input type="text" name="name" id="nama"
+                                        placeholder="Nama {{ $title }}"
                                         class="form-control  {{ $errors->has('name') ? 'form-control is-invalid' : 'form-control' }}"
                                         value="{{ $task->name }}" required>
                                 </div>
@@ -37,8 +38,8 @@
                                         {{ ucfirst($route) }}</label>
                                 </div>
                                 <div>
-                                    <input type="text" name="description" placeholder="Description {{ ucfirst($route) }}"
-                                        id="description"
+                                    <input type="text" name="description"
+                                        placeholder="Description {{ ucfirst($route) }}" id="description"
                                         class="form-control  {{ $errors->has('description') ? 'form-control is-invalid' : 'form-control' }}"
                                         value="{{ $task->description }}" required>
                                 </div>
@@ -47,6 +48,38 @@
                                         <strong id="textDescription">{{ $errors->first('name') }}</strong>
                                     </span>
                                 @endif
+                            </div>
+
+                            <div class="form-group">
+                                <table class="table table-bordered table-striped" border='10'
+                                    style=" text-align:center;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center" style="vertical-align:middle">Tugas</th>
+                                            <th scope="col" class="text-center" style="vertical-align:middle">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach ($task->permissions as $permission)
+                                            <tr>
+                                                <td class="{{ $task->name }}">
+                                                    <div class=" hak{{ $task->name }}">
+                                                        {{ $permission->name }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                                        data-placement="top" title="Hapus"
+                                                        onclick=deleteconf("{{ $permission->id }}")>
+                                                        <i class="fa fa-trash"></i> Hapus
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
