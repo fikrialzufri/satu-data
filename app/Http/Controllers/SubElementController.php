@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Element;
+use App\Models\Legenda;
 use App\Models\SubElement;
+use App\Models\SubElementTahun;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
+use DB;
+use Carbon\Carbon;
 
 class SubElementController extends Controller
 {
@@ -23,38 +28,75 @@ class SubElementController extends Controller
     {
         return [
             [
+                'name'    => 'kode',
+                'alias'    => 'Kode',
+            ],
+            [
                 'name'    => 'nama',
-                'alias'    => 'Nama Element',
+                'alias'    => 'Nama',
             ],
             [
-                'name'    => 'group',
-                'alias'    => 'Group',
-            ],
-            [
-                'name'    => 'jenis_data',
-                'alias'    => 'Jenis Data',
+                'name'    => 'satuan',
+                'alias'    => 'Satuan',
             ]
         ];
     }
     public function configSearch()
     {
-        return [
-            [
-                'name'    => 'nama',
-                'input'    => 'text',
-                'alias'    => 'Nama Element',
-                'value'    => null
-            ],
-        ];
+        $Element_id = request()->get('element_id');
+        $checkElement = Element::where('id', $Element_id)->first();
+        if ($checkElement) {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'hidden',
+                    'alias'    => 'element_id',
+                    'value' => $Element_id,
+                ],
+            ];
+        } else {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'combo',
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element'),
+                    'validasi'    => ['required']
+                ],
+            ];
+        }
     }
     public function configForm()
     {
 
-        $unit_id =  $unit_id = request()->get('unit_id');
-        $listUnit = [];
-        $checkUnit = Unit::where('id', $unit_id)->first();
+        $Element_id =  $Element_id = request()->get('element_id');
+        $checkElement = Element::where('id', $Element_id)->first();
 
-        if ($checkUnit) {
+        if ($checkElement) {
             return [
                 [
                     'name'    => 'kode',
@@ -70,34 +112,38 @@ class SubElementController extends Controller
                 ],
 
                 [
-                    'name'    => 'group_id',
+                    'name'    => 'satuan_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
+                    'alias'    => 'Satuan',
+                    'value' => $this->combobox('Satuan'),
                     'validasi'    => ['required'],
                 ],
-                [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
-                ],
+
                 [
                     'name'    => 'keterangan',
                     'input'    => 'textarea',
                     'alias'    => 'Keterangan',
                 ],
                 [
-                    'name'    => 'dokumentasi',
+                    'name'    => 'sumber_data',
                     'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
+                    'alias'    => 'Sumber Data',
                 ],
                 [
-                    'name'    => 'unit_id',
+                    'name'    => 'metode_perhitungan',
+                    'input'    => 'textarea',
+                    'alias'    => 'Metode Perhitungan',
+                ],
+                [
+                    'name'    => 'meta_data',
+                    'input'    => 'textarea',
+                    'alias'    => 'Meta Data',
+                ],
+                [
+                    'name'    => 'element_id',
                     'input'    => 'hidden',
-                    'alias'    => 'unit_id',
-                    'value' => $unit_id,
+                    'alias'    => 'element_id',
+                    'value' => $Element_id,
                 ],
             ];
         } else {
@@ -115,35 +161,34 @@ class SubElementController extends Controller
                     'validasi'    => ['required', 'unique', 'min:1'],
                 ],
                 [
-                    'name'    => 'unit_id',
+                    'name'    => 'element_id',
                     'input'    => 'combo',
-                    'alias'    => 'Unit',
-                    'value' => $this->combobox('Unit'),
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element'),
                     'validasi'    => ['required']
                 ],
                 [
-                    'name'    => 'group_id',
+                    'name'    => 'satuan_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
+                    'alias'    => 'Satuan',
+                    'value' => $this->combobox('Satuan'),
                     'validasi'    => ['required'],
                 ],
-                [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
-                ],
+
                 [
                     'name'    => 'keterangan',
                     'input'    => 'textarea',
                     'alias'    => 'Keterangan',
                 ],
                 [
-                    'name'    => 'dokumentasi',
+                    'name'    => 'sumber_data',
                     'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
+                    'alias'    => 'Sumber Data',
+                ],
+                [
+                    'name'    => 'metode_perhitungan',
+                    'input'    => 'textarea',
+                    'alias'    => 'Metode Perhitungan',
                 ],
             ];
         }
@@ -203,7 +248,7 @@ class SubElementController extends Controller
             $hasilSearch[$val['name']] = $search[$key];
 
             if ($search[$key]) {
-                if ($val['input'] != 'daterange') {
+                if ($val['input'] != 'daterange' && $val['input'] != 'year') {
                     # code...
                     $searchValues[$key] = preg_split('/\s+/', $search[$key], -1, PREG_SPLIT_NO_EMPTY);
 
@@ -248,18 +293,6 @@ class SubElementController extends Controller
                     if (count($queryArray) > 0) {
                         $query->where($queryArray);
                     }
-                } else {
-                    $date = explode(' - ', request()->input($val['name']));
-                    $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
-                    $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
-                    $query = $query->whereBetween(DB::raw('DATE(' . $val['name'] . ')'), array($start, $end));
-
-                    $export .= 'from=' . $start . '&to=' . $end;
-                    $countAll = $countAll + 1;
-                }
-
-                if ($countAll == 0) {
-                    $query->where('id',  "");
                 }
             }
             $export .= $val['name'] . '=' . $search[$key] . '&';
@@ -275,13 +308,14 @@ class SubElementController extends Controller
                 $query->where('user_id', Auth::user()->id);
             }
         }
-        $unit_id = request()->get('unit_id');
-        if ($unit_id) {
-            $query = $query->where('unit_id', $unit_id);
-            $unit = Unit::find($unit_id);
-            if ($unit) {
-                $unit = $unit->nama;
-                $title =  ucwords($this->route) . " - " . $unit;
+        $Element_id = request()->get('element_id');
+        $checkElement = Element::where('id', $Element_id)->first();
+        if ($checkElement) {
+            $query = $query->where('element_id', $Element_id);
+            $Element = Element::find($Element_id);
+            if ($Element) {
+                $Element = $Element->nama;
+                $title =  ucwords($this->route) . " - " . $Element;
             }
         }
         if ($this->sort) {
@@ -293,18 +327,34 @@ class SubElementController extends Controller
         }
         //mendapilkan data model setelah query pencarian
         if ($paginate) {
+            // return $data = $query->toSql();
             $data = $query->paginate($paginate);
         } else {
             $data = $query->get();
         }
+        $listLegenda = Legenda::orderBy('nama')->get();
 
+        $year = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $year = request()->get('tahun');
+        }
+
+
+        $subYear = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('tahun') != null) {
+            $subYear = request()->get('tahun') - 1;
+        }
         // return $button;
-        $template = 'element.index';
+        $template = 'subelement.index';
         // return  $data;
 
         return view($template,  compact(
             "title",
-            "unit_id",
+            "Element_id",
+            'listLegenda',
+            'subYear',
+            'year',
             "data",
             'searches',
             'hasilSearch',
@@ -356,6 +406,7 @@ class SubElementController extends Controller
             }
         }
 
+
         return view('template.form', compact(
             'title',
             'form',
@@ -386,20 +437,81 @@ class SubElementController extends Controller
         DB::beginTransaction();
         try {
             DB::commit();
-            $element = new Element();
-            $element->kode = $request->kode;
-            $element->nama = $request->nama;
-            $element->group_id = $request->group_id;
-            $element->jenis_data_id = $request->jenis_data_id;
-            $element->keterangan = $request->keterangan;
-            $element->dokumentasi = $request->dokumentasi;
-            $element->unit_id = $request->unit_id;
-            $element->save();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
+            $subElement = new SubElement();
+            $subElement->kode = $request->kode;
+            $subElement->nama = $request->nama;
+            $subElement->keterangan = $request->keterangan;
+            $subElement->sumber_data = $request->sumber_data;
+            $subElement->metode_perhitungan = $request->metode_perhitungan;
+            $subElement->meta_data = $request->meta_data;
+            $subElement->element_id = $request->element_id;
+            $subElement->satuan_id = $request->satuan_id;
+            $subElement->save();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
         }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+
+        //open model
+        $data = $this->model()->find($id);
+        //get dari post form
+        $relationId = [];
+
+        //check extra form
+        // return $request;
+        $getRequest = $this->getRequest($request, $id, $relationId);
+        $messages = $getRequest['messages'];
+        $validation = $getRequest['validasi'];
+        $form = $getRequest['form'];
+
+        //validasi
+        $this->validate(
+            $request,
+            $validation,
+            $messages
+        );
+        //post ke model
+        DB::beginTransaction();
+
+        try {
+            DB::commit();
+            foreach ($form as $index => $item) {
+                $data->$index = $item;
+            }
+            $data->save();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+        }
+    }
+
+    public function nilai(Request $request)
+    {
+        $subElement = SubElementTahun::where('sub_element_id', $request->id)->where('tahun',  $request->tahun)->first();
+
+        if (!$subElement) {
+            $subElement = new SubElementTahun;
+        }
+
+        $subElement->sub_element_id = $request->id;
+        $subElement->tahun = $request->tahun;
+        $subElement->nilai = $request->value;
+        $subElement->legenda_id = $request->legenda_id;
+        $subElement->save();
+
+        return $this->sendResponse($subElement, "sukses", 200);
     }
     public function model()
     {

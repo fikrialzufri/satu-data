@@ -6,7 +6,7 @@
         <span class="float-none float-sm-right mt-1 mt-sm-0 text-center">
             {{ __('Developed by') }}
             <a href="https://borneocorner.com/" class="text-dark" target="_blank">
-                {{ __('Borneo Corner') }}
+                {{ __('CV. Meja Belakang Teknologi') }}
             </a>
         </span>
     </div>

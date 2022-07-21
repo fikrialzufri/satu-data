@@ -31,4 +31,46 @@ class SubElement extends Model
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function hasSatuan()
+    {
+        return $this->hasOne(Satuan::class, 'id', 'satuan_id');
+    }
+
+    public function getSatuanAttribute()
+    {
+        if ($this->hasSatuan) {
+            return $this->hasSatuan->nama;
+        }
+    }
+
+    public function hasSubElementTahunAll()
+    {
+        return $this->hasMany(SubElementTahun::class, 'sub_element_id');
+    }
+    public function hasSubElementTahun($tahun)
+    {
+        $data = $this->hasSubElementTahunAll()->where('tahun', $tahun)->first();
+        $nilai = 0;
+        if ($data) {
+            $nilai = $data->nilai;
+        }
+        return $nilai;
+    }
+    public function hasSubElementLegend($tahun)
+    {
+        $data = $this->hasSubElementTahunAll()->where('tahun', $tahun)->first();
+        $legenda_id = "";
+        if ($data) {
+            $legenda_id = $data->legenda_id;
+        }
+        return $legenda_id;
+    }
+
+    public function getElementNilaiAttribute()
+    {
+        if ($this->hasSubElementTahun) {
+            return $this->hasSubElementTahun;
+        }
+    }
 }

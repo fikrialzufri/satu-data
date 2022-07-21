@@ -53,4 +53,20 @@ class Element extends Model
             return $this->hasGroup->nama;
         }
     }
+
+    public function hasSubElement()
+    {
+        return $this->hasMany(SubElement::class, 'element_id');
+    }
+
+    public function getTotalSubElementAttribute()
+    {
+        $total = "";
+        if ($this->hasSubElement) {
+
+            $total = $this->hasSubElement()->count();
+        }
+
+        return $total;
+    }
 }

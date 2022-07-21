@@ -16,12 +16,12 @@ class CreateSubElementsTable extends Migration
         Schema::create('sub_element', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('kode');
+            $table->string('nama');
             $table->string('slug');
-            $table->float('nilai', 20, 3);
             $table->longText('keterangan')->nullable();;
             $table->longText('sumber_data')->nullable();;
             $table->longText('metode_perhitungan')->nullable();
-            $table->year('tahun');
+
             $table->longText('meta_data')->nullable();;
             $table->string('satuan_id')->references('id')->on('satuan')->onDelete('cascade');
             $table->string('element_id')->references('id')->on('element')->onDelete('cascade');

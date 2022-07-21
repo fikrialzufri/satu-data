@@ -109,8 +109,7 @@
             <div class="form-group row">
                 <div class="col-sm-3">
                     <div class="input-group ">
-                        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                            class="form-control"
+                        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" class="form-control"
                             @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
                             placeholder="Isi {{ $item['name'] }}">
                         <span class="input-group-append">
@@ -121,6 +120,11 @@
             </div>
         @endif
         @if ($item['input'] == 'datetimepicker')
+            <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
+                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
+                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
+        @endif
+        @if ($item['input'] == 'year')
             <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
                 @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
                 class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
@@ -183,7 +187,7 @@
 
 @push('head')
     @if (isset($item['input']))
-        @if ($item['input'] == 'datetimepicker')
+        @if ($item['input'] == 'datetimepicker' || $item['input'] == 'year')
             <link rel="stylesheet" type="text/css"
                 href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         @endif
@@ -336,6 +340,37 @@
                             locale: {
                                 format: 'DD/M/Y HH:mm:ss'
                             }
+                        })
+                    })
+                </script>
+            @endif
+        @endif
+        @if ($item['input'] == 'year')
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+            <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css"
+                rel="stylesheet" />
+
+            @if ($store == 'update')
+                <script type="text/javascript">
+                    $(document).ready(function() {
+                        $("#{{ $item['name'] }}").datepicker({
+                            format: "yyyy",
+                            viewMode: "years",
+                            minViewMode: "years"
+                        })
+                    })
+                </script>
+            @else
+                <script type="text/javascript">
+                    $(document).ready(function() {
+
+                        $("#{{ $item['name'] }}").datepicker({
+                            format: " yyyy", // Notice the Extra space at the beginning
+                            viewMode: "years",
+                            minViewMode: "years"
+
                         })
                     })
                 </script>
