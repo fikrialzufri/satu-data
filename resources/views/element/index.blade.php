@@ -12,20 +12,23 @@
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
-                            @if ($tambah == 'true')
-                                @canany(['edit-' . $route, 'delete-' . $route])
-                                    <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
-                                        class="btn btn-sm btn-primary float-right text-light">
-                                        <i class="fa fa-plus"></i> Tambah Data
-                                    </a>
-                                @endcan
-                            @endif
-                            @if ($upload == 'true')
-                                <a href="{{ route($route . '.upload') }}"
-                                    class="btn btn-sm btn-warning float-right text-light mr-5">
+
+                            @canany(['upload-' . $route])
+                                <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Upload
                                 </a>
-                            @endif
+                            @endcan
+                            @canany(['download-' . $route])
+                                <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
+                                    <i class="fa fa-file"></i> Download
+                                </a>
+                            @endcan
+                            @canany(['create-' . $route])
+                                <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
+                                    class="btn btn-sm btn-primary float-right text-light">
+                                    <i class="fa fa-plus"></i> Tambah Data
+                                </a>
+                            @endcan
                         </div>
                     </div>
                     <!-- /.card-header -->
@@ -84,7 +87,7 @@
                                                 <div style='background-color:#19b159; color:white; width:100%; '
                                                     class="badge badge-pill mb-1 d-flex justify-content-between">
 
-                                                    <i class="fa fa-plus"></i>
+                                                    <i class="fa fa-plus pr-2"></i>
                                                     <span>
 
                                                         {{ $item->total_sub_element }} Element Data

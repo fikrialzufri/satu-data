@@ -75,6 +75,11 @@ class UsersTableSeedeer extends Seeder
         $taskElement->description = 'Manajemen Element';
         $taskElement->save();
 
+        $taskSubElement = new Task();
+        $taskSubElement->name = 'Sub Element';
+        $taskSubElement->description = 'Manajemen Sub Element';
+        $taskSubElement->save();
+
         $taskGroup = new Task();
         $taskGroup->name = 'Group';
         $taskGroup->description = 'Manajemen Group';
@@ -95,10 +100,6 @@ class UsersTableSeedeer extends Seeder
         $taskUnit->description = 'Manajemen Unit';
         $taskUnit->save();
 
-        $taskSubUnit = new Task();
-        $taskSubUnit->name = 'Sub Unit';
-        $taskSubUnit->description = 'Manajemen Sub Unit';
-        $taskSubUnit->save();
 
         $taskLegenda = new Task();
         $taskLegenda->name = 'Legenda';
@@ -135,20 +136,45 @@ class UsersTableSeedeer extends Seeder
         }
 
         $taskElementPermissiion = Task::where('name', 'Element')->first();
+        $taskSubElementPermissiion = Task::where('name', 'Sub Element')->first();
 
         if ($taskElementPermissiion) {
             $dataElement = array(
 
                 [
-                    'name'    => 'Download ' . $name,
+                    'name'    => 'Download Element',
                     'task_id' =>  $taskElement->id
                 ],
                 [
-                    'name'    => 'Import ' . $name,
+                    'name'    => 'Import Element',
                     'task_id' =>  $taskElement->id
                 ],
             );
             foreach ($dataElement as $element) {
+                $Permission = Permission::Create($element);
+            }
+        }
+        if ($taskSubElementPermissiion) {
+            $dataSubElement = array(
+
+                [
+                    'name'    => 'Download Sub Element',
+                    'task_id' =>  $taskSubElementPermissiion->id
+                ],
+                [
+                    'name'    => 'Import Sub Element',
+                    'task_id' =>  $taskSubElementPermissiion->id
+                ],
+                [
+                    'name'    => 'Input Nilai Sub Element',
+                    'task_id' =>  $taskSubElementPermissiion->id
+                ],
+                [
+                    'name'    => 'Edit Legenda Sub Element',
+                    'task_id' =>  $taskSubElementPermissiion->id
+                ],
+            );
+            foreach ($dataSubElement as $element) {
                 $Permission = Permission::Create($element);
             }
         }

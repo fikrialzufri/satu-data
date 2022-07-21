@@ -87,12 +87,6 @@
                                     Hak Akses
                                 </a>
                             @endcan
-                            @role('superadmin')
-                                <a href="{{ route('task.index') }}"
-                                    class="menu-item {{ $segment1 == 'task' ? 'active' : '' }}">
-                                    Task
-                                </a>
-                            @endrole
                         </div>
                     </div>
                 @endcan
