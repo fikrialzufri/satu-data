@@ -27,6 +27,10 @@ class ElementController extends Controller
     {
         return [
             [
+                'name'    => 'kode_hasil',
+                'alias'    => 'Kode',
+            ],
+            [
                 'name'    => 'nama',
                 'alias'    => 'Nama Element',
             ],
@@ -280,11 +284,9 @@ class ElementController extends Controller
         }
         $unit_id = request()->get('unit_id');
 
-        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
 
-            $unit_id =  auth()->user()->id_unit;
-            $query->where('unit_id', $unit_id);
-        } else {
+
             $unit_id = request()->get('unit_id');
             if ($unit_id) {
                 $query = $query->where('unit_id', $unit_id);
@@ -294,6 +296,9 @@ class ElementController extends Controller
                     $title =  ucwords($this->route) . " - " . $unit;
                 }
             }
+        } else {
+            $unit_id =  auth()->user()->id_unit;
+            $query->where('unit_id', $unit_id);
         }
         if ($this->sort) {
             if ($this->desc) {
@@ -392,18 +397,11 @@ class ElementController extends Controller
             'kode' => 'required',
         ], $messages);
 
-        $kodeGroup = "";
-        $group_id = $request->get('group_id');
-        $checkGroup = Group::find($group_id);
-        if ($checkGroup) {
-            $kodeGroup = $checkGroup->kode;
-        }
-
         DB::beginTransaction();
         try {
             DB::commit();
             $element = new Element();
-            $element->kode = $kodeGroup . "." . $request->kode;
+            $element->kode =  $request->kode;
             $element->nama = $request->nama;
             $element->group_id = $request->group_id;
             $element->jenis_data_id = $request->jenis_data_id;
@@ -449,7 +447,7 @@ class ElementController extends Controller
             DB::commit();
             $element = Element::find($id);
 
-            $element->kode = $kodeGroup . "." . $request->kode;
+            $element->kode =  $request->kode;
             $element->nama = $request->nama;
             $element->group_id = $request->group_id;
             $element->jenis_data_id = $request->jenis_data_id;

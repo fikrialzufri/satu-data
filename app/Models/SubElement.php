@@ -48,6 +48,12 @@ class SubElement extends Model
     {
         return $this->hasMany(SubElementTahun::class, 'sub_element_id');
     }
+
+    public function hasElement()
+    {
+        return $this->hasOne(Element::class, 'id', 'element_id');
+    }
+
     public function hasSubElementTahun($tahun)
     {
         $data = $this->hasSubElementTahunAll()->where('tahun', $tahun)->first();
@@ -72,5 +78,17 @@ class SubElement extends Model
         if ($this->hasSubElementTahun) {
             return $this->hasSubElementTahun;
         }
+    }
+
+    public function getElementKodeHasilAttribute()
+    {
+        if ($this->hasElement) {
+            return $this->hasElement->kode_hasil;
+        }
+    }
+
+    public function getKodeHasilAttribute()
+    {
+        return $this->element_kode_hasil . "." . $this->kode;
     }
 }

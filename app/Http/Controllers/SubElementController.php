@@ -28,7 +28,7 @@ class SubElementController extends Controller
     {
         return [
             [
-                'name'    => 'kode',
+                'name'    => 'kode_hasil',
                 'alias'    => 'Kode',
             ],
             [
@@ -43,52 +43,28 @@ class SubElementController extends Controller
     }
     public function configSearch()
     {
-        $Element_id = request()->get('element_id');
-        $checkElement = Element::where('id', $Element_id)->first();
-        if ($checkElement) {
-            return [
-                [
-                    'name'    => 'nama',
-                    'input'    => 'text',
-                    'alias'    => 'Nama',
-                    'value'    => null
-                ],
-                [
-                    'name'    => 'tahun',
-                    'input'    => 'year',
-                    'default'    => 'year',
-                    'alias'    => 'Tahun',
-                ],
-                [
-                    'name'    => 'element_id',
-                    'input'    => 'hidden',
-                    'alias'    => 'element_id',
-                    'value' => $Element_id,
-                ],
-            ];
-        } else {
-            return [
-                [
-                    'name'    => 'nama',
-                    'input'    => 'text',
-                    'alias'    => 'Nama',
-                    'value'    => null
-                ],
-                [
-                    'name'    => 'tahun',
-                    'input'    => 'year',
-                    'default'    => 'year',
-                    'alias'    => 'Tahun',
-                ],
-                [
-                    'name'    => 'element_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Element',
-                    'value' => $this->combobox('Element'),
-                    'validasi'    => ['required']
-                ],
-            ];
-        }
+        $unit_id =  auth()->user()->id_unit;
+        return [
+            [
+                'name'    => 'nama',
+                'input'    => 'text',
+                'alias'    => 'Nama',
+                'value'    => null
+            ],
+            [
+                'name'    => 'tahun',
+                'input'    => 'year',
+                'default'    => 'year',
+                'alias'    => 'Tahun',
+            ],
+            [
+                'name'    => 'element_id',
+                'input'    => 'combo',
+                'alias'    => 'Element',
+                'value' => $this->combobox('Element', 'unit_id', '=', $unit_id),
+                'validasi'    => ['required']
+            ],
+        ];
     }
     public function configForm()
     {
@@ -314,6 +290,7 @@ class SubElementController extends Controller
             }
         }
         $Element_id = request()->get('element_id');
+
         if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
             $unit_id =  auth()->user()->id_unit;
             $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
@@ -332,6 +309,7 @@ class SubElementController extends Controller
                 }
             }
         }
+
 
         if ($this->sort) {
             if ($this->desc) {
@@ -455,16 +433,9 @@ class SubElementController extends Controller
         DB::beginTransaction();
         try {
 
-            $kodeElement = "";
-            $checkElement = Element::find($element_id)->first();
-            if ($checkElement) {
-                $kodeElement = $checkElement->kode;
-            }
-            $kode = $kodeElement . "." . $request->kode;
-
             DB::commit();
             $subElement = new SubElement();
-            $subElement->kode = $kode;
+            $subElement->kode = $request->kode;
             $subElement->nama = $request->nama;
             $subElement->keterangan = $request->keterangan;
             $subElement->sumber_data = $request->sumber_data;
@@ -506,17 +477,9 @@ class SubElementController extends Controller
 
         DB::beginTransaction();
         try {
-
-            $kodeElement = "";
-            $checkElement = Element::find($element_id)->first();
-            if ($checkElement) {
-                $kodeElement = $checkElement->kode;
-            }
-            $kode = $kodeElement . "." . $request->kode;
-
             DB::commit();
             $subElement = SubElement::find($id);
-            $subElement->kode = $kode;
+            $subElement->kode =  $request->kode;
             $subElement->nama = $request->nama;
             $subElement->keterangan = $request->keterangan;
             $subElement->sumber_data = $request->sumber_data;

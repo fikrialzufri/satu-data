@@ -24,6 +24,9 @@ class Element extends Model
         'jenis_data_id',
         'user_id',
     ];
+    protected $append = [
+        'kode_hasil',
+    ];
 
     public function setNamaAttribute($value)
     {
@@ -53,6 +56,12 @@ class Element extends Model
             return $this->hasGroup->nama;
         }
     }
+    public function getKodeGroupAttribute()
+    {
+        if ($this->hasGroup) {
+            return $this->hasGroup->kode;
+        }
+    }
     public function hasUnit()
     {
         return $this->hasOne(Unit::class, 'id', 'unit_id');
@@ -79,5 +88,10 @@ class Element extends Model
         }
 
         return $total;
+    }
+
+    public function getKodeHasilAttribute()
+    {
+        return $this->kode_group . "." . $this->kode;
     }
 }
