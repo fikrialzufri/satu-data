@@ -48,6 +48,12 @@ class GroupController extends Controller
 
         return [
             [
+                'name'    => 'kode',
+                'input'    => 'text',
+                'alias'    => 'Kode Group',
+                'validasi'    => ['required', 'unique', 'min:1'],
+            ],
+            [
                 'name'    => 'nama',
                 'input'    => 'text',
                 'alias'    => 'Nama Group',

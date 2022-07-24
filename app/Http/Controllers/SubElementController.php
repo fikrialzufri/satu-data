@@ -18,10 +18,10 @@ class SubElementController extends Controller
     public function __construct()
     {
         $this->route = 'sub_element';
-        $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
-        $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
-        $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
-        $this->middleware('permission:delete-' . $this->route, ['only' => ['delete']]);
+        $this->middleware('permission:view-sub-element', ['only' => ['index', 'show']]);
+        $this->middleware('permission:create-sub-element', ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit-sub-element', ['only' => ['edit', 'update']]);
+        $this->middleware('permission:delete-sub-element', ['only' => ['delete']]);
     }
 
     public function configHeaders()
@@ -102,13 +102,13 @@ class SubElementController extends Controller
                     'name'    => 'kode',
                     'input'    => 'text',
                     'alias'    => 'Kode',
-                    'validasi'    => ['required', 'unique', 'min:1'],
+                    'validasi'    => ['required', 'min:1'],
                 ],
                 [
                     'name'    => 'nama',
                     'input'    => 'text',
                     'alias'    => 'Nama',
-                    'validasi'    => ['required', 'unique', 'min:1'],
+                    'validasi'    => ['required', 'min:1'],
                 ],
 
                 [
@@ -152,13 +152,13 @@ class SubElementController extends Controller
                     'name'    => 'kode',
                     'input'    => 'text',
                     'alias'    => 'Kode',
-                    'validasi'    => ['required', 'unique', 'min:1'],
+                    'validasi'    => ['required', 'min:1'],
                 ],
                 [
                     'name'    => 'nama',
                     'input'    => 'text',
                     'alias'    => 'Nama',
-                    'validasi'    => ['required', 'unique', 'min:1'],
+                    'validasi'    => ['required', 'min:1'],
                 ],
                 [
                     'name'    => 'element_id',
@@ -184,6 +184,11 @@ class SubElementController extends Controller
                     'name'    => 'sumber_data',
                     'input'    => 'textarea',
                     'alias'    => 'Sumber Data',
+                ],
+                [
+                    'name'    => 'meta_data',
+                    'input'    => 'textarea',
+                    'alias'    => 'Meta Data',
                 ],
                 [
                     'name'    => 'metode_perhitungan',
@@ -309,15 +314,25 @@ class SubElementController extends Controller
             }
         }
         $Element_id = request()->get('element_id');
-        $checkElement = Element::where('id', $Element_id)->first();
-        if ($checkElement) {
-            $query = $query->where('element_id', $Element_id);
-            $Element = Element::find($Element_id);
-            if ($Element) {
-                $Element = $Element->nama;
-                $title =  ucwords($this->route) . " - " . $Element;
+        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
+            $unit_id =  auth()->user()->id_unit;
+            $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
+            if ($checkElement) {
+                $query = $query->whereIn('element_id', $checkElement);
+            }
+        } else {
+
+            $checkElement = Element::where('id', $Element_id)->first();
+            if ($checkElement) {
+                $query = $query->where('element_id', $Element_id);
+                $Element = Element::find($Element_id);
+                if ($Element) {
+                    $Element = $Element->nama;
+                    $title =  ucwords($this->route) . " - " . $Element;
+                }
             }
         }
+
         if ($this->sort) {
             if ($this->desc) {
                 $data = $query->orderBy($this->sort, $this->desc);
@@ -423,6 +438,9 @@ class SubElementController extends Controller
     {
         //get dari post form
         $getRequest = $this->getRequest($request);
+        $element_id = $request->element_id;
+
+
         // return $this->configForm();
         $validation = $getRequest['validasi'];
         $messages = $getRequest['messages'];
@@ -436,9 +454,17 @@ class SubElementController extends Controller
 
         DB::beginTransaction();
         try {
+
+            $kodeElement = "";
+            $checkElement = Element::find($element_id)->first();
+            if ($checkElement) {
+                $kodeElement = $checkElement->kode;
+            }
+            $kode = $kodeElement . "." . $request->kode;
+
             DB::commit();
             $subElement = new SubElement();
-            $subElement->kode = $request->kode;
+            $subElement->kode = $kode;
             $subElement->nama = $request->nama;
             $subElement->keterangan = $request->keterangan;
             $subElement->sumber_data = $request->sumber_data;
@@ -447,6 +473,7 @@ class SubElementController extends Controller
             $subElement->element_id = $request->element_id;
             $subElement->satuan_id = $request->satuan_id;
             $subElement->save();
+
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
@@ -461,39 +488,48 @@ class SubElementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    { //get dari post form
+        $getRequest = $this->getRequest($request);
+        $element_id = $request->element_id;
 
-        //open model
-        $data = $this->model()->find($id);
-        //get dari post form
-        $relationId = [];
 
-        //check extra form
-        // return $request;
-        $getRequest = $this->getRequest($request, $id, $relationId);
-        $messages = $getRequest['messages'];
+        // return $this->configForm();
         $validation = $getRequest['validasi'];
-        $form = $getRequest['form'];
-
+        $messages = $getRequest['messages'];
         //validasi
         $this->validate(
             $request,
             $validation,
             $messages
         );
-        //post ke model
-        DB::beginTransaction();
 
+
+        DB::beginTransaction();
         try {
-            DB::commit();
-            foreach ($form as $index => $item) {
-                $data->$index = $item;
+
+            $kodeElement = "";
+            $checkElement = Element::find($element_id)->first();
+            if ($checkElement) {
+                $kodeElement = $checkElement->kode;
             }
-            $data->save();
+            $kode = $kodeElement . "." . $request->kode;
+
+            DB::commit();
+            $subElement = SubElement::find($id);
+            $subElement->kode = $kode;
+            $subElement->nama = $request->nama;
+            $subElement->keterangan = $request->keterangan;
+            $subElement->sumber_data = $request->sumber_data;
+            $subElement->metode_perhitungan = $request->metode_perhitungan;
+            $subElement->meta_data = $request->meta_data;
+            $subElement->element_id = $request->element_id;
+            $subElement->satuan_id = $request->satuan_id;
+            $subElement->save();
+
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+            return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element gagal diubah')->with('Class', 'danger');
         }
     }
 

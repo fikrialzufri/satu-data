@@ -29,6 +29,10 @@ class UsersTableSeedeer extends Seeder
         $adminUnitRole->name = 'Admin Unit';
         $adminUnitRole->save();
 
+        $adminOperatorRole = new Role();
+        $adminOperatorRole->name = 'Operator';
+        $adminOperatorRole->save();
+
         $superadmin = Role::where('slug', 'superadmin')->first();
 
         $superadminUser = new User();
@@ -105,6 +109,11 @@ class UsersTableSeedeer extends Seeder
         $taskLegenda->name = 'Legenda';
         $taskLegenda->description = 'Manajemen Legenda';
         $taskLegenda->save();
+
+        $taskOperator = new Task();
+        $taskOperator->name = 'Operator';
+        $taskOperator->description = 'Manajemen Operator';
+        $taskOperator->save();
 
         $tasks = Task::all();
 

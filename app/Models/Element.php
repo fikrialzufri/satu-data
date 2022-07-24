@@ -53,6 +53,17 @@ class Element extends Model
             return $this->hasGroup->nama;
         }
     }
+    public function hasUnit()
+    {
+        return $this->hasOne(Unit::class, 'id', 'unit_id');
+    }
+
+    public function getUnitAttribute()
+    {
+        if ($this->hasUnit) {
+            return $this->hasUnit->nama;
+        }
+    }
 
     public function hasSubElement()
     {

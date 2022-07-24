@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JenisDataController;
 use App\Http\Controllers\JenisUnitController;
 use App\Http\Controllers\LegendaController;
+use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\SubElementController;
@@ -38,6 +39,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Master Data
     Route::resource('satuan', SatuanController::class);
+
+    // Operator
+    Route::resource('operator', OperatorController::class);
 
     // Element
     Route::resource('element', ElementController::class);

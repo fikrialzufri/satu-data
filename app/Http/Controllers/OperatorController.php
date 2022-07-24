@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Element;
-use App\Models\Group;
+use App\Models\Operator;
+use App\Models\Role;
 use App\Models\Unit;
+use App\Models\User;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
+use Str;
 
-class ElementController extends Controller
+class OperatorController extends Controller
 {
     use CrudTrait;
 
     public function __construct()
     {
-        $this->route = 'element';
-        $this->kelipatan = 12;
+        $this->route = 'operator';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
@@ -28,16 +29,16 @@ class ElementController extends Controller
         return [
             [
                 'name'    => 'nama',
-                'alias'    => 'Nama Element',
+                'alias'    => 'Nama Operator',
             ],
             [
-                'name'    => 'group',
-                'alias'    => 'Group',
+                'name'    => 'username',
+                'alias'    => 'Username',
             ],
             [
-                'name'    => 'jenis_data',
-                'alias'    => 'Jenis Data',
-            ]
+                'name'    => 'unit',
+                'alias'    => 'Unit',
+            ],
         ];
     }
     public function configSearch()
@@ -46,55 +47,47 @@ class ElementController extends Controller
             [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Element',
+                'alias'    => 'Nama Operator',
                 'value'    => null
             ],
         ];
     }
     public function configForm()
     {
-
-        $unit_id =  $unit_id = request()->get('unit_id');
+        $unit_id =  auth()->user()->id_unit;
         $checkUnit = Unit::where('id', $unit_id)->first();
 
         if ($checkUnit) {
             return [
                 [
-                    'name'    => 'kode',
-                    'input'    => 'text',
-                    'alias'    => 'Kode',
-                    'validasi'    => ['required', 'unique', 'min:1'],
-                ],
-                [
                     'name'    => 'nama',
                     'input'    => 'text',
-                    'alias'    => 'Nama',
+                    'alias'    => 'Nama Operator',
                     'validasi'    => ['required', 'unique', 'min:1'],
                 ],
-
                 [
-                    'name'    => 'group_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
-                    'validasi'    => ['required'],
+                    'name'    => 'username',
+                    'input'    => 'text',
+                    'alias'    => 'Username',
+                    'validasi'    => ['required', 'unique', 'min:1'],
                 ],
                 [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
+                    'name'    => 'email',
+                    'input'    => 'email',
+                    'alias'    => 'Email',
+                    'validasi'    => ['required', 'unique', 'min:1'],
                 ],
                 [
-                    'name'    => 'keterangan',
-                    'input'    => 'textarea',
-                    'alias'    => 'Keterangan',
+                    'name'    => 'password',
+                    'input'    => 'password',
+                    'alias'    => 'Password',
+                    'validasi'    => ['required', 'unique', 'min:8'],
                 ],
                 [
-                    'name'    => 'dokumentasi',
-                    'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
+                    'name'    => 'passwordConfrim',
+                    'input'    => 'password',
+                    'alias'    => 'Password Konfirmasi',
+                    'validasi'    => ['required', 'unique', 'min:8'],
                 ],
                 [
                     'name'    => 'unit_id',
@@ -104,49 +97,44 @@ class ElementController extends Controller
                 ],
             ];
         } else {
+
             return [
-                [
-                    'name'    => 'kode',
-                    'input'    => 'text',
-                    'alias'    => 'Kode',
-                    'validasi'    => ['required', 'unique', 'min:1'],
-                ],
                 [
                     'name'    => 'nama',
                     'input'    => 'text',
-                    'alias'    => 'Nama',
-                    'validasi'    => ['required', 'min:1'],
+                    'alias'    => 'Nama Operator',
+                    'validasi'    => ['required', 'unique', 'min:1'],
+                ],
+                [
+                    'name'    => 'username',
+                    'input'    => 'text',
+                    'alias'    => 'Username',
+                    'validasi'    => ['required', 'unique', 'min:1'],
+                ],
+                [
+                    'name'    => 'email',
+                    'input'    => 'email',
+                    'alias'    => 'Email',
+                    'validasi'    => ['required', 'unique', 'min:1'],
+                ],
+                [
+                    'name'    => 'password',
+                    'input'    => 'password',
+                    'alias'    => 'Password',
+                    'validasi'    => ['required', 'unique', 'min:8'],
+                ],
+                [
+                    'name'    => 'passwordConfrim',
+                    'input'    => 'password',
+                    'alias'    => 'Password Konfirmasi',
+                    'validasi'    => ['required', 'unique', 'min:8'],
                 ],
                 [
                     'name'    => 'unit_id',
                     'input'    => 'combo',
                     'alias'    => 'Unit',
                     'value' => $this->combobox('Unit'),
-                    'validasi'    => ['required']
-                ],
-                [
-                    'name'    => 'group_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Group',
-                    'value' => $this->combobox('Group'),
                     'validasi'    => ['required'],
-                ],
-                [
-                    'name'    => 'jenis_data_id',
-                    'input'    => 'combo',
-                    'alias'    => 'Jenis Data',
-                    'value' => $this->combobox('JenisData'),
-                    'validasi'    => ['required'],
-                ],
-                [
-                    'name'    => 'keterangan',
-                    'input'    => 'textarea',
-                    'alias'    => 'Keterangan',
-                ],
-                [
-                    'name'    => 'dokumentasi',
-                    'input'    => 'textarea',
-                    'alias'    => 'Dokumentasi',
                 ],
             ];
         }
@@ -154,7 +142,6 @@ class ElementController extends Controller
 
     public function index()
     {
-
         //nama title
         if (!isset($this->title)) {
             $title =  ucwords($this->route);
@@ -278,23 +265,6 @@ class ElementController extends Controller
                 $query->where('user_id', Auth::user()->id);
             }
         }
-        $unit_id = request()->get('unit_id');
-
-        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
-
-            $unit_id =  auth()->user()->id_unit;
-            $query->where('unit_id', $unit_id);
-        } else {
-            $unit_id = request()->get('unit_id');
-            if ($unit_id) {
-                $query = $query->where('unit_id', $unit_id);
-                $unit = Unit::find($unit_id);
-                if ($unit) {
-                    $unit = $unit->nama;
-                    $title =  ucwords($this->route) . " - " . $unit;
-                }
-            }
-        }
         if ($this->sort) {
             if ($this->desc) {
                 $data = $query->orderBy($this->sort, $this->desc);
@@ -303,6 +273,10 @@ class ElementController extends Controller
             }
         }
         //mendapilkan data model setelah query pencarian
+        if (!auth()->user()->hasRole('superadmin')) {
+            $unit_id =  auth()->user()->id_unit;
+            $query->where('unit_id', $unit_id);
+        }
         if ($paginate) {
             $data = $query->paginate($paginate);
         } else {
@@ -310,12 +284,14 @@ class ElementController extends Controller
         }
 
         // return $button;
-        $template = 'element.index';
+        $template = 'template.index';
+        if ($this->index) {
+            $template = $this->index . '.index';
+        }
         // return  $data;
 
         return view($template,  compact(
             "title",
-            "unit_id",
             "data",
             'searches',
             'hasilSearch',
@@ -329,58 +305,10 @@ class ElementController extends Controller
         ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //nama title
-        if (!isset($this->title)) {
-            $title =  "Tambah " . ucwords($this->route);
-        } else {
-            $title =  "Tambah " . ucwords($this->title);
-        }
-
-        //nama route dan action route
-        $route =  $this->route;
-        $store =  "store";
-
-        //memanggil config form
-        $form = $this->configform();
-
-        $count = count($form);
-
-        $colomField = $this->colomField($count);
-
-        $countColom = $this->countColom($count);
-        $countColomFooter = $this->countColomFooter($count);
-        // $hasValue = $this->hasValue;
-
-        $unit_id = request()->get('unit_id');
-        if ($unit_id) {
-            $unit = Unit::find($unit_id);
-            if ($unit) {
-                $unit = $unit->nama;
-                $title = "Tambah " . ucwords($this->route) . " - " . $unit;
-            }
-        }
-
-        return view('template.form', compact(
-            'title',
-            'form',
-            'countColom',
-            'colomField',
-            'countColomFooter',
-            'store',
-            'route'
-            // 'hasValue'
-        ));
-    }
-
     public function store(Request $request)
     {
+        //get dari post form
+        $unit_id =  auth()->user()->id_unit;
         $messages = [
             'required' => ':attribute tidak boleh kosong',
             'unique' => ':attribute tidak boleh sama',
@@ -389,34 +317,51 @@ class ElementController extends Controller
 
         $this->validate(request(), [
             'nama' => 'required',
-            'kode' => 'required',
+            'username' => 'required|unique:users',
+            'email' => 'required|unique:users',
+            'password' => 'required|min:6',
+            'passwordConfrim' => 'required|same:password|min:6',
         ], $messages);
-
-        $kodeGroup = "";
-        $group_id = $request->get('group_id');
-        $checkGroup = Group::find($group_id);
-        if ($checkGroup) {
-            $kodeGroup = $checkGroup->kode;
-        }
+        $username =  $request->username;
 
         DB::beginTransaction();
+
+
+        $nama =  $request->nama;
+        $email =  $request->email;
         try {
             DB::commit();
-            $element = new Element();
-            $element->kode = $kodeGroup . "." . $request->kode;
-            $element->nama = $request->nama;
-            $element->group_id = $request->group_id;
-            $element->jenis_data_id = $request->jenis_data_id;
-            $element->keterangan = $request->keterangan;
-            $element->dokumentasi = $request->dokumentasi;
-            $element->unit_id = $request->unit_id;
-            $element->save();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
+
+            $adminOperatorRole = Role::where('slug', 'operator')->first();
+            $pass = bcrypt(request()->input('password'));
+            $user = new User;
+            $user->name = $username;
+            $user->username = $request->username;
+            $user->slug = Str::slug($request->username);
+            $user->email = $email;
+            $user->password = $pass;
+            $user->save();
+
+            $user->role()->sync($adminOperatorRole);
+
+            $operator = $this->model();
+            $operator->nama = $nama;
+            if ($request->unit_id != $request->unit_id) {
+                $operator->unit_id = $request->unit_id;
+            } else {
+                $operator->unit_id = $unit_id;
+            }
+            $operator->user_id = $user->id;
+            $operator->save();
+            return redirect()->route('operator.index')->with('message', 'Operator berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+            User::where('username', $username)->delete();
+
+            return redirect()->route('operator.index')->with('message', 'operator gagal ditambah')->with('Class', 'danger');
         }
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -424,8 +369,10 @@ class ElementController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Operator $operator)
     {
+        //get dari post form
+        $unit_id =  auth()->user()->id_unit;
         $messages = [
             'required' => ':attribute tidak boleh kosong',
             'unique' => ':attribute tidak boleh sama',
@@ -434,38 +381,72 @@ class ElementController extends Controller
 
         $this->validate(request(), [
             'nama' => 'required',
-            'kode' => 'required',
+            'username' => 'required|unique:users',
+            'email' => 'required|unique:users',
+            'password' => 'required|min:6',
+            'passwordConfrim' => 'required|same:password|min:6',
         ], $messages);
-
-        $kodeGroup = "";
-        $group_id = $request->get('group_id');
-        $checkGroup = Group::find($group_id);
-        if ($checkGroup) {
-            $kodeGroup = $checkGroup->kode;
-        }
+        $username =  $request->username;
 
         DB::beginTransaction();
+
+
+        $nama =  $request->nama;
+        $email =  $request->email;
         try {
             DB::commit();
-            $element = Element::find($id);
 
-            $element->kode = $kodeGroup . "." . $request->kode;
-            $element->nama = $request->nama;
-            $element->group_id = $request->group_id;
-            $element->jenis_data_id = $request->jenis_data_id;
-            $element->keterangan = $request->keterangan;
-            $element->dokumentasi = $request->dokumentasi;
-            $element->unit_id = $request->unit_id;
-            $element->save();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
+            $adminOperatorRole = Role::where('slug', 'operator')->first();
+            $pass = bcrypt(request()->input('password'));
+            $user = User::find($operator->user_id);
+            $user->name = $username;
+            $user->username = $request->username;
+            $user->slug = Str::slug($request->username);
+            $user->email = $email;
+            $user->password = $pass;
+            $user->save();
+
+            $user->role()->sync($adminOperatorRole);
+
+            $operator->nama = $nama;
+            if ($request->unit_id != $request->unit_id) {
+                $operator->unit_id = $request->unit_id;
+            } else {
+                $operator->unit_id = $unit_id;
+            }
+            $operator->user_id = $user->id;
+            $operator->save();
+            return redirect()->route('operator.index')->with('message', 'Operator berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
+            User::where('username', $username)->delete();
+
+            return redirect()->route('operator.index')->with('message', 'operator gagal diubah')->with('Class', 'danger');
+        }
+    }
+
+    public function destroy(Operator $operator)
+    {
+        DB::beginTransaction();
+
+        try {
+            DB::commit();
+
+            $operator->delete();
+            $user = User::find($operator->user_id);
+            if ($user) {
+                $user->delete();
+            }
+            return redirect()->route('operator.index')->with('message', 'Operator berhasil dihapus')->with('Class', 'success');
+        } catch (\Throwable $th) {
+            DB::rollback();
+
+            return redirect()->route('operator.index')->with('message', 'operator gagal dihapus')->with('Class', 'danger');
         }
     }
 
     public function model()
     {
-        return new Element();
+        return new Operator();
     }
 }

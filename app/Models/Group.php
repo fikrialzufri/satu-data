@@ -14,7 +14,7 @@ class Group extends Model
     protected $table = 'group';
     protected $guarded = ['id'];
     protected $fillable = [
-        'nama',
+        'kode',
         'nama',
         'keterangan',
         'dokumentasi',

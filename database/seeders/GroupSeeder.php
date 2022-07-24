@@ -159,10 +159,11 @@ class GroupSeeder extends Seeder
 
             if (!$Group[$key]) {
                 $Group[$key] = new Group();
-                $Group[$key]->nama = $nama;
-                $Group[$key]->warna = $warna;
-                $Group[$key]->save();
             }
+            $Group[$key]->kode = $key + 1;
+            $Group[$key]->nama = $nama;
+            $Group[$key]->warna = $warna;
+            $Group[$key]->save();
         }
     }
 }

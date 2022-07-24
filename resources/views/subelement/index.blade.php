@@ -12,17 +12,17 @@
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
-                            @canany(['upload-' . $route])
+                            @canany(['import-sub-element'])
                                 <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Upload
+                                    <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
-                            @canany(['download-' . $route])
+                            @canany(['download-sub-element'])
                                 <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
-                            @canany(['create-' . $route])
+                            @canany(['create-sub-element'])
                                 <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
@@ -76,10 +76,12 @@
                                     <td class="text-center" width="10%">
                                         {{ $year }}
                                     </td>
-                                    <td class="text-center">
-                                        Nilai & Legenda
-                                    </td>
-                                    @canany(['edit-' . $route, 'delete-' . $route])
+                                    @canany(['input-nilai-sub-element'])
+                                        <td class="text-center">
+                                            Nilai & Legenda
+                                        </td>
+                                    @endcan
+                                    @canany(['edit-sub-element', 'delete-sub-element'])
                                         <th class="text-center">Aksi</th>
                                     @endcan
                                 </tr>
@@ -87,7 +89,7 @@
                             <tbody>
                                 @forelse ($data as $index => $item)
 
-                                    <tr>
+                                    <tr id="element_{{ $item->id }}">
                                         <td class="text-center">
                                             {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
                                         @foreach ($configHeaders as $key => $header)
@@ -130,42 +132,48 @@
                                         <td>
                                             {{ $item->hasSubElementTahun($subYear) }}
                                         </td>
-                                        <td>
-                                            <div class="form-group ">
+                                        @canany(['input-nilai-sub-element'])
+                                            <td>
+                                                <div class="form-group ">
 
-                                                <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
-                                                    type="text" class="form-control numberOnly nilai"
-                                                    value="{{ $item->hasSubElementTahun($year) }}">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="form-group ">
-                                                <select name="legenda" class="selected2 form-control cmblegenda"
-                                                    id="legenda_{{ $item->id }}">
-                                                    @foreach ($listLegenda as $legenda)
-                                                        <option value="{{ $legenda->id }}"
-                                                            @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
+                                                    <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
+                                                        type="text" class="form-control numberOnly nilai"
+                                                        id="tahun_{{ $item->id }}"
+                                                        value="{{ $item->hasSubElementTahun($year) }}">
+                                                </div>
+                                            </td>
+                                        @endcanany
+
+                                        @canany(['edit-legenda-sub-element'])
+                                            <td>
+                                                <div class="form-group ">
+                                                    <select name="legenda" class="selected2 form-control cmblegenda"
+                                                        id="legenda_{{ $item->id }}">
+                                                        @foreach ($listLegenda as $legenda)
+                                                            <option value="{{ $legenda->id }}"
+                                                                @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
                                                             @else
                                                             {{ $legenda->nama == 'Tetap' ? 'selected' : 'bebel' }} @endif>
-                                                            {{ $legenda->nama }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </td>
-                                        @canany(['edit-' . $route, 'delete-' . $route])
+                                                                {{ $legenda->nama }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        @endcanany
+                                        @canany(['edit-sub-element', 'delete-sub-element'])
                                             <td class="text-center">
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
                                                         @include('template.button')
                                                     @endforeach
                                                 @endif
-                                                @can('edit-' . $route)
+                                                @can('edit-sub-element')
                                                     <a href="{{ route($route . '.edit', $item->id) }}?unit_id={{ $item->unit_id }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
                                                         <i class="nav-icon fas fa-edit"></i> Ubah</a>
                                                 @endcan
-                                                @can('delete-' . $route)
+                                                @can('delete-sub-element')
                                                     <form id="form-{{ $item->id }}"
                                                         action="{{ route($route . '.destroy', $item->id) }}" method="POST"
                                                         style="display: none;">
@@ -236,6 +244,31 @@
             var value = $(this).val();
             var legenda = $("#legenda_" + id).val();
 
+            // ajakan ajax
+            $.ajax({
+                url: "{{ route('elemen.update.nilai') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    id: id,
+                    tahun: tahun,
+                    value: value,
+                    legenda_id: legenda
+                },
+                success: function(response) {
+
+                }
+            });
+        });
+
+        $(".cmblegenda").on("select2:select", function(e) {
+
+            var select_val = $(e.currentTarget).val();
+            var parentId = $(this).closest('tr').attr('id');
+            let id = parentId.replace(/element_/g, "");
+            let tahun = $("#tahun_" + id).attr("data-tahun");
+            let value = $("#tahun_" + id).val();
+            let legenda = select_val;
             // ajakan ajax
             $.ajax({
                 url: "{{ route('elemen.update.nilai') }}",

@@ -13,9 +13,9 @@
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
 
-                            @canany(['upload-' . $route])
+                            @canany(['import-' . $route])
                                 <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Upload
+                                    <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
                             @canany(['download-' . $route])
