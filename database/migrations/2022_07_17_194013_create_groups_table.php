@@ -15,7 +15,7 @@ class CreateGroupsTable extends Migration
     {
         Schema::create('group', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('kode');
+            $table->integer('kode');
             $table->string('slug');
             $table->string('nama');
             $table->string('warna');

@@ -11,7 +11,6 @@
                         <h3 class="card-title">Daftar {{ ucwords(str_replace([':', '_', '-', '*'], ' ', $title)) }}
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
-
                         <div class="">
                             @canany(['import-' . str_replace('_', '-', $route)])
                                 <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">

@@ -21,6 +21,48 @@
                 <!-- yeild contents here -->
 
                 @yield('content')
+
+                <div class="modal fade" id="jenisdatamodal" tabindex="-1" role="dialog"
+                    aria-labelledby="jeniDataModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="jeniDataModalLabel"></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table table-bordered">
+
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nama</th>
+                                            <th class="text-center" width="20%">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                1
+                                            </td>
+                                            <td>
+                                                <a href="#">
+                                                    Admin
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             {{-- <!-- initiate chat section-->
             @include('template.chat') --}}
@@ -52,6 +94,12 @@
             rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
             return prefix == undefined ? rupiah : (rupiah ? rupiah : '');
         }
+
+        $('.jenisdatamodal').on('click', function() {
+            $('#jenisdatamodal').modal('show');
+            let title = $(this).data('nama');
+            jeniDataModalLabel.innerHTML = title;
+        });
     </script>
     <!-- initiate scripts-->
     @include('template.script')

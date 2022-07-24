@@ -12,6 +12,8 @@ class GroupController extends Controller
     public function __construct()
     {
         $this->route = 'group';
+        $this->index = 'group';
+        $this->sort = 'kode';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
@@ -21,6 +23,10 @@ class GroupController extends Controller
     public function configHeaders()
     {
         return [
+            [
+                'name'    => 'kode',
+                'alias'    => 'Kode',
+            ],
             [
                 'name'    => 'nama',
                 'alias'    => 'Nama Group',

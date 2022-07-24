@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisData;
 use App\Traits\CrudTrait;
+use Illuminate\Http\Request;
 
 class JenisDataController extends Controller
 {
@@ -61,6 +62,11 @@ class JenisDataController extends Controller
                 'validasi'    => ['required'],
             ],
         ];
+    }
+
+    public function getDetail(Request $request)
+    {
+        return $request;
     }
 
     public function model()
