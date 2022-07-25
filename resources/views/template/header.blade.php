@@ -19,11 +19,12 @@
 
                 <button type="button" id="navbar-fullscreen" class="nav-link"><i class="ik ik-maximize"></i></button>
 
-                <div class="mt-2 ml-3">
+                <div class="mt-1 ml-3">
                     @forelse ($jenis_data as $item)
-                        <label class="badge jenisdatamodal" style="background-color: {{ $item->warna }}"
-                            data-id="{{ $item->id }}" data-nama="{{ $item->nama }}">
-                            {{ $item->nama }}</label>
+                        <button class="btn btn-sm badge jenisdatamodal" role="button"
+                            style="background-color: {{ $item->warna }}" data-id="{{ $item->id }}"
+                            data-nama="{{ $item->nama }}">
+                            {{ $item->nama }}</button>
                     @empty
                     @endforelse
                 </div>

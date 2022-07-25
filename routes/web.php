@@ -45,15 +45,27 @@ Route::group(['middleware' => 'auth'], function () {
 
     // Element
     Route::resource('element', ElementController::class);
+    Route::get('/elementimport', [ElementController::class, 'import'])->name('element.import');
+    Route::post('/elementimport', [ElementController::class, 'importpost'])->name('element.import.post');
+
+    // update nilai
+    Route::post('/elementnilai', [SubElementController::class, 'nilai'])->name('elemen.update.nilai');
+
+    // import Element
+    Route::get('/elementinport', [SubElementController::class, 'import'])->name('sub-element.import');
+
     Route::resource('sub_element', SubElementController::class);
+    Route::get('/sub_elementimport', [SubElementController::class, 'import'])->name('sub-element.import');
+    Route::post('/sub_elementimport', [SubElementController::class, 'importpost'])->name('sub-element.import.post');
+
     Route::resource('jenis_data', JenisDataController::class);
     Route::resource('jenis_unit', JenisUnitController::class);
     Route::resource('group', GroupController::class);
     Route::resource('unit', UnitController::class);
     Route::resource('legenda', LegendaController::class);
 
-    // update nilai
-    Route::post('/elementnilai', [SubElementController::class, 'nilai'])->name('elemen.update.nilai');
+
+
     // ubah profile
     Route::get('/ubahuser', [UserController::class, 'ubah'])->name('user.ubah');
     Route::put('/simpanuser', [UserController::class, 'simpan'])->name('user.simpan');

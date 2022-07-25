@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ElementImport;
 use App\Models\Element;
 use App\Models\Group;
+use App\Models\JenisData;
 use App\Models\Unit;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
+use Excel;
+
 
 class ElementController extends Controller
 {
@@ -461,6 +465,80 @@ class ElementController extends Controller
             return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
         }
     }
+
+    public function import()
+    {
+        $title =  "Import " . ucwords($this->route);
+        $action = route('element.import.post');
+        $route = $this->route;
+        $listGroup = Group::orderBy('nama')->get();
+        $listJenisData = JenisData::orderBy('nama')->get();
+        $listUnit = Unit::orderBy('nama')->get();
+        $unit_id =  auth()->user()->id_unit;
+        return view('element.import', compact(
+            'title',
+            'action',
+            'listGroup',
+            'unit_id',
+            'listUnit',
+            'route',
+            'listJenisData'
+        ));
+    }
+    public function importpost(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:xls,xlsx',
+            'group_id' => 'required',
+            'jenis_data_id' => 'required',
+        ]);
+
+        DB::beginTransaction();
+        $group_id = $request->group_id;
+        $jenis_data_id = $request->jenis_data_id;
+        $unit_id = $request->unit_id;
+        $listElement = [];
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $element = Excel::toArray(new ElementImport, $file);
+
+            foreach ($element[0] as $key => $value) {
+                $listElement[$key] = [
+                    'kode' => $value[1],
+                    'nama' => $value[2],
+                    'keterangan' => $value[3],
+                    'dokumentasi' => $value[4],
+                ];
+            }
+
+            try {
+                DB::commit();
+                $checkElement = [];
+                foreach ($listElement as $el => $value) {
+                    $checkElement[$el] = Element::where('kode', $value['kode'])->first();
+                    if (!$checkElement[$el]) {
+                        $checkElement[$el] = new Element();
+                    }
+                    $checkElement[$el]->kode = $value['kode'];
+                    $checkElement[$el]->nama = $value['nama'];
+                    $checkElement[$el]->group_id = $group_id;
+                    $checkElement[$el]->jenis_data_id = $jenis_data_id;
+                    $checkElement[$el]->keterangan = $value['keterangan'];
+                    $checkElement[$el]->dokumentasi = $value['dokumentasi'];
+                    $checkElement[$el]->unit_id = $unit_id;
+                    $checkElement[$el]->save();
+                }
+                return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Berhasil Import Roster')->with('Class', 'success');
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Gagal Import Roster')->with('Class', 'danger');
+            }
+        }
+
+        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Gagal Import Roster')->with('Class', 'dangger');
+    }
+
 
     public function model()
     {

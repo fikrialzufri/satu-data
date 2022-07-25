@@ -13,7 +13,8 @@
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
                             @canany(['import-sub-element'])
-                                <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
+                                <a href="{{ route(str_replace([':', '_', '*'], '-', $route) . '.import') }}?element_id={{ $Element_id }}"
+                                    class="btn btn-sm btn-warning float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan

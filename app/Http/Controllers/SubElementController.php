@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SubElementImport;
 use App\Models\Element;
 use App\Models\Legenda;
 use App\Models\SubElement;
@@ -9,6 +10,8 @@ use App\Models\SubElementTahun;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
+use Excel;
+use App\Models\Satuan;
 use Carbon\Carbon;
 
 class SubElementController extends Controller
@@ -18,6 +21,7 @@ class SubElementController extends Controller
     public function __construct()
     {
         $this->route = 'sub_element';
+        $this->sort = 'kode';
         $this->middleware('permission:view-sub-element', ['only' => ['index', 'show']]);
         $this->middleware('permission:create-sub-element', ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-sub-element', ['only' => ['edit', 'update']]);
@@ -511,6 +515,103 @@ class SubElementController extends Controller
         $subElement->save();
 
         return $this->sendResponse($subElement, "sukses", 200);
+    }
+
+    public function import()
+    {
+        $title =  "Import " . ucwords($this->route);
+        $action = route('sub-element.import.post');
+        $route = $this->route;
+        $unit_id =  auth()->user()->id_unit;
+        $element_id =  request()->get('element_id');
+        $checkElement = Element::find($element_id);
+
+        if (!$checkElement) {
+            $element_id =  null;
+        }
+        return view('subelement.import', compact(
+            'title',
+            'action',
+            'element_id',
+            'route'
+        ));
+    }
+    public function importpost(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:xls,xlsx',
+        ]);
+
+        DB::beginTransaction();
+        $element_id = $request->element_id;
+        $listElement = [];
+
+        $legenda_id = Legenda::whereSlug('tetap')->first()->id;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $element = Excel::toArray(new SubElementImport, $file);
+
+            foreach ($element[0] as $key => $value) {
+                $listElement[$key] = [
+                    'kode' => $value[1],
+                    'nama' => $value[2],
+                    'nilai' => $value[3],
+                    'tahun' => $value[4],
+                    'satuan' => $value[5],
+                    'keterangan' => $value[6],
+                    'sumber_data' => $value[7],
+                    'metode_perhitungan' => $value[8],
+                    'meta_data' => $value[9],
+                ];
+            }
+
+            $checkElement = [];
+            foreach ($listElement as $el => $value) {
+                $checkElement[$el] = SubElement::where('kode', $value['kode'])->first();
+                if (!$checkElement[$el]) {
+                    $checkElement[$el] = new SubElement();
+                }
+                $dataSatuan[$el] = SubElement::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
+
+                if (!$dataSatuan[$el]) {
+                    $dataSatuan[$el] = new Satuan();
+                    $dataSatuan[$el]->nama = $value['satuan'];
+                    $dataSatuan[$el]->save();
+                }
+
+                $checkElement[$el]->kode = $value['kode'];
+                $checkElement[$el]->nama = $value['nama'];
+                $checkElement[$el]->keterangan = $value['keterangan'];
+                $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
+                $checkElement[$el]->meta_data = $value['meta_data'];
+                $checkElement[$el]->element_id = $element_id;
+                $checkElement[$el]->satuan_id = $dataSatuan[$el]->id;
+                $checkElement[$el]->save();
+
+
+                $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
+
+                if (!$subElement[$el]) {
+                    $subElement[$el] = new SubElementTahun;
+                }
+
+                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
+                $subElement[$el]->tahun = $value['tahun'];
+                $subElement[$el]->nilai =  $value['nilai'];
+                $subElement[$el]->legenda_id = $legenda_id;
+                $subElement[$el]->save();
+            }
+            try {
+                DB::commit();
+                return redirect()->route($this->route . '.index')->with('message', 'Element Berhasil Import Roster')->with('Class', 'success');
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return redirect()->route($this->route . '.index')->with('message', 'Element Gagal Import Roster')->with('Class', 'danger');
+            }
+        }
+
+        return redirect()->route($this->route . '.index')->with('message', 'Element Gagal Import Roster')->with('Class', 'dangger');
     }
     public function model()
     {

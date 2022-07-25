@@ -14,7 +14,8 @@
                         <div class="">
 
                             @canany(['import-' . $route])
-                                <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
+                                <a href="{{ route($route . '.import') }}"
+                                    class="btn btn-sm btn-warning float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan

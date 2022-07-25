@@ -49,7 +49,7 @@
                     'view-legenda', 'view-legenda'])
                     <div class="nav-lavel">{{ __('Element') }} </div>
                     @can('view-element')
-                        <div class="nav-item {{ $segment1 == 'element' ? 'active' : '' }}">
+                        <div class="nav-item {{ $segment1 == 'element' || $segment1 == 'sub_element' ? 'active' : '' }}">
                             <a href="{{ route('element.index') }}">
                                 <i class="ik ik-box"></i>
                                 <span>{{ __('Element') }}</span>
