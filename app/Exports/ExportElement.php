@@ -2,12 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\Tagihan;
-use App\Models\TagihanItem;
+use App\Models\Element;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
 
-class ExportTagihan implements FromView
+class ExportElement implements FromView
 {
 
     protected $id;
@@ -21,11 +20,9 @@ class ExportTagihan implements FromView
     {
         $data = [];
 
-        $tagihan = Tagihan::find($this->id);
-        $data = TagihanItem::where('tagihan_id', $tagihan->id)->orderBy('urutan')->get();
+        $data = Element::where('unit_id', $this->id)->orderBy('kode')->get();
 
-        return view('tagihan.export', compact(
-            'tagihan',
+        return view('element.export', compact(
             'data'
         ));
     }

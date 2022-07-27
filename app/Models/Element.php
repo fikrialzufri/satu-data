@@ -81,7 +81,7 @@ class Element extends Model
 
     public function getTotalSubElementAttribute()
     {
-        $total = "";
+        $total = 0;
         if ($this->hasSubElement) {
 
             $total = $this->hasSubElement()->count();

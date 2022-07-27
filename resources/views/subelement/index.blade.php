@@ -19,7 +19,8 @@
                                 </a>
                             @endcan
                             @canany(['download-sub-element'])
-                                <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
+                                <a href="{{ route(str_replace([':', '_', '*'], '-', $route) . '.download') }}?element_id={{ $Element_id }}"
+                                    class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
@@ -74,10 +75,12 @@
                                     <td class="text-center" width="10%">
                                         {{ $subYear }}
                                     </td>
-                                    <td class="text-center" width="10%">
-                                        {{ $year }}
-                                    </td>
                                     @canany(['input-nilai-sub-element'])
+                                        <td class="text-center" width="10%">
+                                            {{ $year }}
+                                        </td>
+                                    @endcan
+                                    @canany(['edit-legenda-sub-element'])
                                         <td class="text-center">
                                             Nilai & Legenda
                                         </td>

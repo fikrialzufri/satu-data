@@ -47,7 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('element', ElementController::class);
     Route::get('/elementimport', [ElementController::class, 'import'])->name('element.import');
     Route::post('/elementimport', [ElementController::class, 'importpost'])->name('element.import.post');
-
+    Route::get('/elementdownload', [ElementController::class, 'download'])->name('element.download');
     // update nilai
     Route::post('/elementnilai', [SubElementController::class, 'nilai'])->name('elemen.update.nilai');
 
@@ -57,6 +57,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('sub_element', SubElementController::class);
     Route::get('/sub_elementimport', [SubElementController::class, 'import'])->name('sub-element.import');
     Route::post('/sub_elementimport', [SubElementController::class, 'importpost'])->name('sub-element.import.post');
+
+    Route::get('/sub_elementdownload', [SubElementController::class, 'download'])->name('sub-element.download');
 
     Route::resource('jenis_data', JenisDataController::class);
     Route::resource('jenis_unit', JenisUnitController::class);

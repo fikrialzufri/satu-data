@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportSubElement;
 use App\Imports\SubElementImport;
 use App\Models\Element;
 use App\Models\Legenda;
@@ -297,9 +298,11 @@ class SubElementController extends Controller
 
         if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
             $unit_id =  auth()->user()->id_unit;
-            $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
+            $checkElement = Element::where('unit_id', $unit_id)->where('id', $Element_id);
             if ($checkElement) {
-                $query = $query->whereIn('element_id', $checkElement);
+                $Element = $checkElement->first()->nama;
+                $title =  ucwords($this->route) . " - " . $Element;
+                $query = $query->whereIn('element_id', $checkElement->pluck('id')->toArray());
             }
         } else {
 
@@ -421,7 +424,7 @@ class SubElementController extends Controller
         //get dari post form
         $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
-
+        $legenda_id = Legenda::whereSlug('tetap')->first()->id;
 
         // return $this->configForm();
         $validation = $getRequest['validasi'];
@@ -445,8 +448,9 @@ class SubElementController extends Controller
             $subElement->sumber_data = $request->sumber_data;
             $subElement->metode_perhitungan = $request->metode_perhitungan;
             $subElement->meta_data = $request->meta_data;
-            $subElement->element_id = $request->element_id;
+            $subElement->element_id = $element_id;
             $subElement->satuan_id = $request->satuan_id;
+            $subElement->legenda_id = $legenda_id;
             $subElement->save();
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
@@ -466,7 +470,7 @@ class SubElementController extends Controller
     { //get dari post form
         $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
-
+        $legenda_id = Legenda::whereSlug('tetap')->first()->id;
 
         // return $this->configForm();
         $validation = $getRequest['validasi'];
@@ -491,6 +495,7 @@ class SubElementController extends Controller
             $subElement->meta_data = $request->meta_data;
             $subElement->element_id = $request->element_id;
             $subElement->satuan_id = $request->satuan_id;
+            $subElement->legenda_id = $legenda_id;
             $subElement->save();
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
@@ -549,70 +554,141 @@ class SubElementController extends Controller
         $legenda_id = Legenda::whereSlug('tetap')->first()->id;
 
         if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $element = Excel::toArray(new SubElementImport, $file);
-
-            foreach ($element[0] as $key => $value) {
-                $listElement[$key] = [
-                    'kode' => $value[1],
-                    'nama' => $value[2],
-                    'nilai' => $value[3],
-                    'tahun' => $value[4],
-                    'satuan' => $value[5],
-                    'keterangan' => $value[6],
-                    'sumber_data' => $value[7],
-                    'metode_perhitungan' => $value[8],
-                    'meta_data' => $value[9],
-                ];
-            }
-
-            $checkElement = [];
-            foreach ($listElement as $el => $value) {
-                $checkElement[$el] = SubElement::where('kode', $value['kode'])->first();
-                if (!$checkElement[$el]) {
-                    $checkElement[$el] = new SubElement();
-                }
-                $dataSatuan[$el] = SubElement::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
-
-                if (!$dataSatuan[$el]) {
-                    $dataSatuan[$el] = new Satuan();
-                    $dataSatuan[$el]->nama = $value['satuan'];
-                    $dataSatuan[$el]->save();
-                }
-
-                $checkElement[$el]->kode = $value['kode'];
-                $checkElement[$el]->nama = $value['nama'];
-                $checkElement[$el]->keterangan = $value['keterangan'];
-                $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
-                $checkElement[$el]->meta_data = $value['meta_data'];
-                $checkElement[$el]->element_id = $element_id;
-                $checkElement[$el]->satuan_id = $dataSatuan[$el]->id;
-                $checkElement[$el]->save();
-
-
-                $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
-
-                if (!$subElement[$el]) {
-                    $subElement[$el] = new SubElementTahun;
-                }
-
-                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
-                $subElement[$el]->tahun = $value['tahun'];
-                $subElement[$el]->nilai =  $value['nilai'];
-                $subElement[$el]->legenda_id = $legenda_id;
-                $subElement[$el]->save();
-            }
             try {
                 DB::commit();
-                return redirect()->route($this->route . '.index')->with('message', 'Element Berhasil Import Roster')->with('Class', 'success');
+                $file = $request->file('file');
+                $element = Excel::toArray(new SubElementImport, $file);
+
+                foreach ($element[0] as $key => $value) {
+                    $listElement[$key] = [
+                        'kode' => $value[1],
+                        'nama' => $value[2],
+                        'nilai' => $value[3],
+                        'tahun' => $value[4],
+                        'satuan' => $value[5],
+                        'keterangan' => $value[6],
+                        'sumber_data' => $value[7],
+                        'metode_perhitungan' => $value[8],
+                        'meta_data' => $value[9],
+                    ];
+                }
+                $checkElement = [];
+                $subElement = [];
+                foreach ($listElement as $el => $value) {
+                    $checkElement[$el] = SubElement::where('kode', $value['kode'])->first();
+                    $dataSatuan[$el] = SubElement::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
+
+                    $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
+
+                    if (!$checkElement[$el]) {
+
+                        if (!$dataSatuan[$el]) {
+                            if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+                                $dataSatuan[$el] = new Satuan();
+                                $dataSatuan[$el]->nama = $value['satuan'];
+                                $dataSatuan[$el]->save();
+                            } else {
+                                if (auth()->user()->can("create-sub-element")) {
+                                    $dataSatuan[$el] = new Satuan();
+                                    $dataSatuan[$el]->nama = $value['satuan'];
+                                    $dataSatuan[$el]->save();
+                                }
+                            }
+                        }
+                        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+                            $checkElement[$el] = new SubElement();
+                            $checkElement[$el]->kode = $value['kode'];
+                            $checkElement[$el]->nama = $value['nama'];
+                            $checkElement[$el]->keterangan = $value['keterangan'];
+                            $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
+                            $checkElement[$el]->meta_data = $value['meta_data'];
+                            $checkElement[$el]->satuan_id = $dataSatuan[$el]->id;
+                            $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
+                            $checkElement[$el]->save();
+                        } else {
+                            if (auth()->user()->can("create-sub-element")) {
+                                $checkElement[$el] = new SubElement();
+                                $checkElement[$el]->kode = $value['kode'];
+                                $checkElement[$el]->nama = $value['nama'];
+                                $checkElement[$el]->keterangan = $value['keterangan'];
+                                $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
+                                $checkElement[$el]->meta_data = $value['meta_data'];
+
+                                $checkElement[$el]->save();
+                            }
+                        }
+                    } else {
+                        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+
+                            if (!$subElement[$el]) {
+                                $subElement[$el] = new SubElementTahun;
+                                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
+                                $subElement[$el]->legenda_id = $legenda_id;
+                                $subElement[$el]->tahun = $value['tahun'];
+                                $subElement[$el]->nilai =  $value['nilai'];
+
+                                $subElement[$el]->save();
+                            }
+                        } else {
+
+                            if (auth()->user()->can("create-sub-element")) {
+                                if (!$subElement[$el]) {
+                                    $subElement[$el] = new SubElementTahun;
+                                    $subElement[$el]->sub_element_id = $checkElement[$el]->id;
+                                    $subElement[$el]->legenda_id = $legenda_id;
+                                }
+                                $subElement[$el]->tahun = $value['tahun'];
+                                $subElement[$el]->nilai =  $value['nilai'];
+
+                                $subElement[$el]->save();
+                            } else {
+                                if ($subElement[$el]) {
+                                    $subElement[$el]->tahun = $value['tahun'];
+                                    $subElement[$el]->nilai =  $value['nilai'];
+
+                                    $subElement[$el]->save();
+                                }
+                            }
+                        }
+                    }
+                }
+                return redirect()->route('sub_element.index', "element_id=" . $element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
             } catch (\Throwable $th) {
                 DB::rollback();
-                return redirect()->route($this->route . '.index')->with('message', 'Element Gagal Import Roster')->with('Class', 'danger');
+                return redirect()->route('sub_element.index', "element_id=" . $element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
             }
         }
 
         return redirect()->route($this->route . '.index')->with('message', 'Element Gagal Import Roster')->with('Class', 'dangger');
     }
+
+    public function download()
+    {
+        $year = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $year = request()->get('tahun');
+        }
+
+        $element_id = request()->get('element_id');
+
+        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
+            $unit_id =  auth()->user()->id_unit;
+            $checkElement = Element::where('unit_id', $unit_id)->where('id', $element_id)->first();
+            if ($checkElement) {
+                $id = $checkElement->id;
+            } else {
+                $id = null;
+                // return redirect()->route($this->route . '.index')->with('message', 'Download Element Gagal, Mohon tidak merubah element')->with('Class', 'dangger');
+            }
+        } else {
+            $checkElement = Element::find($element_id);
+            if ($checkElement) {
+                $id = $checkElement->id;
+            }
+        }
+        return Excel::download(new ExportSubElement($id, $year), 'Download Sub Element.xlsx');
+    }
+
     public function model()
     {
         return new SubElement();

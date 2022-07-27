@@ -12,12 +12,13 @@
                     <form action="{{ $action }}" method="post" role="form" enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
-                            <div class="form-group col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                <a class="btn btn-success" href="{{ asset('/excel/Template Sub Element.xlsx') }}">
-                                    <i class="fas fa-download"></i> Download Template
-                                    Element</a>
-                                {{ $errors }}
-                            </div>
+                            @canany(['create-sub-element'])
+                                <div class="form-group col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                    <a class="btn btn-success" href="{{ asset('/excel/Template Sub Element.xlsx') }}">
+                                        <i class="fas fa-download"></i> Download Template
+                                        Element</a>
+                                </div>
+                            @endcanany
 
                             @if ($element_id === 'null')
                                 <div class="form-group col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-6">

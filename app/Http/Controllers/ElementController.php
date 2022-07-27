@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportElement;
 use App\Imports\ElementImport;
 use App\Models\Element;
 use App\Models\Group;
@@ -539,7 +540,23 @@ class ElementController extends Controller
         return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Gagal Import Roster')->with('Class', 'dangger');
     }
 
+    public function download()
+    {
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
 
+
+            $unit_id = request()->get('unit_id');
+            if ($unit_id) {
+                $unit = Unit::find($unit_id);
+                if ($unit) {
+                    $id = $unit->id;
+                }
+            }
+        } else {
+            $id =  auth()->user()->id_unit;
+        }
+        return Excel::download(new ExportElement($id), 'Download Element.xlsx');
+    }
     public function model()
     {
         return new Element();

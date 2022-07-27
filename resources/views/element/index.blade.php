@@ -20,7 +20,8 @@
                                 </a>
                             @endcan
                             @canany(['download-' . $route])
-                                <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
+                                <a href="{{ route($route . '.download') }}?unit_id={{ $unit_id }}"
+                                    class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
