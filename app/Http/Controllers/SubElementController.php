@@ -529,6 +529,7 @@ class SubElementController extends Controller
         $route = $this->route;
         $unit_id =  auth()->user()->id_unit;
         $element_id =  request()->get('element_id');
+        $tahun =  request()->get('tahun');
         $checkElement = Element::find($element_id);
 
         if (!$checkElement) {
@@ -537,6 +538,7 @@ class SubElementController extends Controller
         return view('subelement.import', compact(
             'title',
             'action',
+            'tahun',
             'element_id',
             'route'
         ));
@@ -549,6 +551,7 @@ class SubElementController extends Controller
 
         DB::beginTransaction();
         $element_id = $request->element_id;
+        $tahun = $request->tahun;
         $listElement = [];
 
         $legenda_id = Legenda::whereSlug('tetap')->first()->id;
@@ -631,31 +634,22 @@ class SubElementController extends Controller
                             }
                         } else {
 
-                            if (auth()->user()->can("create-sub-element")) {
-                                if (!$subElement[$el]) {
-                                    $subElement[$el] = new SubElementTahun;
-                                    $subElement[$el]->sub_element_id = $checkElement[$el]->id;
-                                    $subElement[$el]->legenda_id = $legenda_id;
-                                }
-                                $subElement[$el]->tahun = $value['tahun'];
-                                $subElement[$el]->nilai =  $value['nilai'];
-
-                                $subElement[$el]->save();
-                            } else {
-                                if ($subElement[$el]) {
-                                    $subElement[$el]->tahun = $value['tahun'];
-                                    $subElement[$el]->nilai =  $value['nilai'];
-
-                                    $subElement[$el]->save();
-                                }
+                            if (!$subElement[$el]) {
+                                $subElement[$el] = new SubElementTahun;
+                                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
+                                $subElement[$el]->legenda_id = $legenda_id;
                             }
+                            $subElement[$el]->tahun = $value['tahun'];
+                            $subElement[$el]->nilai =  $value['nilai'];
+
+                            $subElement[$el]->save();
                         }
                     }
                 }
-                return redirect()->route('sub_element.index', "element_id=" . $element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil diubah')->with('Class', 'success');
             } catch (\Throwable $th) {
                 DB::rollback();
-                return redirect()->route('sub_element.index', "element_id=" . $element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil diubah')->with('Class', 'success');
             }
         }
 

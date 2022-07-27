@@ -39,6 +39,10 @@
                             @else
                                 <input type="hidden" name="element_id" value="{{ $element_id }}">
                             @endif
+
+                            @if ($tahun)
+                                <input type="hidden" name="tahun" value="{{ $tahun }}">
+                            @endif
                             <div class="form-group col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                 <label for="exampleInputFile">Silahkan Input File Element Di bawah</label>
                                 <input type="file" name="file" class="file-upload-default">
