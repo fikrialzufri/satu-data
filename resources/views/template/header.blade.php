@@ -23,7 +23,7 @@
                     @forelse ($jenis_data as $item)
                         <button class="btn btn-sm badge jenisdatamodal" role="button"
                             style="background-color: {{ $item->warna }}" data-id="{{ $item->id }}"
-                            data-nama="{{ $item->nama }}">
+                            data-url="{{ route('sub_element.index') }}?element_id=" data-nama="{{ $item->nama }}">
                             {{ $item->nama }}</button>
                     @empty
                     @endforelse

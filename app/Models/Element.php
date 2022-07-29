@@ -24,8 +24,9 @@ class Element extends Model
         'jenis_data_id',
         'user_id',
     ];
-    protected $append = [
+    protected $appends = [
         'kode_hasil',
+        'total_sub_element',
     ];
 
     public function setNamaAttribute($value)

@@ -296,16 +296,7 @@ class SubElementController extends Controller
         }
         $Element_id = request()->get('element_id');
 
-        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
-            $unit_id =  auth()->user()->id_unit;
-            $checkElement = Element::where('unit_id', $unit_id)->where('id', $Element_id);
-            if ($checkElement) {
-                $Element = $checkElement->first()->nama;
-                $title =  ucwords($this->route) . " - " . $Element;
-                $query = $query->whereIn('element_id', $checkElement->pluck('id')->toArray());
-            }
-        } else {
-
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
             $checkElement = Element::where('id', $Element_id)->first();
             if ($checkElement) {
                 $query = $query->where('element_id', $Element_id);
@@ -314,6 +305,14 @@ class SubElementController extends Controller
                     $Element = $Element->nama;
                     $title =  ucwords($this->route) . " - " . $Element;
                 }
+            }
+        } else {
+            $unit_id =  auth()->user()->id_unit;
+            $checkElement = Element::where('unit_id', $unit_id)->where('id', $Element_id);
+            if ($checkElement) {
+                $Element = $checkElement->first()->nama;
+                $title =  ucwords($this->route) . " - " . $Element;
+                $query = $query->whereIn('element_id', $checkElement->pluck('id')->toArray());
             }
         }
 
@@ -659,7 +658,12 @@ class SubElementController extends Controller
 
         $element_id = request()->get('element_id');
 
-        if (!auth()->user()->hasRole('superadmin') || !auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+            $checkElement = Element::find($element_id);
+            if ($checkElement) {
+                $id = $checkElement->id;
+            }
+        } else {
             $unit_id =  auth()->user()->id_unit;
             $checkElement = Element::where('unit_id', $unit_id)->where('id', $element_id)->first();
             if ($checkElement) {
@@ -667,11 +671,6 @@ class SubElementController extends Controller
             } else {
                 $id = null;
                 // return redirect()->route($this->route . '.index')->with('message', 'Download Element Gagal, Mohon tidak merubah element')->with('Class', 'dangger');
-            }
-        } else {
-            $checkElement = Element::find($element_id);
-            if ($checkElement) {
-                $id = $checkElement->id;
             }
         }
         return Excel::download(new ExportSubElement($id, $year), 'Download Sub Element.xlsx');

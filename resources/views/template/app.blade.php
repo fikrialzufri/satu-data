@@ -5,7 +5,14 @@
     <title>@yield('title', '') | Satu Data</title>
     <!-- initiate head with meta tags, css and script -->
     @include('template.head')
-
+    <style>
+        @media (min-width: 768px) {
+            .modal-xl {
+                width: 90%;
+                max-width: 1200px;
+            }
+        }
+    </style>
 </head>
 
 <body id="app">
@@ -22,42 +29,30 @@
 
                 @yield('content')
 
-                <div class="modal fade" id="jenisdatamodal" tabindex="-1" role="dialog"
+                <div class="modal fade " id="jenisdatamodal" tabindex="-1" role="dialog"
                     aria-labelledby="jeniDataModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content ">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="jeniDataModalLabel"></h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                         aria-hidden="true">&times;</span></button>
                             </div>
                             <div class="modal-body">
-                                <table class="table table-bordered">
+                                <table class="table table-bordered " id="tableElement">
 
                                     <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>Nama</th>
-                                            <th class="text-center" width="20%">Aksi</th>
+                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                1
-                                            </td>
-                                            <td>
-                                                <a href="#">
-                                                    Admin
-                                                </a>
-                                            </td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" class="btn btn-primary">Save changes</button>
+
                             </div>
                         </div>
                     </div>
@@ -99,6 +94,48 @@
             $('#jenisdatamodal').modal('show');
             let title = $(this).data('nama');
             jeniDataModalLabel.innerHTML = title;
+
+            let id = $(this).data('id');
+            let url = $(this).data('url');
+            // ajax jenis_data.getDetail
+            $.ajax({
+                url: "{{ route('jenisdata.detail') }}",
+                type: "GET",
+                data: {
+                    id: id
+                },
+                success: function(data) {
+                    console.log(data);
+                    $("#tableElement tbody tr").remove();
+                    let html = '';
+                    data.forEach((element, index) => {
+                        let no = parseInt(index) + 1;
+                        html += '<tr>';
+                        html += '<td colspan="2" class="text-center"><b>' + element.group +
+                            ' (' +
+                            element.total +
+                            ') </b></td>';
+                        // element tidak sama dengan null
+                        html += '</tr>';
+                        if (element.element != null) {
+                            element.element.forEach((detail, index) => {
+                                let no = parseInt(index) + 1;
+                                html += '<tr>';
+
+                                html += '<td> <a href="' + url + detail.id + '">' +
+                                    detail
+                                    .nama + '<a/></td>';
+                                html += '<td>' + detail.total_sub_element + '</td>';
+                                html += '</tr>';
+                            });
+                        }
+                    });
+                    $("#tableElement tbody").append(html);
+
+                }
+            });
+
+
         });
     </script>
     <!-- initiate scripts-->
