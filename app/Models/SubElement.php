@@ -91,4 +91,9 @@ class SubElement extends Model
     {
         return $this->element_kode_hasil . "." . $this->kode;
     }
+
+    public function getTotalAttribute()
+    {
+        return $this->hasSubElementTahunAll()->count();
+    }
 }

@@ -421,12 +421,9 @@ class SubElementController extends Controller
 
     public function store(Request $request)
     {
-        //get dari post form
         $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
-        $legenda_id = Legenda::whereSlug('tetap')->first()->id;
 
-        // return $this->configForm();
         $validation = $getRequest['validasi'];
         $messages = $getRequest['messages'];
         //validasi
@@ -450,7 +447,6 @@ class SubElementController extends Controller
             $subElement->meta_data = $request->meta_data;
             $subElement->element_id = $element_id;
             $subElement->satuan_id = $request->satuan_id;
-            $subElement->legenda_id = $legenda_id;
             $subElement->save();
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
@@ -470,7 +466,6 @@ class SubElementController extends Controller
     { //get dari post form
         $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
-        $legenda_id = Legenda::whereSlug('tetap')->first()->id;
 
         // return $this->configForm();
         $validation = $getRequest['validasi'];
@@ -484,20 +479,19 @@ class SubElementController extends Controller
 
 
         DB::beginTransaction();
+        $subElement = SubElement::find($id);
+        $subElement->kode =  $request->kode;
+        $subElement->nama = $request->nama;
+        $subElement->keterangan = $request->keterangan;
+        $subElement->sumber_data = $request->sumber_data;
+        $subElement->metode_perhitungan = $request->metode_perhitungan;
+        $subElement->meta_data = $request->meta_data;
+        $subElement->element_id =  $element_id;
+        $subElement->satuan_id = $request->satuan_id;
+        $subElement->save();
         try {
-            DB::commit();
-            $subElement = SubElement::find($id);
-            $subElement->kode =  $request->kode;
-            $subElement->nama = $request->nama;
-            $subElement->keterangan = $request->keterangan;
-            $subElement->sumber_data = $request->sumber_data;
-            $subElement->metode_perhitungan = $request->metode_perhitungan;
-            $subElement->meta_data = $request->meta_data;
-            $subElement->element_id = $request->element_id;
-            $subElement->satuan_id = $request->satuan_id;
-            $subElement->legenda_id = $legenda_id;
-            $subElement->save();
 
+            DB::commit();
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();

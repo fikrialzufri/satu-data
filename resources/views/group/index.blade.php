@@ -23,7 +23,7 @@
                                 </a>
                             @endcan
                             @canany(['create-' . str_replace('_', '-', $route)])
-                                <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
+                                <a href="{{ route($route . '.create') }}}}"
                                     class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
                                 </a>
@@ -56,51 +56,42 @@
                             </div>
                         </form>
                         <br>
-                        <table class="table table-bordered " id="example">
+                        <table class="table table-bordered" id="example">
                             <thead>
                                 <tr>
-                                    <th width="5%">No</th>
-                                    @foreach ($configHeaders as $key => $header)
-                                        @if (isset($header['alias']))
-                                            <th>{{ ucfirst($header['alias']) }}</th>
-                                        @else
-                                            <th>{{ ucfirst($header['name']) }}</th>
-                                        @endif
-                                    @endforeach
+                                    <th rowspan="2" width="1%">No</th>
+                                    <th rowspan="2" width="5%">Kode</th>
+                                    <th rowspan="2">Nama Group</th>
+                                    <th colspan="2" class="text-center">Jenis</th>
+                                    <th colspan="2" class="text-center">Element</th>
+                                    <th rowspan="2" class="text-center" width="15%">Created</th>
                                     @canany(['edit-' . $route, 'delete-' . $route])
-                                        <th class="text-center">Aksi</th>
+                                        <th class="text-center" rowspan="2">Aksi</th>
                                     @endcan
+                                </tr>
+                                <tr>
+                                    <th class="text-center">Data</th>
+                                    <th class="text-center">Unit</th>
+                                    <th class="text-center">Kategori</th>
+                                    <th class="text-center">Data</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($data as $index => $item)
 
-                                    <tr>
-                                        <td>{{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
-                                        @foreach ($configHeaders as $key => $header)
-                                            @if (isset($header['input']))
-                                                @if ($header['input'] == 'rupiah')
-                                                    <td>Rp. {{ format_uang($item[$header['name']]) }}</td>
-                                                @elseif ($header['input'] == 'warna')
-                                                    <td width="200">
-                                                        <span
-                                                            style='background-color:{{ $item[$header['name']] }}; color:white; width:100%; display:block;''
-                                                            class="badge badge-pill mb-1">
-                                                            {{ $item[$header['name']] }}</span>
-                                                    </td>
-                                                @elseif ($header['input'] == 'date')
-                                                    <td>
-                                                        @if ($item[$header['name']] != null || $item[$header['name']] != '')
-                                                            {{ tanggal_indonesia($item[$header['name']]) }}
-                                                        @endif
-                                                    </td>
-                                                @endif
-                                            @else
-                                                <td>{{ $item[$header['name']] }}</td>
-                                            @endif
-                                        @endforeach
+                                    <tr class="table-danger">
+                                        <td class="text-center">
+                                            {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}
+                                        </td>
+                                        <td>{{ $item->kode }}</td>
+                                        <td>{{ $item->nama }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-center">{{ $item->total_element }}</td>
+                                        <td class="text-center">{{ $item->total_sub_element }}</td>
+                                        <td class="text-center">{{ tanggal_indonesia($item->created_at) }}</td>
                                         @canany(['edit-' . $route, 'delete-' . $route])
-                                            <td class="text-center">
+                                            <td class="text-center" class="text-center">
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
                                                         @include('template.button')
@@ -128,6 +119,61 @@
                                             </td>
                                         @endcan
                                     </tr>
+
+                                    @if ($item->hasElement)
+                                        @foreach ($item->hasElement as $key => $value)
+                                            <tr class="table-success">
+                                                <td class="text-center">{{ $key + 1 }}</td>
+                                                <td>{{ $value->kode_hasil }}</td>
+                                                <td>{{ $value->nama }}</td>
+                                                <td class="text-center">{{ $value->jenis_data }}</td>
+                                                <td class="text-center">{{ $value->jenis_unit }}</td>
+                                                <td colspan="2" class="text-center">{{ $value->total_sub_element }}
+                                                    Element Data</td>
+                                                <td class="text-center">{{ $value->unit }}</td>
+                                                @canany(['edit-element', 'delete-element'])
+                                                    <td class="text-center" class="text-center">
+                                                        @can('edit-element')
+                                                            <a href="{{ route($route . '.edit', $value->id) }}"
+                                                                class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
+                                                                data-placement="top" title="Edit">
+                                                                <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                        @endcan
+                                                        @can('delete-element')
+                                                            <form id="form-{{ $value->id }}"
+                                                                action="{{ route($route . '.destroy', $value->id) }}"
+                                                                method="POST" style="display: none;">
+                                                                {{ csrf_field() }}
+                                                                {{ method_field('DELETE') }}
+                                                            </form>
+
+                                                            <button class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                                                data-placement="top" title="Hapus"
+                                                                onclick=deleteconf("{{ $value->id }}")>
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </button>
+                                                        @endcan
+                                                    </td>
+                                                @endcan
+                                            </tr>
+                                            @if ($value->hasSubElement)
+                                                @foreach ($value->hasSubElement as $no => $sub)
+                                                    <tr class="table-info">
+                                                        <td class="text-center">{{ $no + 1 }}</td>
+                                                        <td>{{ $sub->kode_hasil }}</td>
+                                                        <td>{{ $sub->nama }}</td>
+                                                        <td class="text-center">{{ $value->jenis_data }}</td>
+                                                        <td class="text-center">{{ $value->jenis_unit }}</td>
+                                                        <td colspan="2" class="text-center">
+                                                            {{ $sub->total }}
+                                                            Element Data</td>
+                                                        <td class="text-center">{{ $value->unit }}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 @empty
                                     <tr>
                                         <td colspan="10">Data

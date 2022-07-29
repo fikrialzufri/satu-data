@@ -74,6 +74,13 @@ class Element extends Model
         }
     }
 
+    public function getJenisUnitAttribute()
+    {
+        if ($this->hasUnit) {
+            return $this->hasUnit->jenis_unit;
+        }
+    }
+
     public function hasSubElement()
     {
         return $this->hasMany(SubElement::class, 'element_id');

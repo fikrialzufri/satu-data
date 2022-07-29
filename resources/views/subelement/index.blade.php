@@ -85,9 +85,8 @@
                                             Nilai & Legenda
                                         </td>
                                     @endcan
-                                    @canany(['edit-sub-element', 'delete-sub-element'])
-                                        <th class="text-center">Aksi</th>
-                                    @endcan
+                                    <th class="text-center" width="5%">Aksi</th>
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -164,8 +163,16 @@
                                                 </div>
                                             </td>
                                         @endcanany
-                                        @canany(['edit-sub-element', 'delete-sub-element'])
-                                            <td class="text-center">
+                                        <td class="text-center">
+                                            <button class="btn btn-primary btn-sm detailSubElementmodal"
+                                                data-toggle="tooltip" data-placement="top" title="Detail"
+                                                data-nama="{{ $item->nama }}" data-keterangan="{{ $item->keterangan }}"
+                                                data-satuan="{{ $item->satuan }}"
+                                                data-metode="{{ $item->metode_perhitungan }}"
+                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}">
+                                                <i class="fa fa-search"></i> Detail
+                                            </button>
+                                            @canany(['edit-sub-element', 'delete-sub-element'])
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
                                                         @include('template.button')
@@ -190,8 +197,8 @@
                                                         <i class="fa fa-trash"></i> Hapus
                                                     </button>
                                                 @endcan
-                                            </td>
-                                        @endcan
+                                            @endcan
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -213,6 +220,70 @@
             <!-- Main row -->
             <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
+
+        <div class="modal fade" id="detailSubElementmodal" tabindex="-1" role="dialog"
+            aria-labelledby="SubElementModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="SubElementModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        Satuan
+                                    </td>
+                                    <td>
+                                        <span id="satuan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Keterangan
+                                    </td>
+                                    <td>
+                                        <span id="keterangan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Sumber Data
+                                    </td>
+                                    <td>
+                                        <span id="sumberData"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Metode Perhitungan
+                                    </td>
+                                    <td>
+                                        <span id="metodePerhitungan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Meta Data
+                                    </td>
+                                    <td>
+                                        <span id="metaData"></span>
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -288,6 +359,23 @@
 
                 }
             });
+        });
+
+        $('.detailSubElementmodal').on('click', function() {
+            $('#detailSubElementmodal').modal('show');
+            let nama = $(this).data('nama');
+            let satuan = $(this).data('satuan');
+            let keterangan = $(this).data('keterangan');
+            let metodePerhitungan = $(this).data('metode');
+            let metaData = $(this).data('meta');
+            let sumberData = $(this).data('sumber');
+            SubElementModalLabel.innerHTML = nama;
+            $('#satuan').html(satuan);
+            $('#keterangan').html(keterangan);
+            $('#metodePerhitungan').html(metodePerhitungan);
+            $('#metaData').html(metaData);
+            $('#sumberData').html(sumberData);
+
         });
     </script>
 @endpush
