@@ -310,9 +310,12 @@ class SubElementController extends Controller
             $unit_id =  auth()->user()->id_unit;
             $checkElement = Element::where('unit_id', $unit_id)->where('id', $Element_id);
             if ($checkElement) {
-                $Element = $checkElement->first()->nama;
-                $title =  ucwords($this->route) . " - " . $Element;
-                $query = $query->whereIn('element_id', $checkElement->pluck('id')->toArray());
+                $Element = $checkElement->first();
+                if ($Element) {
+                    # code...
+                    $title =  ucwords($this->route) . " - " . $Element->nama;
+                    $query = $query->whereIn('element_id', $checkElement->pluck('id')->toArray());
+                }
             }
         }
 

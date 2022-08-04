@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Element;
 use App\Models\Group;
 use App\Models\JenisData;
 use App\Traits\CrudTrait;
@@ -68,6 +69,7 @@ class JenisDataController extends Controller
     public function detail()
     {
         $id = request()->get('id');
+
         $jenisData = JenisData::find($id);
         $data = [];
         if ($jenisData) {
