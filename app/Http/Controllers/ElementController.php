@@ -41,7 +41,7 @@ class ElementController extends Controller
             ],
             [
                 'name'    => 'group',
-                'alias'    => 'Group',
+                'alias'    => 'Urusan',
             ],
             [
                 'name'    => 'jenis_data',
@@ -84,7 +84,7 @@ class ElementController extends Controller
                 [
                     'name'    => 'group_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
+                    'alias'    => 'Urusan',
                     'value' => $this->combobox('Group'),
                     'validasi'    => ['required'],
                 ],
@@ -136,7 +136,7 @@ class ElementController extends Controller
                 [
                     'name'    => 'group_id',
                     'input'    => 'combo',
-                    'alias'    => 'Group',
+                    'alias'    => 'Urusan',
                     'value' => $this->combobox('Group'),
                     'validasi'    => ['required'],
                 ],
@@ -391,16 +391,17 @@ class ElementController extends Controller
 
     public function store(Request $request)
     {
-        $messages = [
-            'required' => ':attribute tidak boleh kosong',
-            'unique' => ':attribute tidak boleh sama',
-            'same' => 'Password dan konfirmasi password harus sama',
-        ];
+        $getRequest = $this->getRequest($request);
+        $messages = $getRequest['messages'];
+        $validation = $getRequest['validasi'];
 
-        $this->validate(request(), [
-            'nama' => 'required',
-            'kode' => 'required',
-        ], $messages);
+
+        //validasi
+        $this->validate(
+            $request,
+            $validation,
+            $messages
+        );
 
         DB::beginTransaction();
         try {

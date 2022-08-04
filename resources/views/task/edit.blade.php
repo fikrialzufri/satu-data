@@ -72,7 +72,7 @@
                                                     <button class="btn btn-danger btn-sm" data-toggle="tooltip"
                                                         data-placement="top" title="Hapus"
                                                         onclick=deleteconf("{{ $permission->id }}")>
-                                                        <i class="fa fa-trash"></i> Hapus
+                                                        <i class="fa fa-trash"></i>
                                                     </button>
                                                 </td>
 
