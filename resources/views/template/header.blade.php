@@ -33,7 +33,7 @@
                 {{-- Notification --}}
                 <div class="dropdown">
                     {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="ik ik-bell"></i><span class="badge bg-danger">{{ App\Models\Notifikasi::where('to_user_id', auth()->user()->id)->where('status', 'belum')->count() }}</span></a> --}}
-                    <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button"
+                    {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                             class="ik ik-bell"></i><span class="badge bg-danger" id="total_notification">0</span></a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notiDropdown">
@@ -43,7 +43,7 @@
                         </div>
                         <div class="footer"><a href="javascript:void(0);">{{ __('See all activity') }}</a>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="dropdown">
                     <span>{{ ucfirst(Auth::user()->name) }}</span>
