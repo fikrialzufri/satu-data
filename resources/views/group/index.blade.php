@@ -14,7 +14,7 @@
                         <div class="">
 
                             @canany(['create-' . str_replace('_', '-', $route)])
-                                <a href="{{ route($route . '.create') }}}}" class="btn btn-sm btn-primary float-right text-light">
+                                <a href="{{ route($route . '.create') }}" class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
                                 </a>
                             @endcan
@@ -55,7 +55,7 @@
                                     <th colspan="2" class="text-center">Jenis</th>
                                     <th colspan="2" class="text-center">Element</th>
                                     <th rowspan="2" class="text-center" width="15%">Created</th>
-                                    @canany(['edit-' . $route, 'delete-' . $route])
+                                    @canany(['edit-' . $route, 'delete-' . $route, 'edit-element', 'delete-element'])
                                         <th class="text-center" rowspan="2">Aksi</th>
                                     @endcan
                                 </tr>
@@ -91,7 +91,7 @@
                                                     <a href="{{ route($route . '.edit', $item->id) }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
-                                                        <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                        <i class="nav-icon fas fa-edit"></i></a>
                                                 @endcan
                                                 @can('delete-' . $route)
                                                     <form id="form-{{ $item->id }}"
@@ -103,7 +103,7 @@
 
                                                     <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
                                                         title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                        <i class="fa fa-trash"></i> Hapus
+                                                        <i class="fa fa-trash"></i>
                                                     </button>
                                                 @endcan
                                             </td>
@@ -127,7 +127,7 @@
                                                             <a href="{{ route($route . '.edit', $value->id) }}"
                                                                 class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                                 data-placement="top" title="Edit">
-                                                                <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                                <i class="nav-icon fas fa-edit"></i></a>
                                                         @endcan
                                                         @can('delete-element')
                                                             <form id="form-{{ $value->id }}"
@@ -140,7 +140,7 @@
                                                             <button class="btn btn-danger btn-sm" data-toggle="tooltip"
                                                                 data-placement="top" title="Hapus"
                                                                 onclick=deleteconf("{{ $value->id }}")>
-                                                                <i class="fa fa-trash"></i> Hapus
+                                                                <i class="fa fa-trash"></i>
                                                             </button>
                                                         @endcan
                                                     </td>

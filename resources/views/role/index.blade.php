@@ -51,7 +51,7 @@
                                         <td class="text-center">
                                             <a href="{{ route('role.edit', $item->id) }}"
                                                 class="btn btn-sm btn-warning text-light">
-                                                <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                <i class="nav-icon fas fa-edit"></i></a>
                                             <form id="form-{{ $item->id }}"
                                                 action="{{ route('role.destroy', $item->id) }}" method="POST"
                                                 style="display: none;">
@@ -60,7 +60,7 @@
                                             </form>
                                             <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
                                                 title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                <i class="fa fa-trash"></i> Hapus
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>

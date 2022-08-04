@@ -113,7 +113,7 @@
                                                     <a href="{{ route($route . '.edit', $item->id) }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
-                                                        <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                        <i class="nav-icon fas fa-edit"></i></a>
                                                 @endcan
                                                 @can('delete-' . $route)
                                                     <form id="form-{{ $item->id }}"
@@ -125,7 +125,7 @@
 
                                                     <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
                                                         title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                        <i class="fa fa-trash"></i> Hapus
+                                                        <i class="fa fa-trash"></i>
                                                     </button>
                                                 @endcan
                                             </td>
