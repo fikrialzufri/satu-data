@@ -13,21 +13,21 @@
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
                             @canany(['import-sub-element'])
-                                <a href="{{ route(str_replace([':', '_', '*'], '-', $route) . '.import') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
+                                <a href="{{ route('sub-element.import') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
                                     class="btn btn-sm btn-warning float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
 
                             @canany(['download-sub-element'])
-                                <a href="{{ route(str_replace([':', '_', '*'], '-', $route) . '.download') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
+                                <a href="{{ route('sub-element.download') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
                                     class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
 
                             @canany(['create-sub-element'])
-                                <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
+                                <a href="{{ route('sub_element.create') }}?element_id={{ $Element_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
                                 </a>
