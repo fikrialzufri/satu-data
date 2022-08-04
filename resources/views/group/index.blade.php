@@ -56,7 +56,7 @@
                                     <th colspan="2" class="text-center">Element</th>
                                     <th rowspan="2" class="text-center" width="15%">Created</th>
                                     @canany(['edit-' . $route, 'delete-' . $route, 'edit-element', 'delete-element'])
-                                        <th class="text-center" rowspan="2">Aksi</th>
+                                        <th class="text-center" rowspan="2" width="10%">Aksi</th>
                                     @endcan
                                 </tr>
                                 <tr>
@@ -90,8 +90,7 @@
                                                 @can('edit-' . $route)
                                                     <a href="{{ route($route . '.edit', $item->id) }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
-                                                        data-placement="top" title="Edit">
-                                                        <i class="nav-icon fas fa-edit"></i></a>
+                                                        data-placement="top" title="Edit"><i class="nav-icon fas fa-edit"></i></a>
                                                 @endcan
                                                 @can('delete-' . $route)
                                                     <form id="form-{{ $item->id }}"
@@ -100,10 +99,9 @@
                                                         {{ csrf_field() }}
                                                         {{ method_field('DELETE') }}
                                                     </form>
-
                                                     <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
-                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                        <i class="fa fa-trash"></i>
+                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")><i
+                                                            class="fa fa-trash"></i>
                                                     </button>
                                                 @endcan
                                             </td>
