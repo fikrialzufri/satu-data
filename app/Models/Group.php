@@ -29,7 +29,14 @@ class Group extends Model
 
     public function hasElement()
     {
-        return $this->hasMany(Element::class, 'group_id', 'id');
+        $unit_id =  auth()->user()->id_unit;
+        $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
+
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+            return $this->hasMany(Element::class, 'group_id', 'id');
+        } else {
+            return $this->hasMany(Element::class, 'group_id', 'id')->whereIn('id', $checkElement);
+        }
     }
 
     public function getTotalElementAttribute()
