@@ -18,12 +18,14 @@
                                     <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
+
                             @canany(['download-sub-element'])
                                 <a href="{{ route(str_replace([':', '_', '*'], '-', $route) . '.download') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
                                     class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
+
                             @canany(['create-sub-element'])
                                 <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">

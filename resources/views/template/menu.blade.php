@@ -93,7 +93,7 @@
                         <div class="nav-item {{ $segment1 == 'group' ? 'active' : '' }}">
                             <a href="{{ route('group.index') }}">
                                 <i class="ik ik-box"></i>
-                                <span>{{ __('Group') }}</span>
+                                <span>{{ __('Urusan') }}</span>
                             </a>
                         </div>
                     @endcan

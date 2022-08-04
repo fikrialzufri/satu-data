@@ -13,6 +13,7 @@ class GroupController extends Controller
     {
         $this->route = 'group';
         $this->index = 'group';
+        $this->title = 'Urusan';
         $this->sort = 'kode';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
@@ -29,7 +30,7 @@ class GroupController extends Controller
             ],
             [
                 'name'    => 'nama',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
             ],
             [
                 'name'    => 'warna',
@@ -44,7 +45,7 @@ class GroupController extends Controller
             [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
                 'value'    => null
             ],
         ];
@@ -56,13 +57,13 @@ class GroupController extends Controller
             [
                 'name'    => 'kode',
                 'input'    => 'text',
-                'alias'    => 'Kode Group',
+                'alias'    => 'Kode Urusan',
                 'validasi'    => ['required', 'unique', 'min:1'],
             ],
             [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
                 'validasi'    => ['required', 'unique', 'min:1'],
             ],
             [

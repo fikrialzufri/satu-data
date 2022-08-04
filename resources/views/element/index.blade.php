@@ -19,12 +19,14 @@
                                     <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
+
                             @canany(['download-' . $route])
                                 <a href="{{ route($route . '.download') }}?unit_id={{ $unit_id }}"
                                     class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
+
                             @canany(['create-' . $route])
                                 <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">

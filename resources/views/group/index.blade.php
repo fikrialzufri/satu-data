@@ -61,7 +61,7 @@
                                 <tr>
                                     <th rowspan="2" width="1%">No</th>
                                     <th rowspan="2" width="5%">Kode</th>
-                                    <th rowspan="2">Nama Group</th>
+                                    <th rowspan="2">Nama Urusan</th>
                                     <th colspan="2" class="text-center">Jenis</th>
                                     <th colspan="2" class="text-center">Element</th>
                                     <th rowspan="2" class="text-center" width="15%">Created</th>
