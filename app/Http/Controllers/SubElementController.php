@@ -619,12 +619,12 @@ class SubElementController extends Controller
                             if (!$subElement[$el]) {
                                 $subElement[$el] = new SubElementTahun;
                                 $subElement[$el]->sub_element_id = $checkElement[$el]->id;
-                                $subElement[$el]->legenda_id = $legenda_id;
-                                $subElement[$el]->tahun = $value['tahun'];
-                                $subElement[$el]->nilai =  $value['nilai'];
-
-                                $subElement[$el]->save();
                             }
+                            $subElement[$el]->legenda_id = $legenda_id;
+                            $subElement[$el]->tahun = $value['tahun'];
+                            $subElement[$el]->nilai =  $value['nilai'];
+
+                            $subElement[$el]->save();
                         } else {
 
                             if (!$subElement[$el]) {
