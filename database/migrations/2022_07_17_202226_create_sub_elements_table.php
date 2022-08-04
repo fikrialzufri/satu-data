@@ -21,7 +21,7 @@ class CreateSubElementsTable extends Migration
             $table->longText('keterangan')->nullable();;
             $table->longText('sumber_data')->nullable();;
             $table->longText('metode_perhitungan')->nullable();
-
+            $table->enum('parent', ['Y', 'N'])->default('N');
             $table->longText('meta_data')->nullable();;
             $table->string('satuan_id')->references('id')->on('satuan')->onDelete('cascade');
             $table->string('element_id')->references('id')->on('element')->onDelete('cascade');

@@ -33,7 +33,7 @@ class SubElementController extends Controller
     {
         return [
             [
-                'name'    => 'kode_hasil',
+                'name'    => 'kode',
                 'alias'    => 'Kode',
             ],
             [
@@ -505,14 +505,21 @@ class SubElementController extends Controller
         if (!$subElement) {
             $subElement = new SubElementTahun;
         }
+        if ($request->parent) {
+            $subElement = SubElement::find($request->id);
 
-        $subElement->sub_element_id = $request->id;
-        $subElement->tahun = $request->tahun;
-        $subElement->nilai = $request->value;
-        $subElement->legenda_id = $request->legenda_id;
-        $subElement->save();
+            $subElement->parent = $request->parent === "true" ? "Y" : "N";
+            $subElement->save();
+            return $this->sendResponse($subElement, "sukses", 200);
+        } else {
 
-        return $this->sendResponse($subElement, "sukses", 200);
+            $subElement->sub_element_id = $request->id;
+            $subElement->tahun = $request->tahun;
+            $subElement->nilai = $request->value;
+            $subElement->legenda_id = $request->legenda_id;
+            $subElement->save();
+            return $this->sendResponse($subElement, "sukses", 200);
+        }
     }
 
     public function import()

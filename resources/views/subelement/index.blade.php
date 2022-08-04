@@ -67,6 +67,9 @@
                             <thead>
                                 <tr>
                                     <th width="5%" class="text-center">No</th>
+                                    <td class="text-center" width="1%">
+                                        Parent
+                                    </td>
                                     @foreach ($configHeaders as $key => $header)
                                         @if (isset($header['alias']))
                                             <th class="text-center">{{ ucfirst($header['alias']) }}</th>
@@ -96,7 +99,13 @@
 
                                     <tr id="element_{{ $item->id }}">
                                         <td class="text-center">
-                                            {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
+                                            {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}
+                                        </td>
+
+                                        <td class="text-center">
+                                            <input type="checkbox" class="js-danger parent" data-id="{{ $item->id }}"
+                                                {{ $item->parent == 'Y' ? 'checked' : '' }}>
+                                        </td>
                                         @foreach ($configHeaders as $key => $header)
                                             @if (isset($header['input']))
                                                 @if ($header['input'] == 'rupiah')
@@ -297,6 +306,7 @@
     <!-- DataTables -->
     <script src="{{ asset('plugins/DataTables/datatables.js') }}"></script>
     <script script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('plugins/mohithg-switchery/dist/switchery.min.js') }}"></script>
 
     <script>
         $('.cmblegenda').select2({
@@ -337,6 +347,28 @@
                 }
             });
         });
+
+
+        $(document).on('change', '.parent', function(e) {
+            var id = $(this).attr("data-id");
+            var parent = $(this).is(":checked");
+
+            console.log(parent);
+            // ajakan ajax
+            $.ajax({
+                url: "{{ route('elemen.update.nilai') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    id: id,
+                    parent: parent,
+                },
+                success: function(response) {
+                    console.log(response);
+                }
+            });
+        });
+
 
         $(".cmblegenda").on("select2:select", function(e) {
 

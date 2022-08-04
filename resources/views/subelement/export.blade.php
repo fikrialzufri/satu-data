@@ -29,17 +29,51 @@
     </thead>
     <tbody>
         @forelse ($data as $index => $item)
-            <tr style="border: 1px solid #000000;">
-                <td style="border: 1px solid #000000;">{{ $index + 1 }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->kode }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->nama }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->hasSubElementTahun($year) }}</td>
-                <td style="border: 1px solid #000000;">{{ $year }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->satuan }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->keterangan }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->sumber_data }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->metode_perhitungan }}</td>
-                <td style="border: 1px solid #000000;">{{ $item->meta_data }}</td>
+            <tr
+                style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $index + 1 }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+
+                    {{ $item->kode }}
+                </td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->nama }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->hasSubElementTahun($year) }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $year }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->satuan }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->keterangan }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->sumber_data }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->metode_perhitungan }}</td>
+                <td
+                    style="border: 1px solid #000000;
+                    @if ($item->parent == 'Y') font-weight: bold @endif">
+                    {{ $item->meta_data }}</td>
             </tr>
         @empty
             <tr>
