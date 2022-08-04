@@ -32,7 +32,7 @@ class ElementController extends Controller
     {
         return [
             [
-                'name'    => 'kode_hasil',
+                'name'    => 'kode',
                 'alias'    => 'Kode',
             ],
             [
