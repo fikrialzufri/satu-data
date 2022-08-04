@@ -12,19 +12,9 @@
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
-                            @canany(['import-' . str_replace('_', '-', $route)])
-                                <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Import
-                                </a>
-                            @endcan
-                            @canany(['download-' . str_replace('_', '-', $route)])
-                                <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Download
-                                </a>
-                            @endcan
+
                             @canany(['create-' . str_replace('_', '-', $route)])
-                                <a href="{{ route($route . '.create') }}}}"
-                                    class="btn btn-sm btn-primary float-right text-light">
+                                <a href="{{ route($route . '.create') }}}}" class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
                                 </a>
                             @endcan
