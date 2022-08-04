@@ -52,45 +52,25 @@ class User extends Authenticatable
         return $this->morphMany(Sanctum::$personalAccessTokenModel, 'tokenable', "tokenable_type", "tokenable_uuid");
     }
 
-    public function karyawan()
+    public function unit()
     {
-        return $this->hasOne(Karyawan::class, 'user_id');
+        return $this->hasOne(Unit::class, 'user_id');
+    }
+
+    public function operator()
+    {
+        return $this->hasOne(Operator::class, 'user_id');
     }
 
 
-    public function getIdWilayahAttribute()
+    public function getIdUnitAttribute()
     {
-        if ($this->karyawan) {
-            return $this->karyawan->id_wilayah;
+        if ($this->unit) {
+            return $this->unit->id;
         }
-    }
 
-
-    public function hasRekanan()
-    {
-        return $this->hasOne(Rekanan::class, 'user_id');
-    }
-
-    public function getIdRekananAttribute()
-    {
-        if ($this->hasRekanan) {
-            return $this->hasRekanan->id;
-        }
-    }
-
-    public function getIdKaryawanAttribute()
-    {
-        if ($this->karyawan) {
-            return $this->karyawan->id;
-        }
-    }
-
-    public function getKaryawanListRekananAttribute()
-    {
-        if ($this->karyawan) {
-            if ($this->karyawan->hasRekanan) {
-                return $this->karyawan->hasRekanan->pluck('id');
-            }
+        if ($this->operator) {
+            return $this->operator->unit_id;
         }
     }
 }

@@ -12,6 +12,9 @@ class GroupController extends Controller
     public function __construct()
     {
         $this->route = 'group';
+        $this->index = 'group';
+        $this->title = 'Urusan';
+        $this->sort = 'kode';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
@@ -22,8 +25,12 @@ class GroupController extends Controller
     {
         return [
             [
+                'name'    => 'kode',
+                'alias'    => 'Kode',
+            ],
+            [
                 'name'    => 'nama',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
             ],
             [
                 'name'    => 'warna',
@@ -38,7 +45,7 @@ class GroupController extends Controller
             [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
                 'value'    => null
             ],
         ];
@@ -48,9 +55,15 @@ class GroupController extends Controller
 
         return [
             [
+                'name'    => 'kode',
+                'input'    => 'text',
+                'alias'    => 'Kode Urusan',
+                'validasi'    => ['required', 'unique', 'min:1'],
+            ],
+            [
                 'name'    => 'nama',
                 'input'    => 'text',
-                'alias'    => 'Nama Group',
+                'alias'    => 'Nama Urusan',
                 'validasi'    => ['required', 'unique', 'min:1'],
             ],
             [

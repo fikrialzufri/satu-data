@@ -26,4 +26,20 @@ class JenisData extends Model
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function hasElement()
+    {
+        return $this->hasMany(Element::class, 'jenis_data_id', 'id');
+    }
+
+    public function getTotalElementAttribute()
+    {
+        $total = 0;
+        if ($this->hasElement) {
+
+            $total = $this->hasElement()->count();
+        }
+
+        return $total;
+    }
 }

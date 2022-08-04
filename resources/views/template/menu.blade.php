@@ -34,38 +34,69 @@
 
 
                 @endcan
-                @canany('view-satuan')
+                @canany('view-operator')
+                    <div class="nav-lavel">{{ __('Operator') }} </div>
+                    <div class="nav-item {{ $segment1 == 'operator' ? 'active' : '' }}">
+                        <a href="{{ route('operator.index') }}">
+                            <i class="ik ik-users"></i>
+                            <span>{{ __('Operator') }}</span>
+                        </a>
+                    </div>
+
+
+                @endcan
+                @canany(['view-element', 'view-sub-element', 'view-jenis-unit', 'create-jenis-data', 'view-unit',
+                    'view-legenda', 'view-legenda'])
                     <div class="nav-lavel">{{ __('Element') }} </div>
-                    <div class="nav-item {{ $segment1 == 'jenis_unit' ? 'active' : '' }}">
-                        <a href="{{ route('jenis_unit.index') }}">
-                            <i class="ik ik-box"></i>
-                            <span>{{ __('Jenis Unit') }}</span>
-                        </a>
-                    </div>
-                    <div class="nav-item {{ $segment1 == 'jenis_data' ? 'active' : '' }}">
-                        <a href="{{ route('jenis_data.index') }}">
-                            <i class="ik ik-box"></i>
-                            <span>{{ __('Jenis Data') }}</span>
-                        </a>
-                    </div>
-                    <div class="nav-item {{ $segment1 == 'unit' ? 'active' : '' }}">
-                        <a href="{{ route('unit.index') }}">
-                            <i class="ik ik-box"></i>
-                            <span>{{ __('Unit') }}</span>
-                        </a>
-                    </div>
-                    <div class="nav-item {{ $segment1 == 'legenda' ? 'active' : '' }}">
-                        <a href="{{ route('legenda.index') }}">
-                            <i class="ik ik-box"></i>
-                            <span>{{ __('Legenda') }}</span>
-                        </a>
-                    </div>
-                    <div class="nav-item {{ $segment1 == 'group' ? 'active' : '' }}">
-                        <a href="{{ route('group.index') }}">
-                            <i class="ik ik-box"></i>
-                            <span>{{ __('Group') }}</span>
-                        </a>
-                    </div>
+                    @can('view-element')
+                        <div class="nav-item {{ $segment1 == 'element' || $segment1 == 'sub_element' ? 'active' : '' }}">
+                            <a href="{{ route('element.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Element') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+
+                    @can('view-jenis-unit')
+                        <div class="nav-item {{ $segment1 == 'jenis_unit' ? 'active' : '' }}">
+                            <a href="{{ route('jenis_unit.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Jenis Unit') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+                    @can('view-jenis-data')
+                        <div class="nav-item {{ $segment1 == 'jenis_data' ? 'active' : '' }}">
+                            <a href="{{ route('jenis_data.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Jenis Data') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+                    @can('view-unit')
+                        <div class="nav-item {{ $segment1 == 'unit' ? 'active' : '' }}">
+                            <a href="{{ route('unit.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Unit') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+                    @can('view-legenda')
+                        <div class="nav-item {{ $segment1 == 'legenda' ? 'active' : '' }}">
+                            <a href="{{ route('legenda.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Legenda') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+                    @can('view-group')
+                        <div class="nav-item {{ $segment1 == 'group' ? 'active' : '' }}">
+                            <a href="{{ route('group.index') }}">
+                                <i class="ik ik-box"></i>
+                                <span>{{ __('Urusan') }}</span>
+                            </a>
+                        </div>
+                    @endcan
 
 
                 @endcan

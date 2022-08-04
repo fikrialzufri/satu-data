@@ -14,7 +14,7 @@ class Group extends Model
     protected $table = 'group';
     protected $guarded = ['id'];
     protected $fillable = [
-        'nama',
+        'kode',
         'nama',
         'keterangan',
         'dokumentasi',
@@ -25,5 +25,34 @@ class Group extends Model
     {
         $this->attributes['nama'] = $value;
         $this->attributes['slug'] = Str::slug($value);
+    }
+
+    public function hasElement()
+    {
+        return $this->hasMany(Element::class, 'group_id', 'id');
+    }
+
+    public function getTotalElementAttribute()
+    {
+        $total = 0;
+
+        if ($this->hasElement) {
+            $total = $this->hasElement->count();
+        }
+
+        return $total;
+    }
+
+    public function getTotalSubElementAttribute()
+    {
+        $total = 0;
+
+        if ($this->hasElement) {
+            foreach ($this->hasElement as $element) {
+                $total += $element->total_sub_element;
+            }
+        }
+
+        return $total;
     }
 }

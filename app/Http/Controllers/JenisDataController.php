@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use App\Models\JenisData;
 use App\Traits\CrudTrait;
+use Illuminate\Http\Request;
 
 class JenisDataController extends Controller
 {
@@ -61,6 +63,30 @@ class JenisDataController extends Controller
                 'validasi'    => ['required'],
             ],
         ];
+    }
+
+    public function detail()
+    {
+        $id = request()->get('id');
+        $jenisData = JenisData::find($id);
+        $data = [];
+        if ($jenisData) {
+            $listElement = $jenisData->hasElement()->get();
+            $group_id = [];
+            foreach ($listElement as $element) {
+                $group_id[$element->group_id] = $element->group_id;
+            }
+            $listGroup = Group::whereIn('id', $group_id)->get();
+
+            foreach ($listGroup as $group) {
+                $data[] = [
+                    'group' => $group->nama,
+                    'total' => $group->total_sub_element,
+                    'element' => $group->hasElement()->where('jenis_data_id', $id)->get(),
+                ];
+            }
+        }
+        return response()->json($data);
     }
 
     public function model()

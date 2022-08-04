@@ -73,38 +73,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <div>
-                                            <label for="logo" class=" form-control-label">Logo</label>
-                                        </div>
-                                        <div>
-                                            <input type="file" value="{{ old('logo') }}" name="logo"
-                                                placeholder="Logo" id="logo" class="form-control"
-                                                @if ($store == 'update') value="{{ $data->logo }}" @else value="{{ old('logo') }}" @endif>
 
-                                            <br>
-
-                                            @if ($store == 'update')
-                                                <img class="img-profile img-responsive" width="20%"
-                                                    @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
-                        src="{{ asset('storage/' . $route . '/thumbnail/' . $data->logo) }}" @endif>
-                                            @else
-                                                <div class="preview">
-                                                    <img class="img-profile img-responsive" width="100%"
-                                                        src="{{ asset('img/logo.png') }}">
-                                                </div>
-                                            @endif
-                                        </div>
-                                        @if ($errors->has('logo'))
-                                            <span class="text-danger">
-                                                <strong id="textlogo">Nama Singkat wajib diisi!</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
@@ -227,6 +196,48 @@
                                     </div>
                                 </div>
                             </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Detail</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <div>
+                                            <label for="logo" class=" form-control-label">Logo</label>
+                                        </div>
+                                        <div>
+                                            <input type="file" value="{{ old('logo') }}" name="logo"
+                                                placeholder="Logo" id="logo" class="form-control"
+                                                @if ($store == 'update') value="{{ $data->logo }}" @else value="{{ old('logo') }}" @endif>
+
+                                            <br>
+
+                                            @if ($store == 'update')
+                                                <img class="img-profile img-responsive" width="20%"
+                                                    @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
+                        src="{{ asset('storage/' . $route . '/thumbnail/' . $data->logo) }}" @endif>
+                                            @else
+                                                <div class="preview">
+                                                    <img class="img-profile img-responsive" width="100%"
+                                                        src="{{ asset('img/logo.png') }}">
+                                                </div>
+                                            @endif
+                                        </div>
+                                        @if ($errors->has('logo'))
+                                            <span class="text-danger">
+                                                <strong id="textlogo">Logo wajib diisi!</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
@@ -247,30 +258,6 @@
                                                 <strong id="textkk">Keterangan wajib diisi!</strong>
                                             </span>
                                         @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Detail alamat</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <div>
-                                            <label for="alamat" class=" form-control-label">Alamat</label>
-                                        </div>
-                                        <div>
-                                            <input type="text" name="alamat" placeholder="alamat"
-                                                class="{{ $errors->has('alamat') ? 'form-control is-invalid' : 'form-control' }}"
-                                                @if ($store == 'update') value="{{ $data->alamat }}" @else value="{{ old('alamat') }}" @endif
-                                                id="alamat">
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +284,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-12">
                                     <div class="form-group">
                                         <div>
@@ -329,7 +316,7 @@
                                         <div id="map"></div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
 
                         </div>
@@ -433,28 +420,28 @@
             width: '100%'
         });
 
-        map = new L.Map('map', {
-            zoomControl: true
-        });
+        // map = new L.Map('map', {
+        //     zoomControl: true
+        // });
 
-        var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            osmAttribution = 'Map data &copy; 2012 <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-            osm = new L.TileLayer(osmUrl, {
-                maxZoom: 18,
-                attribution: osmAttribution
-            });
-
-
-        marker = L.marker(lat_long).addTo(map)
-            .bindPopup('<b>' + lokasi + '</b>').openPopup();
+        // var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        //     osmAttribution = 'Map data &copy; 2012 <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+        //     osm = new L.TileLayer(osmUrl, {
+        //         maxZoom: 18,
+        //         attribution: osmAttribution
+        //     });
 
 
-        map.setView(new L.LatLng(latitude, longitude), 20).addLayer(osm);
+        // marker = L.marker(lat_long).addTo(map)
+        //     .bindPopup('<b>' + lokasi + '</b>').openPopup();
 
-        map.on('click', onMapClick);
-        var geocodeService = L.esri.Geocoding.geocodeService({
-            apikey: "AAPK8176d782dece458a826c6ad408eeadf1rNg3Erse47Uah_Ij6q4nyG-WI3ryr5IBT8nb3hRNh2TfpyCkl0wVQjdk3nzJbBFo" // replace with your api key - https://developers.arcgis.com
-        });
+
+        // map.setView(new L.LatLng(latitude, longitude), 20).addLayer(osm);
+
+        // map.on('click', onMapClick);
+        // var geocodeService = L.esri.Geocoding.geocodeService({
+        //     apikey: "AAPK8176d782dece458a826c6ad408eeadf1rNg3Erse47Uah_Ij6q4nyG-WI3ryr5IBT8nb3hRNh2TfpyCkl0wVQjdk3nzJbBFo" // replace with your api key - https://developers.arcgis.com
+        // });
 
         function chooseAddr(lat1, lng1, lat2, lng2, osm_type) {
             var loc1 = new L.LatLng(lat1, lng1);

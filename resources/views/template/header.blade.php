@@ -15,16 +15,27 @@
                     </div>
                 </div>
 
-                <button type="button" id="navbar-fullscreen" class="nav-link"><i
-                        class="ik ik-maximize"></i></button>
+
+
+                <button type="button" id="navbar-fullscreen" class="nav-link"><i class="ik ik-maximize"></i></button>
+
+                <div class="mt-1 ml-3">
+                    @forelse ($jenis_data as $item)
+                        <button class="btn btn-sm badge jenisdatamodal" role="button"
+                            style="background-color: {{ $item->warna }}" data-id="{{ $item->id }}"
+                            data-url="{{ route('sub_element.index') }}?element_id=" data-nama="{{ $item->nama }}">
+                            {{ $item->nama }}</button>
+                    @empty
+                    @endforelse
+                </div>
             </div>
             <div class="top-menu d-flex align-items-center">
                 {{-- Notification --}}
                 <div class="dropdown">
                     {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="ik ik-bell"></i><span class="badge bg-danger">{{ App\Models\Notifikasi::where('to_user_id', auth()->user()->id)->where('status', 'belum')->count() }}</span></a> --}}
-                    <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false"><i class="ik ik-bell"></i><span
-                            class="badge bg-danger" id="total_notification">0</span></a>
+                    <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                            class="ik ik-bell"></i><span class="badge bg-danger" id="total_notification">0</span></a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notiDropdown">
                         <h4 class="header">{{ __('Notifications') }}</h4>
                         <div class="notifications-wrap" id="notifikasi">

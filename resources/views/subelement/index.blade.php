@@ -12,18 +12,22 @@
                         </h3>
                         {{ $data->appends(request()->input())->links() }}
                         <div class="">
-                            @canany(['upload-' . $route])
-                                <a href="#" class="btn btn-sm btn-warning float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Upload
+                            @canany(['import-sub-element'])
+                                <a href="{{ route('sub-element.import') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
+                                    class="btn btn-sm btn-warning float-right text-light mr-5">
+                                    <i class="fa fa-file"></i> Import
                                 </a>
                             @endcan
-                            @canany(['download-' . $route])
-                                <a href="#" class="btn btn-sm btn-danger float-right text-light mr-5">
+
+                            @canany(['download-sub-element'])
+                                <a href="{{ route('sub-element.download') }}?element_id={{ $Element_id }}&tahun={{ $year }}"
+                                    class="btn btn-sm btn-danger float-right text-light mr-5">
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan
-                            @canany(['create-' . $route])
-                                <a href="{{ route($route . '.create') }}?element_id={{ $Element_id }}"
+
+                            @canany(['create-sub-element'])
+                                <a href="{{ route('sub_element.create') }}?element_id={{ $Element_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">
                                     <i class="fa fa-plus"></i> Tambah Data
                                 </a>
@@ -73,21 +77,24 @@
                                     <td class="text-center" width="10%">
                                         {{ $subYear }}
                                     </td>
-                                    <td class="text-center" width="10%">
-                                        {{ $year }}
-                                    </td>
-                                    <td class="text-center">
-                                        Nilai & Legenda
-                                    </td>
-                                    @canany(['edit-' . $route, 'delete-' . $route])
-                                        <th class="text-center">Aksi</th>
+                                    @canany(['input-nilai-sub-element'])
+                                        <td class="text-center" width="10%">
+                                            {{ $year }}
+                                        </td>
                                     @endcan
+                                    @canany(['edit-legenda-sub-element'])
+                                        <td class="text-center">
+                                            Nilai & Legenda
+                                        </td>
+                                    @endcan
+                                    <th class="text-center" width="5%">Aksi</th>
+
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($data as $index => $item)
 
-                                    <tr>
+                                    <tr id="element_{{ $item->id }}">
                                         <td class="text-center">
                                             {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
                                         @foreach ($configHeaders as $key => $header)
@@ -130,42 +137,56 @@
                                         <td>
                                             {{ $item->hasSubElementTahun($subYear) }}
                                         </td>
-                                        <td>
-                                            <div class="form-group ">
+                                        @canany(['input-nilai-sub-element'])
+                                            <td>
+                                                <div class="form-group ">
 
-                                                <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
-                                                    type="text" class="form-control numberOnly nilai"
-                                                    value="{{ $item->hasSubElementTahun($year) }}">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="form-group ">
-                                                <select name="legenda" class="selected2 form-control cmblegenda"
-                                                    id="legenda_{{ $item->id }}">
-                                                    @foreach ($listLegenda as $legenda)
-                                                        <option value="{{ $legenda->id }}"
-                                                            @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
+                                                    <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
+                                                        type="text" class="form-control numberOnly nilai"
+                                                        id="tahun_{{ $item->id }}"
+                                                        value="{{ $item->hasSubElementTahun($year) }}">
+                                                </div>
+                                            </td>
+                                        @endcanany
+
+                                        @canany(['edit-legenda-sub-element'])
+                                            <td>
+                                                <div class="form-group ">
+                                                    <select name="legenda" class="selected2 form-control cmblegenda"
+                                                        id="legenda_{{ $item->id }}">
+                                                        @foreach ($listLegenda as $legenda)
+                                                            <option value="{{ $legenda->id }}"
+                                                                @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
                                                             @else
                                                             {{ $legenda->nama == 'Tetap' ? 'selected' : 'bebel' }} @endif>
-                                                            {{ $legenda->nama }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </td>
-                                        @canany(['edit-' . $route, 'delete-' . $route])
-                                            <td class="text-center">
+                                                                {{ $legenda->nama }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </td>
+                                        @endcanany
+                                        <td class="text-center">
+                                            <button class="btn btn-primary btn-sm detailSubElementmodal"
+                                                data-toggle="tooltip" data-placement="top" title="Detail"
+                                                data-nama="{{ $item->nama }}" data-keterangan="{{ $item->keterangan }}"
+                                                data-satuan="{{ $item->satuan }}"
+                                                data-metode="{{ $item->metode_perhitungan }}"
+                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}">
+                                                <i class="fa fa-search"></i> Detail
+                                            </button>
+                                            @canany(['edit-sub-element', 'delete-sub-element'])
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
                                                         @include('template.button')
                                                     @endforeach
                                                 @endif
-                                                @can('edit-' . $route)
+                                                @can('edit-sub-element')
                                                     <a href="{{ route($route . '.edit', $item->id) }}?unit_id={{ $item->unit_id }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
                                                         <i class="nav-icon fas fa-edit"></i> Ubah</a>
                                                 @endcan
-                                                @can('delete-' . $route)
+                                                @can('delete-sub-element')
                                                     <form id="form-{{ $item->id }}"
                                                         action="{{ route($route . '.destroy', $item->id) }}" method="POST"
                                                         style="display: none;">
@@ -178,8 +199,8 @@
                                                         <i class="fa fa-trash"></i> Hapus
                                                     </button>
                                                 @endcan
-                                            </td>
-                                        @endcan
+                                            @endcan
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -201,6 +222,70 @@
             <!-- Main row -->
             <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
+
+        <div class="modal fade" id="detailSubElementmodal" tabindex="-1" role="dialog"
+            aria-labelledby="SubElementModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="SubElementModalLabel"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        Satuan
+                                    </td>
+                                    <td>
+                                        <span id="satuan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Keterangan
+                                    </td>
+                                    <td>
+                                        <span id="keterangan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Sumber Data
+                                    </td>
+                                    <td>
+                                        <span id="sumberData"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Metode Perhitungan
+                                    </td>
+                                    <td>
+                                        <span id="metodePerhitungan"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Meta Data
+                                    </td>
+                                    <td>
+                                        <span id="metaData"></span>
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -251,6 +336,48 @@
 
                 }
             });
+        });
+
+        $(".cmblegenda").on("select2:select", function(e) {
+
+            var select_val = $(e.currentTarget).val();
+            var parentId = $(this).closest('tr').attr('id');
+            let id = parentId.replace(/element_/g, "");
+            let tahun = $("#tahun_" + id).attr("data-tahun");
+            let value = $("#tahun_" + id).val();
+            let legenda = select_val;
+            // ajakan ajax
+            $.ajax({
+                url: "{{ route('elemen.update.nilai') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    id: id,
+                    tahun: tahun,
+                    value: value,
+                    legenda_id: legenda
+                },
+                success: function(response) {
+
+                }
+            });
+        });
+
+        $('.detailSubElementmodal').on('click', function() {
+            $('#detailSubElementmodal').modal('show');
+            let nama = $(this).data('nama');
+            let satuan = $(this).data('satuan');
+            let keterangan = $(this).data('keterangan');
+            let metodePerhitungan = $(this).data('metode');
+            let metaData = $(this).data('meta');
+            let sumberData = $(this).data('sumber');
+            SubElementModalLabel.innerHTML = nama;
+            $('#satuan').html(satuan);
+            $('#keterangan').html(keterangan);
+            $('#metodePerhitungan').html(metodePerhitungan);
+            $('#metaData').html(metaData);
+            $('#sumberData').html(sumberData);
+
         });
     </script>
 @endpush

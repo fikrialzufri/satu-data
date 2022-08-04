@@ -24,6 +24,10 @@ class Element extends Model
         'jenis_data_id',
         'user_id',
     ];
+    protected $appends = [
+        'kode_hasil',
+        'total_sub_element',
+    ];
 
     public function setNamaAttribute($value)
     {
@@ -53,6 +57,30 @@ class Element extends Model
             return $this->hasGroup->nama;
         }
     }
+    public function getKodeGroupAttribute()
+    {
+        if ($this->hasGroup) {
+            return $this->hasGroup->kode;
+        }
+    }
+    public function hasUnit()
+    {
+        return $this->hasOne(Unit::class, 'id', 'unit_id');
+    }
+
+    public function getUnitAttribute()
+    {
+        if ($this->hasUnit) {
+            return $this->hasUnit->nama;
+        }
+    }
+
+    public function getJenisUnitAttribute()
+    {
+        if ($this->hasUnit) {
+            return $this->hasUnit->jenis_unit;
+        }
+    }
 
     public function hasSubElement()
     {
@@ -61,12 +89,17 @@ class Element extends Model
 
     public function getTotalSubElementAttribute()
     {
-        $total = "";
+        $total = 0;
         if ($this->hasSubElement) {
 
             $total = $this->hasSubElement()->count();
         }
 
         return $total;
+    }
+
+    public function getKodeHasilAttribute()
+    {
+        return $this->kode_group . "." . $this->kode;
     }
 }

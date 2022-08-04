@@ -115,7 +115,6 @@ class UnitController extends Controller
             'email' => 'required|unique:users',
             'password' => 'required|min:6',
             'passwordConfrim' => 'required|same:password|min:6',
-            'alamat' => 'required|string',
             'logo' => 'nullable|mimes:jpeg,bmp,png,jpg',
             'setuju' => 'required',
         ], $messages);
@@ -256,9 +255,9 @@ class UnitController extends Controller
 
             $unit->nama = $nama;
             $unit->nama_singkat = $request->singkat;
-            $unit->lat_long = str_replace(array('LatLng(', ')'), '', $request->lat_long);
+            // $unit->lat_long = str_replace(array('LatLng(', ')'), '', $request->lat_long);
             $unit->email = $request->email;
-            $unit->alamat = $request->alamat;
+            // $unit->alamat = $request->alamat;
             $unit->detail_alamat = $request->detail_alamat;
             $unit->telepon = $request->telepon;
             $unit->keterangan = $request->keterangan;

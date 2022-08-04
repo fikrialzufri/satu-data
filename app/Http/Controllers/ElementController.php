@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportElement;
+use App\Imports\ElementImport;
 use App\Models\Element;
+use App\Models\Group;
+use App\Models\JenisData;
 use App\Models\Unit;
 use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
+use Excel;
+
 
 class ElementController extends Controller
 {
@@ -25,6 +31,10 @@ class ElementController extends Controller
     public function configHeaders()
     {
         return [
+            [
+                'name'    => 'kode_hasil',
+                'alias'    => 'Kode',
+            ],
             [
                 'name'    => 'nama',
                 'alias'    => 'Nama Element',
@@ -54,7 +64,6 @@ class ElementController extends Controller
     {
 
         $unit_id =  $unit_id = request()->get('unit_id');
-        $listUnit = [];
         $checkUnit = Unit::where('id', $unit_id)->first();
 
         if ($checkUnit) {
@@ -115,7 +124,7 @@ class ElementController extends Controller
                     'name'    => 'nama',
                     'input'    => 'text',
                     'alias'    => 'Nama',
-                    'validasi'    => ['required', 'unique', 'min:1'],
+                    'validasi'    => ['required', 'min:1'],
                 ],
                 [
                     'name'    => 'unit_id',
@@ -279,13 +288,22 @@ class ElementController extends Controller
             }
         }
         $unit_id = request()->get('unit_id');
-        if ($unit_id) {
-            $query = $query->where('unit_id', $unit_id);
-            $unit = Unit::find($unit_id);
-            if ($unit) {
-                $unit = $unit->nama;
-                $title =  ucwords($this->route) . " - " . $unit;
+
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+
+
+            $unit_id = request()->get('unit_id');
+            if ($unit_id) {
+                $query = $query->where('unit_id', $unit_id);
+                $unit = Unit::find($unit_id);
+                if ($unit) {
+                    $unit = $unit->nama;
+                    $title =  ucwords($this->route) . " - " . $unit;
+                }
             }
+        } else {
+            $unit_id =  auth()->user()->id_unit;
+            $query->where('unit_id', $unit_id);
         }
         if ($this->sort) {
             if ($this->desc) {
@@ -373,24 +391,22 @@ class ElementController extends Controller
 
     public function store(Request $request)
     {
-        //get dari post form
-        $getRequest = $this->getRequest($request);
-        // return $this->configForm();
-        $validation = $getRequest['validasi'];
-        $messages = $getRequest['messages'];
-        //validasi
-        $this->validate(
-            $request,
-            $validation,
-            $messages
-        );
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'unique' => ':attribute tidak boleh sama',
+            'same' => 'Password dan konfirmasi password harus sama',
+        ];
 
+        $this->validate(request(), [
+            'nama' => 'required',
+            'kode' => 'required',
+        ], $messages);
 
         DB::beginTransaction();
         try {
             DB::commit();
             $element = new Element();
-            $element->kode = $request->kode;
+            $element->kode =  $request->kode;
             $element->nama = $request->nama;
             $element->group_id = $request->group_id;
             $element->jenis_data_id = $request->jenis_data_id;
@@ -413,144 +429,134 @@ class ElementController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'unique' => ':attribute tidak boleh sama',
+            'same' => 'Password dan konfirmasi password harus sama',
+        ];
 
-        //open model
-        $data = $this->model()->find($id);
-        //get dari post form
-        $relationId = [];
+        $this->validate(request(), [
+            'nama' => 'required',
+            'kode' => 'required',
+        ], $messages);
 
-        //check extra form
-        if ($this->extraFrom) {
-            foreach ($this->extraFrom as $key => $item) {
-                $fileId = $item . '_id';
-                $relationId[$fileId] = $data->$fileId;
-            }
-        }
-        // return $request;
-        $getRequest = $this->getRequest($request, $id, $relationId);
-        $messages = $getRequest['messages'];
-        $relation = $getRequest['relation'];
-        $validation = $getRequest['validasi'];
-        $form = $getRequest['form'];
-
-
-        //validasi
-        $this->validate(
-            $request,
-            $validation,
-            $messages
-        );
-        //post ke model
-        // $this->model()->transaction();
-        foreach ($form as $index => $item) {
-
-            if (preg_match("/-image/i", $index)) {
-                $route =  $this->route;
-                $file =  str_replace("-image", "", $index);
-                if ($request->hasFile($file)) {
-                    $nama_gambar = Str::slug($route) . '-' . Str::Random(15) . '.' . $request->file($file)->getClientOriginalExtension();
-
-                    $path = public_path('storage/' . $route . '/' . $nama_gambar);
-
-                    if (!Storage::disk('public')->exists($route)) {
-                        Storage::disk('public')->makeDirectory($route);
-                    }
-                    if (!Storage::disk('public')->exists($route . '/thumbnail')) {
-                        Storage::disk('public')->makeDirectory($route . '/thumbnail');
-                    }
-
-                    // delete gambar original
-                    if (Storage::disk('public')->exists($route . '/' . $data->$file)) {
-                        Storage::disk('public')->delete($route . '/' . $data->$file);
-                    }
-
-                    $gambar_original = Image::make($request->file($file))->save($path);
-                    Storage::disk('public')->put($route . '/' . $nama_gambar, $gambar_original);
-
-                    // delete gambar thumbnail
-                    if (Storage::disk('public')->exists($route . '/thumbnail' . '/' . $data->$file)) {
-                        Storage::disk('public')->delete($route . '/thumbnail' . '/' . $data->$file);
-                    }
-                    $thumbnail = Image::make($request->file($file))->resize(720, 720)->save($path);
-                    Storage::disk('public')->put($route . '/thumbnail' . '/' . $nama_gambar, $thumbnail);
-
-                    $data->$file = $nama_gambar;
-                }
-                continue;
-            }
-            if ($index === "password") {
-                $item = bcrypt($item);
-            }
-            if ($this->manyToMany) {
-                # code...
-                if (in_array(str_replace('_id', '', $index), $this->manyToMany)) {
-                    $manyToMany = str_replace('_id', '', $index);
-                    continue;
-                }
-            }
-            if ($this->oneToMany) {
-                if (in_array(str_replace('_id', '', $index), $this->oneToMany)) {
-                    $oneToMany = str_replace('_id', '', $index);
-                    continue;
-                }
-            }
-
-            $data->$index = $item;
+        $kodeGroup = "";
+        $group_id = $request->get('group_id');
+        $checkGroup = Group::find($group_id);
+        if ($checkGroup) {
+            $kodeGroup = $checkGroup->kode;
         }
 
-        if (isset($relation)) {
-            $firstColumn = [];
-            if (isset($this->extraFrom)) {
+        DB::beginTransaction();
+        try {
+            DB::commit();
+            $element = Element::find($id);
 
-                foreach ($relation as $key => $value) {
-                    $relationsFields = $key . '_id';
-                    $relationModels = '\\App\Models\\' . ucfirst($key);
-                    $relationModels = new $relationModels;
-                    $relationModels = $relationModels->find($data->$relationsFields);
-                    if ($relationModels) {
-                        foreach ($value as $colom => $val) {
-                            if ($colom === "password") {
-                                $val = bcrypt($val);
-                            }
-                            if (in_array(str_replace('_id', '', $colom), $this->manyToMany)) {
-                                $manyToMany = str_replace('_id', '', $colom);
-                                $valueMany[$manyToMany] = $val;
-                                continue;
-                            }
-                            $relationModels->$colom = $val;
-                        }
-                        $relationModels->save();
-                        if (isset($manyToMany)) {
-                            $relationModels->$manyToMany()->sync($valueMany);
-                        }
-                    }
-                }
-            }
+            $element->kode =  $request->kode;
+            $element->nama = $request->nama;
+            $element->group_id = $request->group_id;
+            $element->jenis_data_id = $request->jenis_data_id;
+            $element->keterangan = $request->keterangan;
+            $element->dokumentasi = $request->dokumentasi;
+            $element->unit_id = $request->unit_id;
+            $element->save();
+            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
         }
-
-        $data->save();
-
-        if (isset($this->manyToMany)) {
-            if (!isset($this->extraFrom)) {
-                foreach ($this->manyToMany as  $value) {
-                    $hasRalation = 'has' . ucfirst($value);
-                    $valueField = $data->$hasRalation()->sync($form[$value]);
-                }
-            }
-        }
-
-        if (isset($this->oneToMany)) {
-            foreach ($this->oneToMany as $index => $value) {
-                $hasRalation = 'has' . ucfirst($value);
-                $idRelation = $value . '_id';
-
-                $valueField = $data->$hasRalation()->sync($form[$idRelation]);
-            }
-        }
-
-        return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
     }
 
+    public function import()
+    {
+        $title =  "Import " . ucwords($this->route);
+        $action = route('element.import.post');
+        $route = $this->route;
+        $listGroup = Group::orderBy('nama')->get();
+        $listJenisData = JenisData::orderBy('nama')->get();
+        $listUnit = Unit::orderBy('nama')->get();
+        $unit_id =  auth()->user()->id_unit;
+        return view('element.import', compact(
+            'title',
+            'action',
+            'listGroup',
+            'unit_id',
+            'listUnit',
+            'route',
+            'listJenisData'
+        ));
+    }
+    public function importpost(Request $request)
+    {
+        $this->validate($request, [
+            'file' => 'required|mimes:xls,xlsx',
+            'group_id' => 'required',
+            'jenis_data_id' => 'required',
+        ]);
+
+        DB::beginTransaction();
+        $group_id = $request->group_id;
+        $jenis_data_id = $request->jenis_data_id;
+        $unit_id = $request->unit_id;
+        $listElement = [];
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $element = Excel::toArray(new ElementImport, $file);
+
+            foreach ($element[0] as $key => $value) {
+                $listElement[$key] = [
+                    'kode' => $value[1],
+                    'nama' => $value[2],
+                    'keterangan' => $value[3],
+                    'dokumentasi' => $value[4],
+                ];
+            }
+
+            try {
+                DB::commit();
+                $checkElement = [];
+                foreach ($listElement as $el => $value) {
+                    $checkElement[$el] = Element::where('kode', $value['kode'])->first();
+                    if (!$checkElement[$el]) {
+                        $checkElement[$el] = new Element();
+                    }
+                    $checkElement[$el]->kode = $value['kode'];
+                    $checkElement[$el]->nama = $value['nama'];
+                    $checkElement[$el]->group_id = $group_id;
+                    $checkElement[$el]->jenis_data_id = $jenis_data_id;
+                    $checkElement[$el]->keterangan = $value['keterangan'];
+                    $checkElement[$el]->dokumentasi = $value['dokumentasi'];
+                    $checkElement[$el]->unit_id = $unit_id;
+                    $checkElement[$el]->save();
+                }
+                return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Berhasil Import Roster')->with('Class', 'success');
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Gagal Import Roster')->with('Class', 'danger');
+            }
+        }
+
+        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Gagal Import Roster')->with('Class', 'dangger');
+    }
+
+    public function download()
+    {
+        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+
+
+            $unit_id = request()->get('unit_id');
+            if ($unit_id) {
+                $unit = Unit::find($unit_id);
+                if ($unit) {
+                    $id = $unit->id;
+                }
+            }
+        } else {
+            $id =  auth()->user()->id_unit;
+        }
+        return Excel::download(new ExportElement($id), 'Download Element.xlsx');
+    }
     public function model()
     {
         return new Element();
