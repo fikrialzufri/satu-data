@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Element;
+use App\Models\Group;
 use App\Models\JenisUnit;
 use App\Models\SubElement;
 use App\Models\Unit;
@@ -30,14 +31,35 @@ class HomeController extends Controller
         $start = Carbon::now()->startOfMonth()->format('Y-m-d H:i:s');
         $end = Carbon::now()->endOfMonth()->format('Y-m-d H:i:s');
         $tahun = Carbon::now()->formatLocalized("%Y");
-        $aduanPerbulan = [];
-        $getAduanPerbulan = [];
-        $aduanPerbulanGrafik = [];
-        $aduan = [];
+
+        $grafikGroup = [];
 
         $dataJenisUnit = JenisUnit::all();
 
         $dataUnit = Unit::orderBy('updated_at', 'desc')->limit(7)->get();
+        $tahun = Carbon::now()->formatLocalized("%Y");
+        $dataGroup = Group::get();
+
+        foreach ($dataGroup as $key => $value) {
+            $grafikGroup[] = [
+                'country' => $value->nama,
+                'visits' => $value->hasSubElement($tahun),
+
+                //  "id": "g1",
+                // "valueAxis": "v2",
+                // "bullet": "round",
+                // "bulletBorderAlpha": 1,
+                // "bulletColor": "#FFFFFF",
+                // "bulletSize": 8,
+                // "hideBulletsCount": 50,
+                // "lineThickness": 3,
+                // "lineColor": "#2ed8b6",
+                // "title": "Data Dasar",
+                // "useLineColorForBulletBorder": true,
+                // "valueField": "datadasar",
+                // "balloonText": "[[title]]<br /><b style='font-size: 130%'>[[value]]</b>"
+            ];
+        }
 
         $aduanCount = 0;
         $pekerjaanCount = 0;
@@ -47,7 +69,7 @@ class HomeController extends Controller
             'title',
             'pegawai',
             'pekerjaanCount',
-            'aduanPerbulanGrafik',
+            'grafikGroup',
             'rekananCount',
             'dataUnit',
             'dataJenisUnit',
