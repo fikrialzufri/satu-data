@@ -582,7 +582,7 @@ class SubElementController extends Controller
                 $subElement = [];
                 foreach ($listElement as $el => $value) {
                     $checkElement[$el] = SubElement::where('kode', $value['kode'])->first();
-                    $dataSatuan[$el] = SubElement::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
+                    $dataSatuan[$el] = Satuan::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
 
                     $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
 
