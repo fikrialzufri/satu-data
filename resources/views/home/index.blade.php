@@ -7,13 +7,51 @@
             <!-- page statustic chart start -->
             <div class="col-xl-8 col-md-8">
                 <div class="col-xl-12 col-xl-12">
-                    <div class="card custom-card card-box mb-3">
-                        <div class="card-body p-4">
-                            <div class="row align-items-center">
-
+                    <div class="card bg-success">
+                        <div class="card-block">
+                            <div class="row">
+                                <div class="col-2 text-center">
+                                    <img src="{{ asset('img/favicomahulu.png') }}" width="90%">
+                                </div>
+                                <div class="col d-flex align-middle">
+                                    <div class="d-inline-block">
+                                        <img src="{{ asset('img/logo-white.svg') }}" width="43%" alt=""
+                                            srcset="">
+                                        <p>
+                                            <b class="text-white">Satu Data Indonesia (SDI)</b> merupakan
+                                            kebijakan tata kelola data pemerintah yang bertujuan untuk menciptakan data
+                                            berkualitas,
+                                            mudah diakses, dan dapat dibagipakaikan antar Instansi Pusat serta Daerah.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
+                </div>
+                <div class="col-xl-12 col-xl-12 mb-10">
+                    <div class="owl-container">
+                        <div class="owl-carousel basic">
+
+                            @foreach ($dataJenisUnit as $item)
+                                <div class="card custom-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <span class="tx-13 mb-3">JENIS UNIT</span>
+                                                <h5 class="card-text"> {{ $item->total }} {{ $item->nama }}</h5>
+                                            </div>
+                                            <div class="ml-auto mt-auto" width="110%">
+                                                <button type="button" class="btn btn-icon "
+                                                    style="background-color: {{ $item->warna }}"></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12 col-xl-12">
@@ -44,23 +82,27 @@
                         <div class="row align-items-center">
                             <div class="table-responsive">
                                 <table class="table">
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-middle">
-                                                <div class="d-inline-block">
-                                                    <h6 class="mb-1">Badan Kesatuan Bangsa dan Politik</h6>
-                                                    <p class="mb-0 tx-13 text-muted">6 Element Kategori </p>
+                                    @foreach ($dataUnit as $item)
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-middle">
+                                                    <div class="d-inline-block">
+                                                        <h6 class="mb-1">{{ $item->nama }}</h6>
+                                                        <p class="mb-0 tx-13 text-muted">{{ $item->total_element }} Element
+                                                            Kategori </p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-right">
-                                            <div class="d-inline-block">
-                                                <h6 class="mb-2 tx-15 font-weight-semibold">25<i
-                                                        class="fa fa-level-up-alt ml-2 text-success m-l-10"></i></h6>
-                                                <p class="mb-0 tx-11 text-muted">12 Jan 2020</p>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                            <td class="text-right">
+                                                <div class="d-inline-block">
+                                                    <h6 class="mb-2 tx-15 font-weight-semibold">
+                                                        {{ $item->nilai_terakhir }}</h6>
+                                                    <p class="mb-0 tx-11 text-muted">
+                                                        {{ tanggal_indonesia_waktu($item->updated_at) }}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </table>
                             </div>
                         </div>
@@ -78,6 +120,11 @@
 @endpush
 @push('style')
     <style>
+        .logox {
+            height: 10px;
+            top: 0;
+        }
+
         @media (max-width: 500px) {
             #perda {
                 height: 52px;
@@ -106,6 +153,8 @@
             top: 50%;
         }
     </style>
+    <link rel="stylesheet" href="http://radmin.test/plugins/owl.carousel/dist/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="http://radmin.test/plugins/owl.carousel/dist/assets/owl.theme.default.min.css">
 @endpush
 @push('script')
     <script src="{{ asset('plugins/owl.carousel/dist/owl.carousel.min.js') }}"></script>
@@ -194,6 +243,45 @@
                 "shadowAlpha": 0
             },
             "dataProvider": grafikperbulan
+        });
+
+        $(document).ready(function() {
+            $().owlCarousel && ($(".owl-carousel.basic").length > 0 && $(".owl-carousel.basic").owlCarousel({
+                margin: 10,
+                stagePadding: 15,
+                loop: true,
+                autoplay: true,
+                dotsContainer: $(".owl-carousel.basic").parents(".owl-container").find(
+                    ".slider-dot-container"),
+                responsive: {
+                    0: {
+                        items: 1
+                    },
+                    600: {
+                        items: 2
+                    },
+                    1000: {
+                        items: 3
+                    }
+                }
+            }).data("owl.carousel").onResize(), $(".owl-carousel.single").length > 0 && $(
+                ".owl-carousel.single").owlCarousel({
+                margin: 30,
+                items: 1,
+                loop: !0,
+                stagePadding: 15,
+                dotsContainer: $(".owl-carousel.single").parents(".owl-container").find(
+                    ".slider-dot-container")
+            }).data("owl.carousel").onResize(), $(".owl-dot").click(function() {
+                $($(this).parents(".owl-container").find(".owl-carousel")).owlCarousel().trigger(
+                    "to.owl.carousel", [$(this).index(), 300])
+            }), $(".owl-prev").click(function(e) {
+                e.preventDefault(), $($(this).parents(".owl-container").find(".owl-carousel"))
+                    .owlCarousel().trigger("prev.owl.carousel", [300])
+            }), $(".owl-next").click(function(e) {
+                e.preventDefault(), $($(this).parents(".owl-container").find(".owl-carousel"))
+                    .owlCarousel().trigger("next.owl.carousel", [300])
+            }));
         });
     </script>
 @endpush

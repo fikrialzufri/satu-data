@@ -18,22 +18,25 @@
 
 
                 <button type="button" id="navbar-fullscreen" class="nav-link"><i class="ik ik-maximize"></i></button>
-
-                <div class="mt-1 ml-3">
-                    @forelse ($jenis_data as $item)
-                        <button class="btn btn-sm badge jenisdatamodal" role="button"
-                            style="background-color: {{ $item->warna }}" data-id="{{ $item->id }}"
-                            data-url="{{ route('sub_element.index') }}?element_id=" data-nama="{{ $item->nama }}">
-                            {{ $item->nama }}</button>
-                    @empty
-                    @endforelse
-                </div>
+                @auth
+                    <div class="mt-1 ml-3">
+                        @forelse ($jenis_data as $item)
+                            <button class="btn btn-sm badge jenisdatamodal" role="button"
+                                style="background-color: {{ $item->warna }}" data-id="{{ $item->id }}"
+                                data-url="{{ route('sub_element.index') }}?element_id=" data-nama="{{ $item->nama }}">
+                                {{ $item->nama }}</button>
+                        @empty
+                        @endforelse
+                    </div>
+                @endauth
             </div>
-            <div class="top-menu d-flex align-items-center">
-                {{-- Notification --}}
-                <div class="dropdown">
-                    {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="ik ik-bell"></i><span class="badge bg-danger">{{ App\Models\Notifikasi::where('to_user_id', auth()->user()->id)->where('status', 'belum')->count() }}</span></a> --}}
-                    {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button"
+            @auth
+
+                <div class="top-menu d-flex align-items-center">
+                    {{-- Notification --}}
+                    <div class="dropdown">
+                        {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="ik ik-bell"></i><span class="badge bg-danger">{{ App\Models\Notifikasi::where('to_user_id', auth()->user()->id)->where('status', 'belum')->count() }}</span></a> --}}
+                        {{-- <a class="nav-link dropdown-toggle" href="#" id="notiDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
                             class="ik ik-bell"></i><span class="badge bg-danger" id="total_notification">0</span></a>
                     <div class="dropdown-menu dropdown-menu-right notification-dropdown" aria-labelledby="notiDropdown">
@@ -44,33 +47,34 @@
                         <div class="footer"><a href="javascript:void(0);">{{ __('See all activity') }}</a>
                         </div>
                     </div> --}}
-                </div>
-                <div class="dropdown">
-                    <span>{{ ucfirst(Auth::user()->name) }}</span>
-                </div>
-                <div class="dropdown">
-                    <a class="dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                        <i class="ik ik-user"></i>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="{{ route('user.ubah') }}"><i
-                                    class="ik ik-user dropdown-icon"></i>
-                                {{ __('Profile') }}</a>
-                            {{-- <a class="dropdown-item" href="#"><i class="ik ik-navigation dropdown-icon"></i>
+                    </div>
+                    <div class="dropdown">
+                        <span>{{ ucfirst(Auth::user()->name) }}</span>
+                    </div>
+                    <div class="dropdown">
+                        <a class="dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="ik ik-user"></i>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="{{ route('user.ubah') }}"><i
+                                        class="ik ik-user dropdown-icon"></i>
+                                    {{ __('Profile') }}</a>
+                                {{-- <a class="dropdown-item" href="#"><i class="ik ik-navigation dropdown-icon"></i>
                             {{ __('Message') }}</a> --}}
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="ik ik-power dropdown-icon"></i>
-                                {{ __('Logout') }}
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                                style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-                        </div>
-                </div>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <i class="ik ik-power dropdown-icon"></i>
+                                    {{ __('Logout') }}
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    style="display: none;">
+                                    {{ csrf_field() }}
+                                </form>
+                            </div>
+                    </div>
 
-            </div>
+                </div>
+            @endauth
         </div>
     </div>
 </header>

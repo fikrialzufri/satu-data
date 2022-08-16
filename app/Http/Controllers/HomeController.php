@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Element;
+use App\Models\JenisUnit;
+use App\Models\SubElement;
+use App\Models\Unit;
 use Auth;
 use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+
 
     /**
      * Show the application dashboard.
@@ -39,44 +35,9 @@ class HomeController extends Controller
         $aduanPerbulanGrafik = [];
         $aduan = [];
 
-        // $aduan =  Aduan::selectRaw('year(created_at) as tahun, month(created_at) as bulan, count(*) as jumlah')
-        //     ->whereYear('created_at', $tahun)
-        //     ->groupBy('tahun', 'bulan')
-        //     ->orderBy('tahun', 'desc')
-        //     ->get();
+        $dataJenisUnit = JenisUnit::all();
 
-        // $PelaksanaanPekerjaan =  PelaksanaanPekerjaan::selectRaw('year(created_at) as tahun, month(created_at) as bulan, count(*) as jumlah')
-        //     ->whereYear('created_at', $tahun)
-        //     ->groupBy('tahun', 'bulan')
-        //     ->orderBy('tahun', 'desc')
-        //     ->get();
-
-        // $month = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        // foreach ($aduan as $index => $ad) {
-
-        //     $getAduanPerbulan[$ad->bulan] = [
-        //         'bulan' => $ad->bulan,
-        //         'jumlah' => $ad->jumlah
-        //     ];
-        // }
-        // foreach ($PelaksanaanPekerjaan as $index => $pekerjaan) {
-
-        //     $getPekerjaanPerbulan[$pekerjaan->bulan] = [
-        //         'bulan' => $pekerjaan->bulan,
-        //         'jumlah' => $pekerjaan->jumlah
-        //     ];
-        // }
-
-
-
-        // foreach ($month as $key => $bulan) {
-        //     $aduanPerbulanGrafik[$key] = [
-        //         'date' =>  Carbon::create($tahun, $bulan, 1, 0)->format('Y-m'),
-        //         'aduan' =>  isset($getAduanPerbulan[$bulan]['jumlah']) ? (int) $getAduanPerbulan[$bulan]['jumlah'] : 0,
-        //         'pekerjaan' =>  isset($getPekerjaanPerbulan[$bulan]['jumlah']) ? (int) $getPekerjaanPerbulan[$bulan]['jumlah'] : 0,
-        //     ];
-        // };
-        // $aduanPerbulanGrafik = collect($aduanPerbulanGrafik);
+        $dataUnit = Unit::orderBy('updated_at', 'desc')->limit(7)->get();
 
         $aduanCount = 0;
         $pekerjaanCount = 0;
@@ -88,6 +49,8 @@ class HomeController extends Controller
             'pekerjaanCount',
             'aduanPerbulanGrafik',
             'rekananCount',
+            'dataUnit',
+            'dataJenisUnit',
             'anggota',
             'aduanCount',
             'rapat',

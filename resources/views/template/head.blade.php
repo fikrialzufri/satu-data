@@ -4,7 +4,7 @@
 <meta name="keywords" content="">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-<link rel="icon" href="{{ asset('img/logo.png') }}" />
+<link rel="icon" href="{{ asset('img/favicomahulu.png') }}" />
 
 <!-- font awesome library -->
 <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800" rel="stylesheet">

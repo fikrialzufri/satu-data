@@ -26,11 +26,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () {
 
-    Route::get('/', [HomeController::class, 'index'])->name('home');
 
     //ACL -- Access Control List
     Route::resource('user', UserController::class);

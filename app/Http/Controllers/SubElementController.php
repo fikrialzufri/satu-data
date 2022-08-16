@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use DB;
 use Excel;
 use App\Models\Satuan;
+use App\Models\Unit;
 use Carbon\Carbon;
 
 class SubElementController extends Controller
@@ -49,27 +50,51 @@ class SubElementController extends Controller
     public function configSearch()
     {
         $unit_id =  auth()->user()->id_unit;
-        return [
-            [
-                'name'    => 'nama',
-                'input'    => 'text',
-                'alias'    => 'Nama',
-                'value'    => null
-            ],
-            [
-                'name'    => 'tahun',
-                'input'    => 'year',
-                'default'    => 'year',
-                'alias'    => 'Tahun',
-            ],
-            [
-                'name'    => 'element_id',
-                'input'    => 'combo',
-                'alias'    => 'Element',
-                'value' => $this->combobox('Element', 'unit_id', '=', $unit_id),
-                'validasi'    => ['required']
-            ],
-        ];
+        if ($unit_id) {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'combo',
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element', 'unit_id', '=', $unit_id),
+                    'validasi'    => ['required']
+                ],
+            ];
+        } else {
+            return [
+                [
+                    'name'    => 'nama',
+                    'input'    => 'text',
+                    'alias'    => 'Nama',
+                    'value'    => null
+                ],
+                [
+                    'name'    => 'tahun',
+                    'input'    => 'year',
+                    'default'    => 'year',
+                    'alias'    => 'Tahun',
+                ],
+                [
+                    'name'    => 'element_id',
+                    'input'    => 'combo',
+                    'alias'    => 'Element',
+                    'value' => $this->combobox('Element'),
+                    'validasi'    => ['required']
+                ],
+            ];
+        }
     }
     public function configForm()
     {
@@ -507,6 +532,7 @@ class SubElementController extends Controller
     {
         $subElement = SubElementTahun::where('sub_element_id', $request->id)->where('tahun',  $request->tahun)->first();
 
+
         if (!$subElement) {
             $subElement = new SubElementTahun;
         }
@@ -515,7 +541,7 @@ class SubElementController extends Controller
 
             $subElement->parent = $request->parent === "true" ? "Y" : "N";
             $subElement->save();
-            return $this->sendResponse($subElement, "sukses", 200);
+            $updateAd =  $subElement->created_at;
         } else {
 
             $subElement->sub_element_id = $request->id;
@@ -523,8 +549,24 @@ class SubElementController extends Controller
             $subElement->nilai = $request->value;
             $subElement->legenda_id = $request->legenda_id;
             $subElement->save();
-            return $this->sendResponse($subElement, "sukses", 200);
+            $updateAd =  $subElement->updated_at;
         }
+        $subElement = SubElement::find($subElement->sub_element_id);
+
+        $element = Element::find($subElement->element_id);
+
+        if ($element) {
+            $unit = Unit::find($element->unit_id);
+            if ($unit) {
+                $element->updated_at = $updateAd;
+                $element->save();
+
+                $unit->updated_at = $updateAd;
+                $unit->save();
+            }
+        }
+
+        return $this->sendResponse($subElement, "sukses", 200);
     }
 
     public function import()
@@ -637,6 +679,7 @@ class SubElementController extends Controller
                             $subElement[$el]->nilai =  $value['nilai'];
 
                             $subElement[$el]->save();
+                            $updateAd[$el] =  $subElement[$el]->created_at;
                         } else {
 
                             if (!$subElement[$el]) {
@@ -648,6 +691,21 @@ class SubElementController extends Controller
                             $subElement[$el]->nilai =  $value['nilai'];
 
                             $subElement[$el]->save();
+                            $updateAd[$el] =  $subElement[$el]->updated_at;
+                        }
+                        $subElementParent[$el] = SubElement::find($subElement[$el]->sub_element_id);
+
+                        $element[$el] = Element::find($subElementParent[$el]->element_id);
+
+                        if ($element[$el]) {
+                            $unit[$el] = Unit::find($element[$el]->unit_id);
+                            if ($unit[$el]) {
+                                $element[$el]->updated_at = $updateAd[$el];
+                                $element[$el]->save();
+
+                                $unit[$el]->updated_at = $updateAd[$el];
+                                $unit[$el]->save();
+                            }
                         }
                     }
                 }
