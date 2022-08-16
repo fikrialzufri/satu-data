@@ -6,6 +6,7 @@ use App\Traits\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Str;
+use Auth;
 
 class Group extends Model
 {
@@ -29,11 +30,11 @@ class Group extends Model
 
     public function hasElement()
     {
-        if (auth()) {
-            $unit_id =  auth()->user()->id_unit;
+        if (Auth::user()) {
+            $unit_id =  Auth::user()->id_unit;
             $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
 
-            if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+            if (Auth::user()->hasRole('superadmin') || Auth::user()->hasRole('admin')) {
                 return $this->hasMany(Element::class, 'group_id', 'id');
             } else {
                 return $this->hasMany(Element::class, 'group_id', 'id')->whereIn('id', $checkElement);
