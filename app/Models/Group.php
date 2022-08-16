@@ -29,13 +29,17 @@ class Group extends Model
 
     public function hasElement()
     {
-        $unit_id =  auth()->user()->id_unit;
-        $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
+        if (auth()) {
+            $unit_id =  auth()->user()->id_unit;
+            $checkElement = Element::where('unit_id', $unit_id)->pluck('id')->toArray();
 
-        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
-            return $this->hasMany(Element::class, 'group_id', 'id');
+            if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+                return $this->hasMany(Element::class, 'group_id', 'id');
+            } else {
+                return $this->hasMany(Element::class, 'group_id', 'id')->whereIn('id', $checkElement);
+            }
         } else {
-            return $this->hasMany(Element::class, 'group_id', 'id')->whereIn('id', $checkElement);
+            return $this->hasMany(Element::class, 'group_id', 'id');
         }
     }
 
