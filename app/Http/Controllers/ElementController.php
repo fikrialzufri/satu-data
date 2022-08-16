@@ -391,21 +391,21 @@ class ElementController extends Controller
 
     public function store(Request $request)
     {
-        $getRequest = $this->getRequest($request);
-        $messages = $getRequest['messages'];
-        $validation = $getRequest['validasi'];
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'unique' => ':attribute tidak boleh sama'
+        ];
 
-
-        //validasi
-        $this->validate(
-            $request,
-            $validation,
-            $messages
-        );
+        $this->validate(request(), [
+            'kode' => "required|unique:element,kode,null,id,unit_id,$request->unit_id",
+            'nama' => "required",
+            'group_id' => "required",
+            'unit_id' => "required",
+        ], $messages);
 
         DB::beginTransaction();
         try {
-            DB::commit();
+
             $element = new Element();
             $element->kode =  $request->kode;
             $element->nama = $request->nama;
@@ -415,6 +415,7 @@ class ElementController extends Controller
             $element->dokumentasi = $request->dokumentasi;
             $element->unit_id = $request->unit_id;
             $element->save();
+            DB::commit();
             return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
@@ -437,16 +438,12 @@ class ElementController extends Controller
         ];
 
         $this->validate(request(), [
-            'nama' => 'required',
-            'kode' => 'required',
+            'kode' => "required|unique:element,kode,$id,id,unit_id,$request->unit_id",
+            'nama' => "required",
+            'group_id' => "required",
+            'unit_id' => "required",
         ], $messages);
 
-        $kodeGroup = "";
-        $group_id = $request->get('group_id');
-        $checkGroup = Group::find($group_id);
-        if ($checkGroup) {
-            $kodeGroup = $checkGroup->kode;
-        }
 
         DB::beginTransaction();
         try {
@@ -467,6 +464,21 @@ class ElementController extends Controller
             return redirect()->route('element.index', "unit_id=" . $request->unit_id)->with('message', 'Element gagal ditambah')->with('Class', 'danger');
         }
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $element = Element::find($id);
+        $element->delete();
+
+        return redirect()->route('element.index', "unit_id=" . $element->unit_id)->with('message', 'Element berhasil dihapus')->with('Class', 'success');
+    }
+
 
     public function import()
     {

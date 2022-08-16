@@ -34,17 +34,19 @@
 
 
                 @endcan
-                @canany('view-operator')
-                    <div class="nav-lavel">{{ __('Operator') }} </div>
-                    <div class="nav-item {{ $segment1 == 'operator' ? 'active' : '' }}">
-                        <a href="{{ route('operator.index') }}">
-                            <i class="ik ik-users"></i>
-                            <span>{{ __('Operator') }}</span>
-                        </a>
-                    </div>
+                @if (!Auth::user()->hasRole('superadmin'))
+                    @canany('view-operator')
+                        <div class="nav-lavel">{{ __('Operator') }} </div>
+                        <div class="nav-item {{ $segment1 == 'operator' ? 'active' : '' }}">
+                            <a href="{{ route('operator.index') }}">
+                                <i class="ik ik-users"></i>
+                                <span>{{ __('Operator') }}</span>
+                            </a>
+                        </div>
 
 
-                @endcan
+                    @endcan
+                @endif
                 @canany(['view-element', 'view-sub-element', 'view-jenis-unit', 'create-jenis-data', 'view-unit',
                     'view-legenda', 'view-legenda'])
                     <div class="nav-lavel">{{ __('Element') }} </div>
