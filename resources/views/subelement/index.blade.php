@@ -181,7 +181,7 @@
                                                 data-satuan="{{ $item->satuan }}"
                                                 data-metode="{{ $item->metode_perhitungan }}"
                                                 data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}">
-                                                <i class="fa fa-search"></i> Detail
+                                                <i class="fa fa-search"></i>
                                             </button>
                                             @canany(['edit-sub-element', 'delete-sub-element'])
                                                 @if (isset($button))

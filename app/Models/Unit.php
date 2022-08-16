@@ -73,4 +73,23 @@ class Unit extends Model
 
         return $total;
     }
+
+    public function getNilaiTerakhirAttribute()
+    {
+        $total = 0;
+        if ($this->hasElement) {
+
+            //    element terakhir
+            $element = $this->hasElement()->orderBy('updated_at', 'desc')->first();
+            if ($element) {
+                $subElement = $element->hasSubElement()->orderBy('updated_at', 'desc')->first();
+                if ($subElement) {
+                    $subElementTahun = $subElement->hasSubElementTahunAll()->orderBy('updated_at', 'desc')->first();
+                    $total = $subElementTahun->nilai;
+                }
+            }
+        }
+
+        return $total;
+    }
 }

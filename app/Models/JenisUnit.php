@@ -42,4 +42,15 @@ class JenisUnit extends Model
 
         return $total;
     }
+
+    public function getTotalAttribute()
+    {
+        $total = "";
+        if ($this->hasUnit) {
+
+            $total = $this->hasUnit()->count();
+        }
+
+        return $total;
+    }
 }
