@@ -423,17 +423,18 @@ class SubElementController extends Controller
 
     public function store(Request $request)
     {
-        $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'unique' => ':attribute tidak boleh sama'
+        ];
 
-        $validation = $getRequest['validasi'];
-        $messages = $getRequest['messages'];
-        //validasi
-        $this->validate(
-            $request,
-            $validation,
-            $messages
-        );
+        $this->validate(request(), [
+            'kode' => "required|unique:sub_element,kode,null,id,element_id,$element_id",
+            'nama' => "required",
+            'satuan_id' => "required",
+            'element_id' => "required",
+        ], $messages);
 
 
         DB::beginTransaction();
@@ -466,18 +467,19 @@ class SubElementController extends Controller
      */
     public function update(Request $request, $id)
     { //get dari post form
-        $getRequest = $this->getRequest($request);
         $element_id = $request->element_id;
 
-        // return $this->configForm();
-        $validation = $getRequest['validasi'];
-        $messages = $getRequest['messages'];
-        //validasi
-        $this->validate(
-            $request,
-            $validation,
-            $messages
-        );
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'unique' => ':attribute tidak boleh sama'
+        ];
+
+        $this->validate(request(), [
+            'kode' => "required|unique:sub_element,kode,$id,id,element_id,$element_id",
+            'nama' => "required",
+            'satuan_id' => "required",
+            'element_id' => "required",
+        ], $messages);
 
 
         DB::beginTransaction();

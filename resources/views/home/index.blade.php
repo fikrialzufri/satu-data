@@ -5,66 +5,71 @@
     <div class="container-fluid">
         <div class="row">
             <!-- page statustic chart start -->
-            {{-- <div class="col-xl-4 col-md-6">
-                <div class="card card-red text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ __($aduanCount) }}</h4>
-                                <p class="mb-0">{{ __('Aduan') }}</p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="fas fa-cube f-30"></i>
-                            </div>
-                        </div>
-                        <div id="Widget-line-chart1" class="chart-line chart-shadow"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-md-6">
-                <div class="card card-blue text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ __($pekerjaanCount) }}</h4>
-                                <p class="mb-0">{{ __('Pekerjaan') }}</p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="ik ik-shopping-cart f-30"></i>
-                            </div>
-                        </div>
-                        <div id="Widget-line-chart2" class="chart-line chart-shadow"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 col-md-6">
-                <div class="card card-green text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ __($rekananCount) }}</h4>
-                                <p class="mb-0">{{ __('Rekanan') }}</p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="ik ik-user f-30"></i>
-                            </div>
-                        </div>
-                        <div id="Widget-line-chart3" class="chart-line chart-shadow"></div>
-                    </div>
-                </div>
-            </div> --}}
+            <div class="col-xl-8 col-md-8">
+                <div class="col-xl-12 col-xl-12">
+                    <div class="card custom-card card-box mb-3">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
 
-            <div class="col-md-12 col-xl-12">
-                <div class="card sale-card">
-                    <div class="card-header">
-                        <h3>Grafik Tahun ini</h3>
+                            </div>
+                        </div>
+
                     </div>
-                    <div class="card-block text-center">
-                        <div id="line_chart" class="chart-shadow"></div>
+                </div>
+                <div class="col-md-12 col-xl-12">
+                    <div class="card sale-card">
+                        <div class="card-header">
+                            <h3>Grafik Tahun ini</h3>
+                        </div>
+                        <div class="card-block text-center">
+                            <div id="line_chart" class="chart-shadow"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-md-4">
+                <div class="card card-box">
+                    <div class="card-header d-block">
+                        <h6>
+                            <b>
+                                RECENT TRANSCATIONS
+                            </b>
+                        </h6>
+                        <span>Projects where development work is on completion</span>
+
+
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-middle">
+                                                <div class="d-inline-block">
+                                                    <h6 class="mb-1">Badan Kesatuan Bangsa dan Politik</h6>
+                                                    <p class="mb-0 tx-13 text-muted">6 Element Kategori </p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-right">
+                                            <div class="d-inline-block">
+                                                <h6 class="mb-2 tx-15 font-weight-semibold">25<i
+                                                        class="fa fa-level-up-alt ml-2 text-success m-l-10"></i></h6>
+                                                <p class="mb-0 tx-11 text-muted">12 Jan 2020</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
             </div>
+
+
         </div>
     </div>
 @stop
