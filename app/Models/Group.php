@@ -62,4 +62,20 @@ class Group extends Model
 
         return $total;
     }
+
+    public function hasSubElement($tahun)
+    {
+
+        $total = 0;
+        if ($this->hasElement) {
+            foreach ($this->hasElement as $element) {
+
+                foreach ($element->hasSubElement as $subElement) {
+                    $total += $subElement->hasSubElementTahun($tahun);
+                }
+            }
+        }
+
+        return $total;
+    }
 }
