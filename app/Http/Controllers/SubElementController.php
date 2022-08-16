@@ -625,10 +625,8 @@ class SubElementController extends Controller
                 $checkElement = [];
                 $subElement = [];
                 foreach ($listElement as $el => $value) {
-                    $checkElement[$el] = SubElement::where('kode', $value['kode'])->first();
+                    $checkElement[$el] = SubElement::where('kode', $value['kode'])->where('element_id', $element_id)->first();
                     $dataSatuan[$el] = Satuan::where('nama', 'like', '%' . $value['satuan'] . '%')->first();
-
-                    $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
 
                     if (!$checkElement[$el]) {
 
@@ -653,7 +651,7 @@ class SubElementController extends Controller
                             $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
                             $checkElement[$el]->meta_data = $value['meta_data'];
                             $checkElement[$el]->satuan_id = $dataSatuan[$el]->id;
-                            $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
+                            $checkElement[$el]->element_id = $element_id;
                             $checkElement[$el]->save();
                         } else {
                             if (auth()->user()->can("create-sub-element")) {
@@ -663,56 +661,56 @@ class SubElementController extends Controller
                                 $checkElement[$el]->keterangan = $value['keterangan'];
                                 $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
                                 $checkElement[$el]->meta_data = $value['meta_data'];
-
+                                $checkElement[$el]->element_id = $element_id;
                                 $checkElement[$el]->save();
                             }
                         }
-                    } else {
-                        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
+                    }
+                    $subElement[$el] = SubElementTahun::where('sub_element_id', $checkElement[$el]->id)->where('tahun',  $value['tahun'])->first();
+                    if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
 
-                            if (!$subElement[$el]) {
-                                $subElement[$el] = new SubElementTahun;
-                                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
-                            }
-                            $subElement[$el]->legenda_id = $legenda_id;
-                            $subElement[$el]->tahun = $value['tahun'];
-                            $subElement[$el]->nilai =  $value['nilai'];
-
-                            $subElement[$el]->save();
-                            $updateAd[$el] =  $subElement[$el]->created_at;
-                        } else {
-
-                            if (!$subElement[$el]) {
-                                $subElement[$el] = new SubElementTahun;
-                                $subElement[$el]->sub_element_id = $checkElement[$el]->id;
-                                $subElement[$el]->legenda_id = $legenda_id;
-                            }
-                            $subElement[$el]->tahun = $value['tahun'];
-                            $subElement[$el]->nilai =  $value['nilai'];
-
-                            $subElement[$el]->save();
-                            $updateAd[$el] =  $subElement[$el]->updated_at;
+                        if (!$subElement[$el]) {
+                            $subElement[$el] = new SubElementTahun;
+                            $subElement[$el]->sub_element_id = $checkElement[$el]->id;
                         }
-                        $subElementParent[$el] = SubElement::find($subElement[$el]->sub_element_id);
+                        $subElement[$el]->legenda_id = $legenda_id;
+                        $subElement[$el]->tahun = $value['tahun'];
+                        $subElement[$el]->nilai =  $value['nilai'];
 
-                        $element[$el] = Element::find($subElementParent[$el]->element_id);
+                        $subElement[$el]->save();
+                        $updateAd[$el] =  $subElement[$el]->created_at;
+                    } else {
 
-                        if ($element[$el]) {
-                            $unit[$el] = Unit::find($element[$el]->unit_id);
-                            if ($unit[$el]) {
-                                $element[$el]->updated_at = $updateAd[$el];
-                                $element[$el]->save();
+                        if (!$subElement[$el]) {
+                            $subElement[$el] = new SubElementTahun;
+                            $subElement[$el]->sub_element_id = $checkElement[$el]->id;
+                            $subElement[$el]->legenda_id = $legenda_id;
+                        }
+                        $subElement[$el]->tahun = $value['tahun'];
+                        $subElement[$el]->nilai =  $value['nilai'];
 
-                                $unit[$el]->updated_at = $updateAd[$el];
-                                $unit[$el]->save();
-                            }
+                        $subElement[$el]->save();
+                        $updateAd[$el] =  $subElement[$el]->updated_at;
+                    }
+                    $subElementParent[$el] = SubElement::find($subElement[$el]->sub_element_id);
+
+                    $element[$el] = Element::find($subElementParent[$el]->element_id);
+
+                    if ($element[$el]) {
+                        $unit[$el] = Unit::find($element[$el]->unit_id);
+                        if ($unit[$el]) {
+                            $element[$el]->updated_at = $updateAd[$el];
+                            $element[$el]->save();
+
+                            $unit[$el]->updated_at = $updateAd[$el];
+                            $unit[$el]->save();
                         }
                     }
                 }
-                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
             } catch (\Throwable $th) {
                 DB::rollback();
-                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil diubah')->with('Class', 'success');
+                return redirect()->route('sub_element.index', "element_id=" . $element_id . "&tahun=" . $tahun)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
             }
         }
 
