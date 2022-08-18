@@ -60,50 +60,50 @@
                     </div>
                 @endauth
                 @guest
-                    <div class="modal fade " id="jenisdatamenumodal" tabindex="-1" role="dialog"
-                        aria-labelledby="jeniDataMenuModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                            <div class="modal-content ">
-                                <div class="modal-header">
-                                    <h5 id="jeniDataMenuModalLabel"></h5>
+                @endguest
+                <div class="modal fade " id="jenisdatamenumodal" tabindex="-1" role="dialog"
+                    aria-labelledby="jeniDataMenuModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content ">
+                            <div class="modal-header">
+                                <h5 id="jeniDataMenuModalLabel"></h5>
 
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                            aria-hidden="true">&times;</span></button>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
 
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row">
-                                        <div class="col-sm-8 col-lg-10">
-                                            <div class="input-group">
-                                                <span class="input-group-prepend">
-                                                    <label class="input-group-text">
-                                                        Pencarian
-                                                    </label>
-                                                </span>
-                                                <input type="text" class="form-control" placeholder="Cari"
-                                                    id="searchMenuElement">
-                                            </div>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-8 col-lg-10">
+                                        <div class="input-group">
+                                            <span class="input-group-prepend">
+                                                <label class="input-group-text">
+                                                    Pencarian
+                                                </label>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Cari"
+                                                id="searchMenuElement">
                                         </div>
                                     </div>
-                                    <table class="table table-bordered " id="tableMenuElement">
-
-                                        <thead>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        </tbody>
-                                    </table>
                                 </div>
-                                <div class="modal-footer">
+                                <table class="table table-bordered " id="tableMenuElement">
 
-                                </div>
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+
                             </div>
                         </div>
                     </div>
-                @endguest
+                </div>
 
             </div>
             {{-- <!-- initiate chat section-->
@@ -190,7 +190,8 @@
     </script>
     @guest
         <script>
-            $('.jenisdatamenumodal').on('click', function() {
+            $('.jenisdatamenumodal').on('click', function(e) {
+                e.preventDefault();
                 $('#jenisdatamenumodal').modal('show');
                 let title = $(this).data('nama');
                 jeniDataMenuModalLabel.innerHTML = title;

@@ -16,6 +16,17 @@
                         @endforelse
                     </div>
                 @endauth
+                @guest
+
+                    <div class="mt-1 ml-3">
+                        <a href="{{ route('home') }}"
+                            class="btn {{ request()->segment(1) == '' || request()->segment(1) == 'kategorielement' ? 'bg-success' : 'btn-outline-success' }}"
+                            role="button">Urusan</a>
+                        <a href="{{ route('element.index') }}"
+                            class="btn {{ request()->segment(1) == 'element' ? 'bg-success' : 'btn-outline-success' }} "
+                            role="button">Unit</a>
+                    </div>
+                @endguest
             </div>
             @auth
 

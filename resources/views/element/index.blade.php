@@ -86,7 +86,11 @@
                                         <td class="text-center">
                                             {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
                                         <td>
-                                            <a href="{{ route('sub_element.index') }}?element_id={{ $item->id }}">
+                                            <a @auth
+                                                    href="{{ route('sub_element.index') }}?element_id={{ $item->id }}"
+                                                    @endauth @guest
+                                                    href="{{ route('kategorielement') }}?element_id={{ $item->id }}"
+                                                @endguest>
 
                                                 <div style='background-color:#19b159; color:white; width:100%; '
                                                     class="badge badge-pill mb-1 d-flex justify-content-between">

@@ -45,7 +45,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('operator', OperatorController::class);
 
     // Element
-    Route::resource('element', ElementController::class);
+
     Route::get('/elementimport', [ElementController::class, 'import'])->name('element.import');
     Route::post('/elementimport', [ElementController::class, 'importpost'])->name('element.import.post');
     Route::get('/elementdownload', [ElementController::class, 'download'])->name('element.download');
@@ -55,7 +55,6 @@ Route::group(['middleware' => 'auth'], function () {
     // import Element
     Route::get('/elementinport', [SubElementController::class, 'import'])->name('sub-element.import');
 
-    Route::resource('sub_element', SubElementController::class);
     Route::get('/sub_elementimport', [SubElementController::class, 'import'])->name('sub-element.import');
     Route::post('/sub_elementimport', [SubElementController::class, 'importpost'])->name('sub-element.import.post');
 
@@ -80,3 +79,8 @@ Route::group(['middleware' => 'auth'], function () {
 Route::get('/jenisdetail', [JenisDataController::class, 'detail'])->name('jenisdata.detail');
 
 Route::get('/kategorielement', [SubElementController::class, 'kategorielement'])->name('kategorielement');
+Route::get('/kelompokelement', [SubElementController::class, 'kelompokelement'])->name('kelompokelement');
+
+Route::resource('element', ElementController::class);
+
+Route::resource('sub_element', SubElementController::class);

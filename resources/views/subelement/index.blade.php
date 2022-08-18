@@ -144,7 +144,7 @@
                                             @endif
                                         @endforeach
                                         <td>
-                                            {{ $item->hasSubElementTahun($subYear) }}
+                                            {{ format_uang($item->hasSubElementTahun($subYear)) }}
                                         </td>
                                         @canany(['input-nilai-sub-element'])
                                             <td>
@@ -153,7 +153,7 @@
                                                     <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
                                                         type="text" class="form-control numberOnly nilai"
                                                         id="tahun_{{ $item->id }}"
-                                                        value="{{ $item->hasSubElementTahun($year) }}">
+                                                        value="{{ format_uang($item->hasSubElementTahun($year)) }}">
                                                 </div>
                                             </td>
                                         @endcanany
@@ -330,6 +330,8 @@
             var tahun = $(this).attr("data-tahun");
             var value = $(this).val();
             var legenda = $("#legenda_" + id).val();
+            let val = formatRupiah(value, '');
+            $(this).val(val);
 
             // ajakan ajax
             $.ajax({

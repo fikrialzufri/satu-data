@@ -7,6 +7,28 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
+                    <!-- /.card-header -->
+                    <div class="card-body bg-success ">
+                        <div class="d-block">
+
+                            <div class="">
+                                <b>
+                                    URL
+                                </b>
+                                <br>
+                                <code id="urlapi">{{ $url }}</code>
+                                <br>
+                                <button class="btn btn-xs btn-dark" id="buttonCopy" data-toggle="tooltip" type="button"
+                                    data-original-title="Copy to clipboard"><i class="fa fa-copy"></i>
+                                    Copy API Url</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <div class="card-title d-block">
                             <h3>
@@ -76,7 +98,7 @@
                                         <td>{{ $item->satuan }}</td>
                                         @foreach ($listtahun as $li)
                                             <td>
-                                                {{ $item->hasSubElementTahun($li) }}
+                                                {{ format_uang($item->hasSubElementTahun($li)) }}
                                             </td>
                                         @endforeach
                                         <td>
@@ -87,8 +109,9 @@
                                         </td>
                                         <td>
 
-                                            <button class="btn btn-success btn-sm text-center" data-toggle="tooltip"
-                                                data-placement="top" title="Chart"><i
+                                            <button class="btn btn-success btn-sm text-center chartjenis"
+                                                data-id="{{ $item->id }}" data-nama="{{ $item->nama }}"
+                                                data-toggle="tooltip" data-placement="top" title="Chart"><i
                                                     class="ik ik-bar-chart-2"></i></button>
                                         </td>
                                     </tr>
@@ -166,6 +189,63 @@
             <!-- /.row -->
             <!-- Main row -->
             <!-- /.row (main row) -->
+            <div class="modal fade " id="chartmodal" tabindex="-1" role="dialog" aria-labelledby="chartModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable ">
+                    <div class="modal-content ">
+                        <div class="modal-header">
+                            <h5 id="chartModalLabel"></h5>
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="d-block">
+                                        <p id="titleElement">
+
+                                        </p>
+                                        <p class="font-weight-light">
+                                            Dari {{ $subtahun }} sampai {{ $tahun }}
+                                        </p>
+                                    </div>
+                                    <hr>
+                                    <div class="text-center">
+                                        <h5>Realisasi Pencapaian</h5>
+                                        <p>Source : {{ url('/') }}</p>
+                                        <div id="bar_chart" class="chart-shadow"></div>
+
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="d-block">
+                                        <p>
+                                            <b>Keterangan Element Nilai</b>
+                                        </p>
+                                        <p class="font-weight-light" id="nilaiTitleElement">
+
+                                        </p>
+                                    </div>
+                                    <hr>
+                                    <div>
+                                        <table class="table table-striped">
+                                            <tbody id="listTahun">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div><!-- /.container-fluid -->
     </div>
 @endsection
@@ -175,23 +255,104 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endpush
 @push('script')
-    <!-- DataTables -->
-    <script src="{{ asset('plugins/DataTables/datatables.js') }}"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css"
         rel="stylesheet" />
+
+    <script src="{{ asset('plugins/amcharts/amcharts.js') }}"></script>
+    <script src="{{ asset('plugins/amcharts/serial.js') }}"></script>
+    <script src="{{ asset('plugins/amcharts/themes/light.js') }}"></script>
     <script>
-        // $('#example').DataTable({
-        //   "paging": true,
-        //   "lengthChange": true,
-        //   "searching": true,
-        //   "ordering": true,
-        //   "info": true,
-        //   "autoWidth": true,
-        //   "pageLength": 20,
-        // });
+        $(document).ready(function() {
+
+            $('.chartjenis').on('click', function() {
+                let title = $(this).data('nama');
+
+                chartModalLabel.innerHTML = "Kelompok Data : " + title;
+
+                $('#titleElement').html("<b>" + title + "</b>");
+                $('#nilaiTitleElement').html(title);
+                let id = $(this).data('id');
+                let subtahun = $('#subtahun').val();
+                let tahun = $('#tahun').val();
+
+                console.log(id);
+                // ajax kelompokelement
+                $.ajax({
+                    url: "{{ route('kelompokelement') }}",
+                    type: "GET",
+                    data: {
+                        id,
+                        tahun,
+                        subtahun
+                    },
+                    success: function(res) {
+                        //ambil data nilai lempar ke listTahun
+                        const listnilai = res.data.nilai;
+                        let html = "";
+                        listnilai.forEach((element, index) => {
+                            html += "<tr>";
+                            html +=
+                                `<td>
+                                <h6>
+                                <b> Tahun ${element.tahun} : ${element.nilai} ${element.satuan}</b>
+                                </h6>
+                            </td>
+                            <br>`;
+                            html += "</tr>";
+                        });
+                        $("#listTahun").html(html);
+                        // AmCharts.makeChart("line_chart"
+
+                        $('#chartmodal').modal('show');
+                        $('#chartmodal').on('shown.bs.modal', function(e) {
+
+                            var chart = AmCharts.makeChart("bar_chart", {
+                                "type": "serial",
+                                "dataProvider": listnilai,
+                                "categoryField": "country",
+                                "graphs": [{
+                                    "valueField": "visits",
+                                    "type": "line",
+                                    "labelText": "[[value]]",
+                                    "labelOffset": 4,
+                                    "bullet": "round",
+                                    "lineColor": "#28a745",
+                                    "balloonText": `[[category]]: <b>[[value]]</b>`
+                                }],
+                                "categoryAxis": {
+                                    // ... other category axis settings
+                                    "labelRotation": 80,
+                                    "autoGridCount": false,
+                                    "gridCount": listnilai.length,
+                                },
+                                "export": {
+                                    "enabled": true
+                                },
+                                "legend": {
+                                    "useGraphSettings": true,
+                                    "labelText": title
+                                },
+                            });
+                        });
+                    }
+                });
+
+
+            });
+        })
+
+        // click buttoncopy copy id urlapi
+        $('#buttonCopy').on('click', function() {
+            var copyText = $('#urlapi').text();
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val(copyText).select();
+            document.execCommand("copy");
+            $temp.remove();
+        });
+
         $("#tahun").datepicker({
             format: "yyyy",
             viewMode: "years",

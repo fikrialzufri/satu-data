@@ -18,4 +18,17 @@ class SubElementTahun extends Model
         'legenda_id',
         'user_id',
     ];
+
+    // legenda
+    public function hasLegenda()
+    {
+        return $this->hasOne(Legenda::class, 'id', 'legenda_id');
+    }
+    // get nama legenda
+    public function getLegendaAttribute()
+    {
+        if ($this->hasLegenda) {
+            return $this->hasLegenda->nama;
+        }
+    }
 }
