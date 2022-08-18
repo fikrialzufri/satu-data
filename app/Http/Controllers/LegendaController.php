@@ -30,6 +30,10 @@ class LegendaController extends Controller
                 'input'    => 'warna',
                 'alias'    => 'Warna',
             ],
+            [
+                'name'    => 'keterangan',
+                'alias'    => 'Keterangan',
+            ],
         ];
     }
     public function configSearch()
@@ -59,6 +63,11 @@ class LegendaController extends Controller
                 'alias'    => 'Warna',
                 'default'    => '#006838',
                 'validasi'    => ['required'],
+            ],
+            [
+                'name'    => 'keterangan',
+                'input'    => 'text',
+                'alias'    => 'Keterangan Legenda'
             ],
         ];
     }

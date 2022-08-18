@@ -744,6 +744,64 @@ class SubElementController extends Controller
         return Excel::download(new ExportSubElement($id, $year), 'Download Sub Element.xlsx');
     }
 
+    public function kategorielement()
+    {
+        //memangil model peratama
+        $title = "";
+        $nama_unit = "";
+        $keterangan = "";
+        $dokumentasi = "";
+        $query = $this->model()::query();
+        $element_id = request()->get('element_id');
+
+        $checkElement = Element::where('id', $element_id)->first();
+        if ($checkElement) {
+            $query = $query->where('element_id', $element_id);
+            $Element = Element::find($element_id);
+            if ($Element) {
+                $title =  $Element->nama;
+                $nama_unit = $Element->unit;
+                $keterangan = $Element->keterangan;
+                $dokumentasi = $Element->dokumentasi;
+            }
+        }
+        $data = $query->get();
+
+
+        $tahun = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $tahun = request()->get('tahun');
+        }
+
+        $subtahun = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('subtahun') != null) {
+            $subtahun = request()->get('subtahun');
+        }
+
+        // for loop tahun dan subtahun
+        $listtahun = [];
+        for ($i = $subtahun; $i < $tahun + 1; $i++) {
+            $listtahun[] = (int) $i;
+        }
+
+        $listLegenda = Legenda::all();
+
+        // lenght listh tahun
+        return view('kategorielement.index',  compact(
+            "title",
+            "element_id",
+            "tahun",
+            "subtahun",
+            "listtahun",
+            "nama_unit",
+            "listLegenda",
+            "keterangan",
+            "dokumentasi",
+            'data'
+        ));
+    }
+
     public function model()
     {
         return new SubElement();

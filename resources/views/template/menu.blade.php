@@ -130,7 +130,8 @@
                 @guest
                     @forelse ($jenis_data as $item)
                         <div class="nav-item {{ $segment1 == 'satuan' ? 'active' : '' }}">
-                            <a href="{{ route('home') }}?jenisdata={{ $item->slug }}">
+                            <a href="#" class="jenisdatamenumodal" data-nama="{{ $item->nama }}"
+                                data-id="{{ $item->id }}" data-url="{{ route('kategorielement') }}?element_id=">
                                 <i class="ik ik-box"></i>
                                 <span>{{ $item->nama }}</span>
                             </a>

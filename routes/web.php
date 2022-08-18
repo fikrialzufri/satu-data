@@ -67,8 +67,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('unit', UnitController::class);
     Route::resource('legenda', LegendaController::class);
 
-    // jenis data getDetail
-    Route::get('/jenisdetail', [JenisDataController::class, 'detail'])->name('jenisdata.detail');
+
 
     // ubah profile
     Route::get('/ubahuser', [UserController::class, 'ubah'])->name('user.ubah');
@@ -76,3 +75,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::put('/save-token', [UserController::class, 'token'])->name('user.token');
     Route::get('/user-notification', [UserController::class, 'notification'])->name('user.notification');
 });
+
+// jenis data getDetail
+Route::get('/jenisdetail', [JenisDataController::class, 'detail'])->name('jenisdata.detail');
+
+Route::get('/kategorielement', [SubElementController::class, 'kategorielement'])->name('kategorielement');

@@ -43,6 +43,17 @@ class Group extends Model
             return $this->hasMany(Element::class, 'group_id', 'id');
         }
     }
+    public function hasElementJenis($jenis)
+    {
+        $total = 0;
+        if ($this->hasElement()) {
+            $dataelements =  $this->hasElement()->where('jenis_data_id', $jenis)->get();
+            foreach ($dataelements as $element) {
+                $total += $element->total_sub_element;
+            }
+        }
+        return $total;
+    }
 
     public function getTotalElementAttribute()
     {

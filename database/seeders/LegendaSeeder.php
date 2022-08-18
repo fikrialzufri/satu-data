@@ -19,10 +19,11 @@ class LegendaSeeder extends Seeder
         $faker = Faker::create();
         $listLegenda = [
             ['nama' => 'Aram', 'warna' => $faker->hexColor()],
-            ['nama' => 'Proyeksi | n/a Tidak Ada', 'warna' => $faker->hexColor()],
+            ['nama' => 'Proyeksi', 'warna' => $faker->hexColor()],
+            ['nama' => 'Tidak Ada', 'warna' => $faker->hexColor()],
             ['nama' => 'Sangat Sementara', 'warna' => $faker->hexColor()],
             ['nama' => 'Sementara', 'warna' => $faker->hexColor()],
-            ['nama' => 'Tetap', 'warna' => $faker->hexColor()]
+            ['nama' => 'Tetap', 'warna' => $faker->hexColor()],
         ];
 
         foreach ($listLegenda as $key => $value) {
