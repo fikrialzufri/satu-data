@@ -878,12 +878,15 @@ class SubElementController extends Controller
         $no = 0;
         foreach ($data as $key => $value) {
             for ($i = $subtahun; $i < $tahun + 1; $i++) {
+
                 $listnilai[$key][$no++] = [
                     'nilai' => format_uang($value->hasSubElementTahun((int) $i)),
                     'legenda' => $value->hasLegenda((int) $i),
                     'satuan' => $value->satuan,
                     'tahun' => (int) $i
                 ];
+                // total nilai
+
             }
             $result[] = [
                 'nama' => $value->nama,
@@ -893,8 +896,9 @@ class SubElementController extends Controller
                 'nilai' => $listnilai[$key]
             ];
         }
+
         // lenght listh tahun
-        return $this->sendResponse($result, "sukses", 200);
+        return $this->sendResponse($result, "sukses", 200, $no);
     }
 
     public function model()
