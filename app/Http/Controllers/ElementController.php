@@ -12,7 +12,7 @@ use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
 use Excel;
-
+use Auth;
 
 class ElementController extends Controller
 {
@@ -22,7 +22,7 @@ class ElementController extends Controller
     {
         $this->route = 'element';
         $this->kelipatan = 12;
-        $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
+        $this->middleware('permission:view-' . $this->route, ['only' => ['show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete-' . $this->route, ['only' => ['delete']]);
@@ -288,22 +288,28 @@ class ElementController extends Controller
             }
         }
         $unit_id = request()->get('unit_id');
+        if (Auth::user()) {
+            if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
 
-        if (auth()->user()->hasRole('superadmin') || auth()->user()->hasRole('admin')) {
 
-
-            $unit_id = request()->get('unit_id');
-            if ($unit_id) {
-                $query = $query->where('unit_id', $unit_id);
-                $unit = Unit::find($unit_id);
-                if ($unit) {
-                    $unit = $unit->nama;
-                    $title =  ucwords($this->route) . " - " . $unit;
+                $unit_id = request()->get('unit_id');
+                if ($unit_id) {
+                    $query = $query->where('unit_id', $unit_id);
+                    $unit = Unit::find($unit_id);
+                    if ($unit) {
+                        $unit = $unit->nama;
+                        $title =  ucwords($this->route) . " - " . $unit;
+                    }
                 }
+            } else {
+                $unit_id =  auth()->user()->id_unit;
+                $query->where('unit_id', $unit_id);
             }
         } else {
-            $unit_id =  auth()->user()->id_unit;
-            $query->where('unit_id', $unit_id);
+            $unit_id =  request()->get('unit_id');
+            if ($unit_id) {
+                $query->where('unit_id', $unit_id);
+            }
         }
         if ($this->sort) {
             if ($this->desc) {

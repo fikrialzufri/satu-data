@@ -21,7 +21,7 @@ class UnitController extends Controller
     {
         $this->route = 'unit';
         $this->index = 'unit';
-        $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
+        $this->middleware('permission:view-' . $this->route, ['only' => ['show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete-' . $this->route, ['only' => ['delete']]);

@@ -28,18 +28,65 @@
                 <!-- yeild contents here -->
 
                 @yield('content')
+                @auth
 
-                <div class="modal fade " id="jenisdatamodal" tabindex="-1" role="dialog"
-                    aria-labelledby="jeniDataModalLabel" aria-hidden="true">
+                    <div class="modal fade " id="jenisdatamodal" tabindex="-1" role="dialog"
+                        aria-labelledby="jeniDataModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content ">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="jeniDataModalLabel"></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                            aria-hidden="true">&times;</span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-bordered " id="tableElement">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Nama</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endauth
+                @guest
+                @endguest
+                <div class="modal fade " id="jenisdatamenumodal" tabindex="-1" role="dialog"
+                    aria-labelledby="jeniDataMenuModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
                         <div class="modal-content ">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="jeniDataModalLabel"></h5>
+                                <h5 id="jeniDataMenuModalLabel"></h5>
+
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                         aria-hidden="true">&times;</span></button>
+
                             </div>
                             <div class="modal-body">
-                                <table class="table table-bordered " id="tableElement">
+                                <div class="row">
+                                    <div class="col-sm-8 col-lg-10">
+                                        <div class="input-group">
+                                            <span class="input-group-prepend">
+                                                <label class="input-group-text">
+                                                    Pencarian
+                                                </label>
+                                            </span>
+                                            <input type="text" class="form-control" placeholder="Cari"
+                                                id="searchMenuElement">
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered " id="tableMenuElement">
 
                                     <thead>
                                         <tr>
@@ -71,6 +118,57 @@
 
     <!-- initiate modal menu section-->
     @include('template.modalmenu')
+    @auth
+        <script>
+            $('.jenisdatamodal').on('click', function() {
+                $('#jenisdatamodal').modal('show');
+                let title = $(this).data('nama');
+                jeniDataModalLabel.innerHTML = title;
+
+                let id = $(this).data('id');
+                let url = $(this).data('url');
+                // ajax jenis_data.getDetail
+                $.ajax({
+                    url: "{{ route('jenisdata.detail') }}",
+                    type: "GET",
+                    data: {
+                        id: id
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        $("#tableElement tbody tr").remove();
+                        let html = '';
+                        data.forEach((element, index) => {
+                            let no = parseInt(index) + 1;
+                            html += '<tr>';
+                            html += '<td colspan="2" class="text-center"><b>' + element.group +
+                                ' (' +
+                                element.total +
+                                ') </b></td>';
+                            // element tidak sama dengan null
+                            html += '</tr>';
+                            if (element.element != null) {
+                                element.element.forEach((detail, index) => {
+                                    let no = parseInt(index) + 1;
+                                    html += '<tr>';
+
+                                    html += '<td> <a href="' + url + detail.id + '">' +
+                                        detail
+                                        .nama + '<a/></td>';
+                                    html += '<td>' + detail.total_sub_element + '</td>';
+                                    html += '</tr>';
+                                });
+                            }
+                        });
+                        $("#tableElement tbody").append(html);
+
+                    }
+                });
+
+
+            });
+        </script>
+    @endauth
     <script>
         /* Fungsi formatRupiah */
         function formatRupiah(angka, prefix) {
@@ -89,55 +187,67 @@
             rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
             return prefix == undefined ? rupiah : (rupiah ? rupiah : '');
         }
+    </script>
+    @guest
+        <script>
+            $('.jenisdatamenumodal').on('click', function(e) {
+                e.preventDefault();
+                $('#jenisdatamenumodal').modal('show');
+                let title = $(this).data('nama');
+                jeniDataMenuModalLabel.innerHTML = title;
 
-        $('.jenisdatamodal').on('click', function() {
-            $('#jenisdatamodal').modal('show');
-            let title = $(this).data('nama');
-            jeniDataModalLabel.innerHTML = title;
+                let id = $(this).data('id');
+                let url = $(this).data('url');
+                // ajax jenis_data.getDetail
+                $.ajax({
+                    url: "{{ route('jenisdata.detail') }}",
+                    type: "GET",
+                    data: {
+                        id: id
+                    },
+                    success: function(data) {
+                        $("#tableMenuElement tbody tr").remove();
+                        let html = '';
+                        data.forEach((element, index) => {
+                            let no = parseInt(index) + 1;
+                            html += '<tr>';
+                            html += '<th colspan="2" class="text-center"><b>' + element.group +
+                                '</b></th>';
+                            // element tidak sama dengan null
+                            html += '</tr>';
+                            if (element.element != null) {
+                                element.element.forEach((detail, index) => {
+                                    let no = parseInt(index) + 1;
+                                    html += '<tr>';
 
-            let id = $(this).data('id');
-            let url = $(this).data('url');
-            // ajax jenis_data.getDetail
-            $.ajax({
-                url: "{{ route('jenisdata.detail') }}",
-                type: "GET",
-                data: {
-                    id: id
-                },
-                success: function(data) {
-                    console.log(data);
-                    $("#tableElement tbody tr").remove();
-                    let html = '';
-                    data.forEach((element, index) => {
-                        let no = parseInt(index) + 1;
-                        html += '<tr>';
-                        html += '<td colspan="2" class="text-center"><b>' + element.group +
-                            ' (' +
-                            element.total +
-                            ') </b></td>';
-                        // element tidak sama dengan null
-                        html += '</tr>';
-                        if (element.element != null) {
-                            element.element.forEach((detail, index) => {
-                                let no = parseInt(index) + 1;
-                                html += '<tr>';
+                                    html += '<td> <a href="' + url + detail.id + '">' +
+                                        detail
+                                        .nama + '<a/></td>';
+                                    html += '<td>' + detail.total_sub_element + '</td>';
+                                    html += '</tr>';
+                                });
+                            }
+                        });
+                        $("#tableMenuElement tbody").append(html);
 
-                                html += '<td> <a href="' + url + detail.id + '">' +
-                                    detail
-                                    .nama + '<a/></td>';
-                                html += '<td>' + detail.total_sub_element + '</td>';
-                                html += '</tr>';
-                            });
-                        }
-                    });
-                    $("#tableElement tbody").append(html);
-
-                }
+                    }
+                });
+            });
+            // cari hanya text didalam td di table mengunakan searchMenuElement
+            $("#searchMenuElement").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#tableMenuElement tbody tr").filter(function() {
+                    // hanya td saja yang di hapus atau di filter di toggle\
+                    $(this).find('td').toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
             });
 
-
-        });
-    </script>
+            // jika modal di tutup maka searchMenuElement di kosongkan
+            $('#jenisdatamenumodal').on('hidden.bs.modal', function() {
+                $("#searchMenuElement").val('');
+            });
+        </script>
+    @endguest
     <!-- initiate scripts-->
     @include('template.script')
 

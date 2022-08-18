@@ -73,6 +73,16 @@ class SubElement extends Model
         return $legenda_id;
     }
 
+    public function hasLegenda($tahun)
+    {
+        $data = $this->hasSubElementTahunAll()->where('tahun', $tahun)->first();
+        $legenda = "";
+        if ($data) {
+            $legenda = $data->legenda;
+        }
+        return $legenda;
+    }
+
     public function getElementNilaiAttribute()
     {
         if ($this->hasSubElementTahun) {
@@ -84,6 +94,30 @@ class SubElement extends Model
     {
         if ($this->hasElement) {
             return $this->hasElement->kode_hasil;
+        }
+    }
+    public function getGroupAttribute()
+    {
+        if ($this->hasElement) {
+            return $this->hasElement->group;
+        }
+    }
+    public function getJenisAttribute()
+    {
+        if ($this->hasElement) {
+            return $this->hasElement->jenis_data;
+        }
+    }
+    public function getUnitAttribute()
+    {
+        if ($this->hasElement) {
+            return $this->hasElement->unit;
+        }
+    }
+    public function getKeteranganElementAttribute()
+    {
+        if ($this->hasElement) {
+            return $this->hasElement->keterangan;
         }
     }
 

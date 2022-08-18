@@ -546,7 +546,7 @@ class SubElementController extends Controller
 
             $subElement->sub_element_id = $request->id;
             $subElement->tahun = $request->tahun;
-            $subElement->nilai = $request->value;
+            $subElement->nilai = str_replace(".", "", $request->value);
             $subElement->legenda_id = $request->legenda_id;
             $subElement->save();
             $updateAd =  $subElement->updated_at;
@@ -614,7 +614,7 @@ class SubElementController extends Controller
                         'kode' => $value[1],
                         'nama' => $value[2],
                         'nilai' => $value[3],
-                        'tahun' => $value[4],
+                        'tahun' => str_replace(".", "", $value[4]),
                         'satuan' => $value[5],
                         'keterangan' => $value[6],
                         'sumber_data' => $value[7],
@@ -742,6 +742,163 @@ class SubElementController extends Controller
             }
         }
         return Excel::download(new ExportSubElement($id, $year), 'Download Sub Element.xlsx');
+    }
+
+    public function kategorielement()
+    {
+        //memangil model peratama
+        $title = "";
+        $nama_unit = "";
+        $keterangan = "";
+        $dokumentasi = "";
+        $query = $this->model()::query();
+        $element_id = request()->get('element_id');
+
+        $checkElement = Element::where('id', $element_id)->first();
+        if ($checkElement) {
+            $query = $query->where('element_id', $element_id);
+            $Element = Element::find($element_id);
+            if ($Element) {
+                $title =  $Element->nama;
+                $nama_unit = $Element->unit;
+                $keterangan = $Element->keterangan;
+                $dokumentasi = $Element->dokumentasi;
+            }
+        }
+        $data = $query->get();
+
+
+        $tahun = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $tahun = request()->get('tahun');
+        }
+
+        $subtahun = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('subtahun') != null) {
+            $subtahun = request()->get('subtahun');
+        }
+
+        // for loop tahun dan subtahun
+        $listtahun = [];
+        for ($i = $subtahun; $i < $tahun + 1; $i++) {
+            $listtahun[] = (int) $i;
+        }
+
+        $listLegenda = Legenda::all();
+        $url = route('kelompokelement.api') . "?element_id=" . $element_id . "&subtahun=" . $subtahun . "&tahun=" . $tahun;
+
+        // lenght listh tahun
+        return view('kategorielement.index',  compact(
+            "title",
+            "element_id",
+            "tahun",
+            "url",
+            "subtahun",
+            "listtahun",
+            "nama_unit",
+            "listLegenda",
+            "keterangan",
+            "dokumentasi",
+            'data'
+        ));
+    }
+
+    public function kelompokelement()
+    {
+        $id = request()->get('id');
+        $element_id = request()->get('element_id');
+        $tahun = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $tahun = request()->get('tahun');
+        }
+
+        $subtahun = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('subtahun') != null) {
+            $subtahun = request()->get('subtahun');
+        }
+        $data = $this->model()->find($id);
+        // for loop tahun dan subtahun
+        $listtahun = [];
+        $no = 0;
+        for ($i = $subtahun; $i < $tahun + 1; $i++) {
+            $listtahun[$no++] = [
+                'nilai' => format_uang($data->hasSubElementTahun((int) $i)),
+                'visits' => $data->hasSubElementTahun((int) $i),
+                'legenda' => $data->hasLegenda((int) $i),
+                'satuan' => $data->satuan,
+                'tahun' => (int) $i,
+                'country' => (int) $i,
+            ];
+        }
+
+        $result =  [
+            'nama' => $data->nama,
+            'nilai' => $listtahun
+        ];
+        return $this->sendResponse($result, "sukses", 200);
+    }
+
+    public function apikategorielement()
+    {
+        $query = $this->model()::query();
+        $element_id = request()->get('element_id');
+
+        $checkElement = Element::where('id', $element_id)->first();
+        if ($checkElement) {
+            $query = $query->where('element_id', $element_id);
+            $Element = Element::find($element_id);
+            if ($Element) {
+                $title =  $Element->nama;
+                $nama_unit = $Element->unit;
+                $keterangan = $Element->keterangan;
+                $dokumentasi = $Element->dokumentasi;
+            }
+        }
+        $data = $query->get();
+
+
+        $tahun = Carbon::now()->year;
+        if (request()->get('tahun') != null) {
+            $tahun = request()->get('tahun');
+        }
+
+        $subtahun = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('subtahun') != null) {
+            $subtahun = request()->get('subtahun');
+        }
+
+        // for loop tahun dan subtahun
+        $listtahun = [];
+        $listnilai = [];
+
+        $result = [];
+        $no = 0;
+        foreach ($data as $key => $value) {
+            for ($i = $subtahun; $i < $tahun + 1; $i++) {
+
+                $listnilai[$key][$no++] = [
+                    'nilai' => format_uang($value->hasSubElementTahun((int) $i)),
+                    'legenda' => $value->hasLegenda((int) $i),
+                    'satuan' => $value->satuan,
+                    'tahun' => (int) $i
+                ];
+                // total nilai
+
+            }
+            $result[] = [
+                'nama' => $value->nama,
+                'satuan' => $value->satuan,
+                'jenis' => $value->jenis,
+                'group' => $value->group,
+                'nilai' => $listnilai[$key]
+            ];
+        }
+
+        // lenght listh tahun
+        return $this->sendResponse($result, "sukses", 200, $no);
     }
 
     public function model()

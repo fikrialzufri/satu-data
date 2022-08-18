@@ -20,16 +20,18 @@ $segment2 = request()->segment(2);
                         <li class="breadcrumb-item">
                             <a href="#"><i class="ik ik-home"></i></a>
                         </li>
-                        @can('view-' . $segment1)
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/' . $segment1) }}">{{ ucwords($segment1) }}</a>
-                            </li>
-                        @endcan
-                        @if ($segment2)
-                            <li class="breadcrumb-item">
-                                <a href="#">{{ ucwords(str_replace([':', '_', '-', '*'], ' ', $title)) }}</a>
-                            </li>
-                        @endif
+                        @auth
+                            @can('view-' . $segment1)
+                                <li class="breadcrumb-item">
+                                    <a href="{{ url('/' . $segment1) }}">{{ ucwords($segment1) }}</a>
+                                </li>
+                            @endcan
+                            @if ($segment2)
+                                <li class="breadcrumb-item">
+                                    <a href="#">{{ ucwords(str_replace([':', '_', '-', '*'], ' ', $title)) }}</a>
+                                </li>
+                            @endif
+                        @endauth
                     </ol>
                 </nav>
             </div>

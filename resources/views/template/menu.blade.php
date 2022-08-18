@@ -12,6 +12,7 @@
     @php
         $segment1 = request()->segment(1);
         $segment2 = request()->segment(2);
+        $segment3 = request()->segment(3);
     @endphp
 
     <div class="sidebar-content">
@@ -128,15 +129,30 @@
                     @endcan
                 @endauth
                 @guest
-                    @forelse ($jenis_data as $item)
-                        <div class="nav-item {{ $segment1 == 'satuan' ? 'active' : '' }}">
-                            <a href="{{ route('home') }}?jenisdata={{ $item->slug }}">
-                                <i class="ik ik-box"></i>
-                                <span>{{ $item->nama }}</span>
-                            </a>
-                        </div>
-                    @empty
-                    @endforelse
+                    {{ $segment1 }}
+
+                    @if ($segment1 === 'element')
+                        @forelse ($unit as $item)
+                            <div class="nav-item {{ $segment2 == $item->nama ? 'active' : '' }}">
+                                <a href="{{ route('element.index') }}?unit_id={{ $item->id }}">
+                                    <i class="ik ik-box"></i>
+                                    <span>{{ $item->nama_singkat }}</span>
+                                </a>
+                            </div>
+                        @empty
+                        @endforelse
+                    @else
+                        @forelse ($jenis_data as $item)
+                            <div class="nav-item {{ $segment2 == $item->nama ? 'active' : '' }}">
+                                <a href="#" class="jenisdatamenumodal" data-nama="{{ $item->nama }}"
+                                    data-id="{{ $item->id }}" data-url="{{ route('kategorielement') }}?element_id=">
+                                    <i class="ik ik-box"></i>
+                                    <span>{{ $item->nama }}</span>
+                                </a>
+                            </div>
+                        @empty
+                        @endforelse
+                    @endif
 
 
                 @endguest

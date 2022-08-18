@@ -83,7 +83,7 @@ class JenisDataController extends Controller
             foreach ($listGroup as $group) {
                 $data[] = [
                     'group' => $group->nama,
-                    'total' => $group->total_sub_element,
+                    'total' => $group->hasElementJenis($id),
                     'element' => $group->hasElement()->where('jenis_data_id', $id)->get(),
                 ];
             }
