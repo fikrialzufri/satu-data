@@ -51,7 +51,7 @@
                                         <td class="text-center">
                                             <a href="{{ route('role.edit', $item->id) }}"
                                                 class="btn btn-sm btn-warning text-light">
-                                                <i class="nav-icon fas fa-edit"></i></a>
+                                                <i class="ik ik-edit-2"></i></a>
                                             <form id="form-{{ $item->id }}"
                                                 action="{{ route('role.destroy', $item->id) }}" method="POST"
                                                 style="display: none;">

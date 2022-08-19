@@ -146,7 +146,7 @@
                                                     <a href="{{ route($route . '.edit', $item->id) }}"
                                                         class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
                                                         data-placement="top" title="Edit">
-                                                        <i class="nav-icon fas fa-edit"></i></a>
+                                                        <i class="ik ik-edit-2"></i></a>
                                                 @endcan
                                                 @can('delete-' . $route)
                                                     <form id="form-{{ $item->id }}"
