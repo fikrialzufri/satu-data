@@ -227,7 +227,7 @@ class UnitController extends Controller
             'email' => 'required|unique:users,email,' . $user_id,
             'password' => 'nullable|min:6',
             'passwordConfrim' => 'nullable|same:password|min:6',
-            'alamat' => 'required|string',
+            'detail_alamat' => 'required|string',
             'logo' => 'nullable|mimes:jpeg,bmp,png,jpg',
             'setuju' => 'required',
         ], $messages);
