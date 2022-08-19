@@ -34,7 +34,7 @@
                             <h3>
                                 TABLE DATA ELEMENT
                             </h3>
-                            <p class="font-weight-light">Terdapat 1 Data Element.</p>
+                            <p class="font-weight-light">Terdapat {{$totaldata}} Data Element.</p>
                         </div>
                         <form action="" role="form" id="form" enctype="multipart/form-data">
                             <input type="hidden" name="element_id" value="{{ $element_id }}">

@@ -773,8 +773,11 @@ class SubElementController extends Controller
             }
         }
         $data = $query->get();
+        $totaldata = 0;
 
-
+        if ($data) {
+            $totaldata = count($data);
+        }
         $tahun = Carbon::now()->year;
         if (request()->get('tahun') != null) {
             $tahun = request()->get('tahun');
@@ -802,6 +805,7 @@ class SubElementController extends Controller
             "tahun",
             "url",
             "subtahun",
+            "totaldata",
             "listtahun",
             "nama_unit",
             "listLegenda",
