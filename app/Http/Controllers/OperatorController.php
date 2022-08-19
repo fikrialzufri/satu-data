@@ -346,10 +346,10 @@ class OperatorController extends Controller
 
             $operator = $this->model();
             $operator->nama = $nama;
-            if ($request->unit_id != $request->unit_id) {
-                $operator->unit_id = $request->unit_id;
-            } else {
+            if ($unit_id !== null) {
                 $operator->unit_id = $unit_id;
+            } else {
+                $operator->unit_id = $request->unit_id;
             }
             $operator->user_id = $user->id;
             $operator->save();
