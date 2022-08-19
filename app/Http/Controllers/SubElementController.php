@@ -375,7 +375,8 @@ class SubElementController extends Controller
         // return $button;
         $template = 'subelement.index';
         // return  $data;
-
+        $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->first();
+        
         return view($template,  compact(
             "title",
             "Element_id",
@@ -385,6 +386,7 @@ class SubElementController extends Controller
             "data",
             'searches',
             'hasilSearch',
+            'userUpdated',
             'button',
             'tambah',
             'upload',
@@ -449,6 +451,7 @@ class SubElementController extends Controller
     public function store(Request $request)
     {
         $element_id = $request->element_id;
+        $user_id= auth()->user()->id;
         $messages = [
             'required' => ':attribute tidak boleh kosong',
             'unique' => ':attribute tidak boleh sama'
@@ -475,6 +478,7 @@ class SubElementController extends Controller
             $subElement->meta_data = $request->meta_data;
             $subElement->element_id = $element_id;
             $subElement->satuan_id = $request->satuan_id;
+            $subElement->user_id = $user_id;
             $subElement->save();
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
@@ -493,6 +497,7 @@ class SubElementController extends Controller
     public function update(Request $request, $id)
     { //get dari post form
         $element_id = $request->element_id;
+        $user_id= auth()->user()->id;
 
         $messages = [
             'required' => ':attribute tidak boleh kosong',
@@ -517,6 +522,7 @@ class SubElementController extends Controller
         $subElement->meta_data = $request->meta_data;
         $subElement->element_id =  $element_id;
         $subElement->satuan_id = $request->satuan_id;
+        $subElement->user_id = $user_id;
         $subElement->save();
         try {
 
@@ -532,7 +538,7 @@ class SubElementController extends Controller
     {
         $subElement = SubElementTahun::where('sub_element_id', $request->id)->where('tahun',  $request->tahun)->first();
 
-
+        $user_id= auth()->user()->id;
         if (!$subElement) {
             $subElement = new SubElementTahun;
         }
@@ -548,6 +554,7 @@ class SubElementController extends Controller
             $subElement->tahun = $request->tahun;
             $subElement->nilai = str_replace(".", "", $request->value);
             $subElement->legenda_id = $request->legenda_id;
+            $subElement->user_id = $user_id;
             $subElement->save();
             $updateAd =  $subElement->updated_at;
         }

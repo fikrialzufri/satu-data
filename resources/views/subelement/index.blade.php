@@ -164,10 +164,13 @@
                                                     <select name="legenda" class="selected2 form-control cmblegenda"
                                                         id="legenda_{{ $item->id }}">
                                                         @foreach ($listLegenda as $legenda)
-                                                            <option value="{{ $legenda->id }}"
+                                                            <option 
                                                                 @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
+                                                                value="{{ $legenda->id }}"
                                                             @else
-                                                            {{ $legenda->nama == 'Tetap' ? 'selected' : 'bebel' }} @endif>
+                                                            {{ $legenda->nama === 'Tetap' ? 'selected' : 'bebel' }}
+                                                            value="{{ $legenda->id }}"
+                                                            @endif>
                                                                 {{ $legenda->nama }}</option>
                                                         @endforeach
                                                     </select>
@@ -175,14 +178,12 @@
                                             </td>
                                         @endcanany
                                         <td class="text-center">
-                                            <button class="btn btn-primary btn-sm detailSubElementmodal"
+                                            <button class="btn btn-primary btn-sm detailSubElementmodal mb-10"
                                                 data-toggle="tooltip" data-placement="top" title="Detail"
                                                 data-nama="{{ $item->nama }}" data-keterangan="{{ $item->keterangan }}"
                                                 data-satuan="{{ $item->satuan }}"
                                                 data-metode="{{ $item->metode_perhitungan }}"
-                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}">
-                                                <i class="fa fa-search"></i>
-                                            </button>
+                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}"><i class="fa fa-search"></i></button>
                                             @canany(['edit-sub-element', 'delete-sub-element'])
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
@@ -191,9 +192,8 @@
                                                 @endif
                                                 @can('edit-sub-element')
                                                     <a href="{{ route($route . '.edit', $item->id) }}?unit_id={{ $item->unit_id }}"
-                                                        class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
-                                                        data-placement="top" title="Edit">
-                                                        <i class="nav-icon fas fa-edit"></i></a>
+                                                        class="btn btn-sm btn-warning mb-10" data-toggle="tooltip"
+                                                        data-placement="top" title="Edit"><i class="ik ik-edit-2"></i></a>
                                                 @endcan
                                                 @can('delete-sub-element')
                                                     <form id="form-{{ $item->id }}"
@@ -204,9 +204,7 @@
                                                     </form>
 
                                                     <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
-                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
+                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")><i class="fa fa-trash"></i></button>
                                                 @endcan
                                             @endcan
                                         </td>
@@ -222,7 +220,14 @@
                     </div>
                     <!-- /.card-body -->
                     <div class="card-footer clearfix">
-                        {{ $data->appends(request()->input())->links('template.pagination') }}
+                        <div class="d-flex justify-content-between">
+                            <div class="mr-auto p-2">
+                                {{ $data->appends(request()->input())->links('template.pagination') }}
+                            </div>
+                            <div class="p2">
+                                Di ubah oleh {{ucfirst($userUpdated->user)}} pada {{tanggal_indonesia_waktu($userUpdated->updated_at)}}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- ./col -->

@@ -97,7 +97,8 @@
                                         <td>{{ ucfirst($item->nama) }}</td>
                                         <td>{{ $item->satuan }}</td>
                                         @foreach ($listtahun as $li)
-                                            <td>
+                                            <td style="background-color: {{$item->hasLegendaWarna($li)}}">
+                                                
                                                 {{ format_uang($item->hasSubElementTahun($li)) }}
                                             </td>
                                         @endforeach

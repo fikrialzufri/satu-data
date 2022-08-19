@@ -83,6 +83,16 @@ class SubElement extends Model
         return $legenda;
     }
 
+    public function hasLegendaWarna($tahun)
+    {
+        $data = $this->hasSubElementTahunAll()->where('tahun', $tahun)->first();
+        $legenda = "";
+        if ($data) {
+            $legenda = $data->legenda_warna;
+        }
+        return $legenda;
+    }
+
     public function getElementNilaiAttribute()
     {
         if ($this->hasSubElementTahun) {
