@@ -19,11 +19,7 @@
                                             srcset="">
                                         <p>
                                             <b class="text-white">Sistem Informasi Satu Data Mahakam Ulu Terintegrasi
-                                                (SISMUT)</b>
-                                            merupakan
-                                            kebijakan tata kelola data pemerintah yang bertujuan untuk menciptakan data
-                                            berkualitas,
-                                            mudah diakses, dan dapat dibagipakaikan antar Instansi Pusat serta Daerah.
+                                            </b>
                                         </p>
                                     </div>
                                 </div>
