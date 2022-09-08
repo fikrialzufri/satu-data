@@ -1,188 +1,193 @@
-@if ($item['input'] == 'hidden')
-    <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
-        class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-        @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
-@else
-    <div class="form-group form-textinput" id="form_{{ $item['name'] }}">
-        @if ($item['input'] !== 'hidden')
-            <div>
-                <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
-            </div>
-        @endif
-        @if (!isset($item['input']))
-            <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                placeholder="{{ $item['alias'] }}"
-                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
-        @else
-            @if ($item['input'] == 'combo')
-                <select class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} selected2"
-                    @if (isset($item['multiple'])) name="{{ $item['name'] }}[]" multiple @else name="{{ $item['name'] }}" @endif
-                    id="cmb{{ $item['name'] }}">
-                    <option value="">--Pilih {{ $item['alias'] }}--</option>
-                    @if (isset($item['value']))
+<div class="form-group form-textinput" id="form_{{ $item['name'] }}">
 
-                        @foreach ($item['value'] as $key => $val)
-                            @if (isset($val['id']))
-                                <option value="{{ $val['id'] }}"
-                                    @if ($store == 'update') @if (gettype($data[$item['name']]) == 'object')
-                                        {{ strpos($data[$item['name']], $val['id']) ? 'selected' : '' }}
+    @if (isset($item['input']) && $item['input'] !== 'hidden')
+        <div>
+            <label for="{{ $item['name'] }}" class=" form-control-label">{{ $item['alias'] }}</label>
+        </div>
+    @endif
+    @if (!isset($item['input']))
+        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+    @else
+        @if ($item['input'] == 'hidden')
+            <input type="hidden" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ isset($item['value']) ? $item['value'] : '' }}" @endif>
+        @endif
+        @if ($item['input'] == 'combo')
+            <select class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} selected2"
+                @if (isset($item['multiple'])) name="{{ $item['name'] }}[]" multiple @else name="{{ $item['name'] }}" @endif
+                id="cmb{{ $item['name'] }}">
+                <option value="">--Pilih {{ $item['alias'] }}--</option>
+                @if (isset($item['value']))
+
+                    @foreach ($item['value'] as $key => $val)
+                        @if (isset($val['id']))
+                            <option value="{{ $val['id'] }}"
+                                @if ($store == 'update') @if (gettype($data[$item['name']]) == 'array')
+                                         {{ in_array($val['id'], $data[$item['name']]) ? 'selected' : '' }}
                                         @else
                                         @if (is_array($data[$item['name'] . 'id']))
                                         {{ in_array($val['id'], $data[$item['name'] . 'id']) ? 'selected' : '' }}
                                         @else
                                         {{ $data[$item['name']] == $val['id'] ? 'selected' : '' }} @endif
-                                    @endif
-                                @else
-                                    {{ old($item['name']) == $val['id'] ? 'selected' : '' }}
-                            @endif>
-                            @if (isset($val['value']))
-                                {{ ucfirst($val['value']) }}
+                                @endif
                             @else
-                                Array salah harus menggunakan value
-                            @endif
-                            </option>
+                                {{ old($item['name']) == $val['id'] ? 'selected' : '' }}
+                        @endif>
+                        @if (isset($val['value']))
+                            {{ ucfirst($val['value']) }}
                         @else
-                            <option value="{{ $val }}"
-                                @if ($store == 'update') @if (isset($item['array']))
+                            Array salah harus menggunakan value
+                        @endif
+                        </option>
+                    @else
+                        <option value="{{ $val }}"
+                            @if ($store == 'update') @if (isset($item['array']))
                                     {{ in_array($val, $data[$item['name']]) ? 'selected' : '' }}
                                     @else
                                     {{ $data[$item['name']] == $val ? 'selected' : '' }} @endif
-                            @else {{ old($item['name']) == $val ? 'selected' : '' }} @endif>
-                                {{ ucfirst($val) }}
+                        @else {{ old($item['name']) == $val ? 'selected' : '' }} @endif>
+                            {{ ucfirst($val) }}
+                        </option>
+                    @endif
+                    @if (isset($item['array']))
+                        @if ($store == 'update')
+                            <option value="{{ $val }}">
+                                {{ $item['name'] }}
+                                {{ implode(' ', $data[$item['name']]) == $val ? 'jhabuk' : 'kada' }}
+
                             </option>
-                        @endif
-                        @if (isset($item['array']))
-                            @if ($store == 'update')
-                                <option value="{{ $val }}">
-                                    {{ $item['name'] }}
-                                    {{ implode(' ', $data[$item['name']]) == $val ? 'jhabuk' : 'kada' }}
 
-                                </option>
-
-                            @endif
                         @endif
-                    @endforeach
-            @endif
-            </select>
-            {{-- @endif
+                    @endif
+                @endforeach
+        @endif
+        </select>
+        {{-- @endif
             @endif --}}
 
-        @endif
-        @if ($item['input'] == 'rupiah')
-            <div class="input-group mb-2 mr-sm-2">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">Rp.</div>
-                </div>
-                <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                    placeholder="{{ $item['alias'] }}"
-                    class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-                    @if ($store == 'update') value="{{ format_uang($data[$item['name']]) }}" @else value="{{ old($item['name']) }}" @endif>
+    @endif
+    @if ($item['input'] == 'rupiah')
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">Rp.</div>
             </div>
 
-
-        @endif
-
-        @if ($item['input'] == 'warna')
-            {{ old($item['name']) }}
             <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                placeholder="{{ $item['alias'] }}" id="text-field"
-                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} warna"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) === old($item['name']) ? $item['default'] : old($item['name']) }}" @endif>
-
-
-        @endif
-        @if ($item['input'] == 'radio')
-            <div class="form-radio">
-                @foreach ($item['value'] as $key => $val)
-                    <div class="radio radiofill radio-inline">
-                        <label>
-                            <input type="radio" name="{{ $item['name'] }}" value="{{ $val }}"
-                                @if ($store == 'update') {{ $data[$item['name']] == $val ? 'checked' : '' }} @else {{ old($item['name']) == $val ? 'checked' : '' }} {{ $item['default'] == $val ? 'checked' : '' }} @endif>
-                            <i class="helper"></i>{{ ucfirst($val) }}
-                        </label>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-        @if ($item['input'] == 'persen')
-            <div class="form-group row">
-                <div class="col-sm-3">
-                    <div class="input-group ">
-                        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" class="form-control"
-                            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
-                            placeholder="Isi {{ $item['name'] }}">
-                        <span class="input-group-append">
-                            <label class="input-group-text">%</label>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        @endif
-        @if ($item['input'] == 'datetimepicker')
-            <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
-                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
-        @endif
-        @if ($item['input'] == 'year')
-            <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
-                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
-        @endif
-        @if ($item['input'] == 'date')
-            <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
                 placeholder="{{ $item['alias'] }}"
                 class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
-        @endif
-        @if ($item['input'] == 'image')
-            <input type="file" value="{{ old($item['name']) }}" name="{{ $item['name'] }}"
-                placeholder="{{ $item['alias'] }}" id="{{ $item['name'] }}" class="form-control"
-                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+                @if ($store == 'update') value="{{ format_uang($data[$item['name']]) }}" @else value="{{ old($item['name']) }}" @endif>
+        </div>
 
-            <br>
-            <div class="preview"></div>
-            @if ($store == 'update')
-                <img class="img-profile img-responsive" width="20%"
-                    @if ($data[$item['name']] == null) src="{{ asset('img/default-icon.png') }}"
+
+    @endif
+
+    @if ($item['input'] == 'warna')
+        {{ old($item['name']) }}
+        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
+            id="text-field" class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }} warna"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) === old($item['name']) ? $item['default'] : old($item['name']) }}" @endif>
+
+
+    @endif
+    @if ($item['input'] == 'radio')
+        <div class="form-radio">
+            @foreach ($item['value'] as $key => $val)
+                <div class="radio radiofill radio-inline">
+                    <label>
+                        <input type="radio" name="{{ $item['name'] }}" value="{{ $val }}"
+                            @if ($store == 'update') {{ $data[$item['name']] == $val ? 'checked' : '' }} @else {{ old($item['name']) == $val ? 'checked' : '' }} {{ $item['default'] == $val ? 'checked' : '' }} @endif>
+                        <i class="helper"></i>{{ ucfirst($val) }}
+                    </label>
+                </div>
+            @endforeach
+        </div>
+    @endif
+    @if ($item['input'] == 'persen')
+        <div class="form-group row">
+            <div class="col-sm-3">
+                <div class="input-group ">
+                    <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" class="form-control"
+                        @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
+                        placeholder="Isi {{ $item['name'] }}">
+                    <span class="input-group-append">
+                        <label class="input-group-text">%</label>
+                    </span>
+                </div>
+            </div>
+        </div>
+    @endif
+    @if ($item['input'] == 'nominal')
+        <input type="text" name="{{ $item['name'] }}" id="{{ $item['name'] }}" placeholder="{{ $item['alias'] }}"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+    @endif
+    @if ($item['input'] == 'datetimepicker')
+        <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
+    @endif
+    @if ($item['input'] == 'year')
+        <input type="text" id="{{ $item['name'] }}" name="{{ $item['name'] }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}">
+    @endif
+    @if ($item['input'] == 'date')
+        <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+            placeholder="{{ $item['alias'] }}"
+            class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+    @endif
+    @if ($item['input'] == 'image')
+        <input type="file" value="{{ old($item['name']) }}" name="{{ $item['name'] }}"
+            placeholder="{{ $item['alias'] }}" id="{{ $item['name'] }}" class="form-control"
+            @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+
+        <br>
+        <div class="preview"></div>
+        @if ($store == 'update')
+            <img class="img-profile img-responsive" width="20%"
+                @if ($data[$item['name']] == null) src="{{ asset('img/default-icon.png') }}"
                         @else
                         src="{{ asset('storage/' . $route . '/thumbnail/' . $data[$item['name']]) }}" @endif>
 
-            @endif
         @endif
-        @if ($item['input'] == 'textarea')
-            <textarea class="form-control" rows="3" placeholder="{{ $item['alias'] }}" name="{{ $item['name'] }}">
-@if ($store == 'update'){{ $data[$item['name']] }}@else{{ old($item['name']) }}@endif
-</textarea>
-        @endif
+    @endif
+    @if ($item['input'] == 'textarea')
+        <textarea class="form-control" rows="3" placeholder="{{ $item['alias'] }}" name="{{ $item['name'] }}">
+        @if ($store == 'update'){{ $data[$item['name']] }}@else{{ old($item['name']) }}@endif
+        </textarea>
+    @endif
 
-        @if ($item['input'] == 'text' ||
-            $item['input'] == 'number' ||
-            $item['input'] == 'email' ||
-            $item['input'] == 'password' ||
-            $item['input'] == 'time')
-            <div>
-                <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
-                    @if ($item['input'] == 'password') autocomplete="on" @else placeholder="{{ $item['alias'] }}" @endif
-                    class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
-                    @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
-            </div>
-        @endif
-@endif
+    @if ($item['input'] == 'text' ||
+        $item['input'] == 'number' ||
+        $item['input'] == 'email' ||
+        $item['input'] == 'password' ||
+        $item['input'] == 'time')
+        <div>
+            <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
+                @if (isset($item['required'])) {{ $item['required'] === true ? 'required' : '' }} @endif
+                @if ($item['input'] == 'password') autocomplete="on" @else placeholder="{{ $item['alias'] }}" @endif
+                class="form-control {{ $errors->has($item['name']) ? 'is-invalid' : '' }}"
+                @if ($store == 'update') value="{{ $data[$item['name']] }}" @else value="{{ old($item['name']) }}" @endif>
+        </div>
+    @endif
+    @endif
 
-@if ($errors->has($item['name']))
-    <span class="text-danger text-capitalize">
-        <strong id="text{{ $item['name'] }}">
-            @if (isset($item['alias']))
-                {{ $item['alias'] }} {{ str_replace('_id', '', $errors->first($item['name'])) }}
-            @else
-                {{ str_replace('_id', '', $errors->first($item['name'])) }}
-            @endif
-        </strong>
-    </span>
-@endif
+    @if ($errors->has($item['name']))
+        <span class="text-danger text-capitalize">
+            <strong id="text{{ $item['name'] }}">
+                @if (isset($item['alias']))
+                    {{ $item['alias'] }} {{ str_replace('_id', '', $errors->first($item['name'])) }}
+                @else
+                    {{ str_replace('_id', '', $errors->first($item['name'])) }}
+                @endif
+            </strong>
+        </span>
+    @endif
 </div>
-@endif
 
 
 @push('head')
@@ -301,6 +306,13 @@
                         $("#{{ $item['name'] }}").removeClass("is-invalid");
                         $("#text{{ $item['name'] }}").html("");
                     }
+                @endif
+                @if ($item['input'] == 'nominal')
+                    $("#{{ $item['name'] }}").keypress(function(e) {
+                        if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                            return false;
+                        }
+                    });
                 @endif
             @endif
         });
