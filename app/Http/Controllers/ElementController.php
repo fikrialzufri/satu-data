@@ -63,7 +63,7 @@ class ElementController extends Controller
     public function configForm()
     {
 
-        $unit_id =  $unit_id = request()->get('unit_id');
+        $unit_id =  request()->get('unit_id');
         $checkUnit = Unit::where('id', $unit_id)->first();
 
         if ($checkUnit) {

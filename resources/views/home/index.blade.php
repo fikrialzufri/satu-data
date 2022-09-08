@@ -15,10 +15,12 @@
                                 </div>
                                 <div class="col d-flex align-middle">
                                     <div class="d-inline-block">
-                                        <img src="{{ asset('img/logo-white.svg') }}" width="43%" alt=""
+                                        <img src="{{ asset('img/logo-white.png') }}" width="43%" alt=""
                                             srcset="">
                                         <p>
-                                            <b class="text-white">Satu Data Indonesia (SDI)</b> merupakan
+                                            <b class="text-white">Sistem Informasi Satu Data Mahakam Ulu Terintegrasi
+                                                (SISMUT)</b>
+                                            merupakan
                                             kebijakan tata kelola data pemerintah yang bertujuan untuk menciptakan data
                                             berkualitas,
                                             mudah diakses, dan dapat dibagipakaikan antar Instansi Pusat serta Daerah.
