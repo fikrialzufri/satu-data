@@ -132,23 +132,23 @@
                         return header.replace(" hakakses", "");
 
                     }).toArray();
-                // var classParentEdit = headerEdit.replace(" hakakses", "");
-
-                // var countCheckedEdit = $('.' + classParentEdit + ':checked').length;
                 var uniqueNames = [];
                 $.each(arrayClassParent, function(i, el) {
                     if ($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
                 });
-
                 $.each(uniqueNames, function(index, value) {
                     var countChecked = $('.' + value + ':checked').length;
-
-                    var parentClass = $('.' + value).closest('td').attr('class');
-                    if (countChecked == 4) {
-
-                        $(".checkAll" + parentClass).prop('checked', true);
+                    console.log(countChecked);
+                    if (countChecked == $('.' + value).length) {
+                        var parentClassAll = value.replace("check", "");
+                        $('.checkAll' + parentClassAll).prop('checked', true);
+                    } else {
+                        var parentClassAll = value.replace("check", "");
+                        $('.checkAll' + parentClassAll).prop('checked', false);
                     }
                 });
+
+
             });
         </script>
     @endpush
