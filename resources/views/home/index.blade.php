@@ -18,7 +18,8 @@
                                         <img src="{{ asset('img/logo-white.png') }}" width="43%" alt=""
                                             srcset="">
                                         <p>
-                                            <b class="text-white">Sistem Informasi Satu Data Mahakam Ulu Terintegrasi
+                                            <b class="text-white">Sistem Informasi Statistik Sektoral Mahakam Ulu
+                                                Terintegrasi
                                             </b>
                                         </p>
                                     </div>
