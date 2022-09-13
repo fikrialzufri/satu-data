@@ -15,6 +15,7 @@ use Excel;
 use App\Models\Satuan;
 use App\Models\Unit;
 use Carbon\Carbon;
+use Auth;
 
 class SubElementController extends Controller
 {
@@ -376,6 +377,8 @@ class SubElementController extends Controller
         $template = 'subelement.index';
         // return  $data;
 
+        return  $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->first();
+
         return view($template,  compact(
             "title",
             "Element_id",
@@ -388,6 +391,7 @@ class SubElementController extends Controller
             'button',
             'tambah',
             'upload',
+            'userUpdated',
             'search',
             'export',
             'configHeaders',
@@ -540,6 +544,8 @@ class SubElementController extends Controller
             $subElement = SubElement::find($request->id);
 
             $subElement->parent = $request->parent === "true" ? "Y" : "N";
+            $subElement->user_id = Auth::user()->id;
+
             $subElement->save();
             $updateAd =  $subElement->created_at;
         } else {
@@ -548,6 +554,7 @@ class SubElementController extends Controller
             $subElement->tahun = $request->tahun;
             $subElement->nilai = str_replace(".", "", $request->value);
             $subElement->legenda_id = $request->legenda_id;
+            $subElement->user_id = Auth::user()->id;
             $subElement->save();
             $updateAd =  $subElement->updated_at;
         }
@@ -652,6 +659,7 @@ class SubElementController extends Controller
                             $checkElement[$el]->meta_data = $value['meta_data'];
                             $checkElement[$el]->satuan_id = $dataSatuan[$el]->id;
                             $checkElement[$el]->element_id = $element_id;
+                            $checkElement[$el]->user_id = Auth::user()->id;
                             $checkElement[$el]->save();
                         } else {
                             if (auth()->user()->can("create-sub-element")) {
@@ -662,6 +670,8 @@ class SubElementController extends Controller
                                 $checkElement[$el]->metode_perhitungan = $value['metode_perhitungan'];
                                 $checkElement[$el]->meta_data = $value['meta_data'];
                                 $checkElement[$el]->element_id = $element_id;
+                                $checkElement[$el]->user_id = Auth::user()->id;
+
                                 $checkElement[$el]->save();
                             }
                         }
@@ -676,6 +686,7 @@ class SubElementController extends Controller
                         $subElement[$el]->legenda_id = $legenda_id;
                         $subElement[$el]->tahun = $value['tahun'];
                         $subElement[$el]->nilai =  $value['nilai'];
+                        $subElement[$el]->user_id = Auth::user()->id;
 
                         $subElement[$el]->save();
                         $updateAd[$el] =  $subElement[$el]->created_at;
@@ -688,6 +699,7 @@ class SubElementController extends Controller
                         }
                         $subElement[$el]->tahun = $value['tahun'];
                         $subElement[$el]->nilai =  $value['nilai'];
+                        $subElement[$el]->user_id = Auth::user()->id;
 
                         $subElement[$el]->save();
                         $updateAd[$el] =  $subElement[$el]->updated_at;
