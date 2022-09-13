@@ -222,12 +222,12 @@ class UnitController extends Controller
         $user_id = $unit->user_id;
         $this->validate(request(), [
             'nama' => 'required|string|unique:unit,nama,' . $unit->id,
-            'nama_singkat' => 'required|string|unique:unit,nama_singkat,' . $unit->id,
+            'singkat' => 'required|string|unique:unit,nama_singkat,' . $unit->id,
             'username' => 'required|unique:users,username,' . $user_id,
             'email' => 'required|unique:users,email,' . $user_id,
             'password' => 'nullable|min:6',
             'passwordConfrim' => 'nullable|same:password|min:6',
-            'alamat' => 'required|string',
+            'detail_alamat' => 'required|string',
             'logo' => 'nullable|mimes:jpeg,bmp,png,jpg',
             'setuju' => 'required',
         ], $messages);
