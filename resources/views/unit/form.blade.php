@@ -220,9 +220,11 @@
                                             <br>
 
                                             @if ($store == 'update')
-                                                <img class="img-profile img-responsive" width="20%"
-                                                    @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
+                                                <div class="preview">
+                                                    <img class="img-profile img-responsive" width="20%"
+                                                        @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
                         src="{{ asset('storage/' . $route . '/thumbnail/' . $data->logo) }}" @endif>
+                                                </div>
                                             @else
                                                 <div class="preview">
                                                     <img class="img-profile img-responsive" width="100%"
