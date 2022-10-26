@@ -377,7 +377,7 @@ class SubElementController extends Controller
         $template = 'subelement.index';
         // return  $data;
 
-        return $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->first();
+        $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->first();
 
         return view($template,  compact(
             "title",
