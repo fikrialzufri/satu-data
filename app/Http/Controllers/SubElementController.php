@@ -345,6 +345,8 @@ class SubElementController extends Controller
             }
         }
 
+        $sub_element_id = $query->pluck('id')->toArray();
+        $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->whereIn('sub_element_id', $sub_element_id)->first();
 
         if ($this->sort) {
             if ($this->desc) {
@@ -353,7 +355,9 @@ class SubElementController extends Controller
                 $data = $query->orderBy($this->sort);
             }
         }
+        // ambil semua sub elemennt id
         //mendapilkan data model setelah query pencarian
+
         if ($paginate) {
             // return $data = $query->toSql();
             $data = $query->paginate($paginate);
@@ -377,7 +381,6 @@ class SubElementController extends Controller
         $template = 'subelement.index';
         // return  $data;
 
-        $userUpdated = SubElementTahun::orderBy('updated_at', 'desc')->first();
 
         return view($template,  compact(
             "title",
