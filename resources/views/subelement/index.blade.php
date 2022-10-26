@@ -227,8 +227,10 @@
                                 {{ $data->appends(request()->input())->links('template.pagination') }}
                             </div>
                             <div class="p2">
-                                Di ubah oleh {{ ucfirst($userUpdated->user) }} pada
-                                {{ tanggal_indonesia_waktu($userUpdated->updated_at) }}
+                                @if (isset($userUpdated->user))
+                                    Di ubah oleh {{ ucfirst($userUpdated->user) }} pada
+                                    {{ tanggal_indonesia_waktu($userUpdated->updated_at) }}
+                                @endif
                             </div>
                         </div>
                     </div>
