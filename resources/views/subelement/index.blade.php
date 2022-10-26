@@ -227,7 +227,6 @@
                                 {{ $data->appends(request()->input())->links('template.pagination') }}
                             </div>
                             <div class="p2">
-                                {{ $userUpdated }}
                                 @if (isset($userUpdated->user))
                                     Di ubah oleh {{ ucfirst($userUpdated->user) }} pada
                                     {{ tanggal_indonesia_waktu($userUpdated->updated_at) }}
