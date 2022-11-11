@@ -147,12 +147,13 @@
                                             {{ format_uang($item->hasSubElementTahun($subYear)) }}
                                         </td>
                                         @canany(['input-nilai-sub-element'])
-                                            <td>
+                                            <td >
                                                 <div class="form-group ">
-
+                                                   
                                                     <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
                                                         type="text" class="form-control numberOnly nilai"
                                                         id="tahun_{{ $item->id }}"
+                                                        style="color: {{ $item->hasLegendaWarna($year) ?? ''}}"
                                                         value="{{ format_uang($item->hasSubElementTahun($year)) }}">
                                                 </div>
                                             </td>

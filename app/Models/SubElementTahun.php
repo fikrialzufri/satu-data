@@ -31,4 +31,11 @@ class SubElementTahun extends Model
             return $this->hasLegenda->nama;
         }
     }
+    // get nama warna
+    public function getLegendaWarnaAttribute()
+    {
+        if ($this->hasLegenda) {
+            return $this->hasLegenda->warna;
+        }
+    }
 }

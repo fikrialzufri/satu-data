@@ -85,7 +85,7 @@ class Unit extends Model
                 $subElement = $element->hasSubElement()->orderBy('updated_at', 'desc')->first();
                 if ($subElement) {
                     $subElementTahun = $subElement->hasSubElementTahunAll()->orderBy('updated_at', 'desc')->first();
-                    $total = $subElementTahun->nilai;
+                    $total = $subElementTahun->nilai ?? 0;
                 }
             }
         }
