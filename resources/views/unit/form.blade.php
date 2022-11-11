@@ -220,9 +220,11 @@
                                             <br>
 
                                             @if ($store == 'update')
-                                                <img class="img-profile img-responsive" width="20%"
-                                                    @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
+                                                <div class="preview">
+                                                    <img class="img-profile img-responsive" width="20%"
+                                                        @if ($data->logo == null) src="{{ asset('img/logo.png') }}" @else
                         src="{{ asset('storage/' . $route . '/thumbnail/' . $data->logo) }}" @endif>
+                                                </div>
                                             @else
                                                 <div class="preview">
                                                     <img class="img-profile img-responsive" width="100%"
@@ -338,7 +340,7 @@
                                 <div class="border-checkbox-group border-checkbox-group-danger">
                                     <input
                                         class=" border-checkbox {{ $errors->has('setuju') ? 'form-control is-invalid' : 'form-control' }}"
-                                        type="checkbox" id="checkbox5" name="setuju" value="Y" required>
+                                        type="checkbox" id="checkbox5" name="setuju" value="Y">
                                     <label class="border-checkbox-label" for="checkbox5">Saya Setuju</label>
                                     @if ($errors->has('setuju'))
                                         <span class="text-danger">

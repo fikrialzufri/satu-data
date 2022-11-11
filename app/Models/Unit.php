@@ -48,7 +48,7 @@ class Unit extends Model
 
     public function hasUser()
     {
-        return $this->hasOne(User::class, 'id');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 
     public function getUsernameAttribute()

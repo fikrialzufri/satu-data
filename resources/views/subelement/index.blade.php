@@ -220,14 +220,7 @@
                     </div>
                     <!-- /.card-body -->
                     <div class="card-footer clearfix">
-                        <div class="d-flex justify-content-between">
-                            <div class="mr-auto p-2">
-                                {{ $data->appends(request()->input())->links('template.pagination') }}
-                            </div>
-                            <div class="p2">
-                                Di ubah oleh {{ucfirst($userUpdated->user)}} pada {{tanggal_indonesia_waktu($userUpdated->updated_at)}}
-                            </div>
-                        </div>
+                        {{ $data->appends(request()->input())->links('template.pagination') }}
                     </div>
                 </div>
                 <!-- ./col -->
