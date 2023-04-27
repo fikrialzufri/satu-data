@@ -28,10 +28,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $jenis_data = JenisData::orderBy('nama', 'asc')->get();
-        $unit = Unit::orderBy('nama', 'asc')->get();
-        View::share('jenis_data', $jenis_data);
-        View::share('unit', $unit);
+        try {
+            $jenis_data = JenisData::orderBy('nama', 'asc')->get();
+            $unit = Unit::orderBy('nama', 'asc')->get();
+            View::share('jenis_data', $jenis_data);
+            View::share('unit', $unit);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
     }
 }
