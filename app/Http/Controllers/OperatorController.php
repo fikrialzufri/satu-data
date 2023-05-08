@@ -393,30 +393,29 @@ class OperatorController extends Controller
 
         $nama =  $request->nama;
         $email =  $request->email;
+        $adminOperatorRole = Role::where('slug', 'operator')->first();
+        $pass = bcrypt(request()->input('password'));
+        $user = User::find($operator->user_id);
+        $user->name = $username;
+        $user->username = $request->username;
+        $user->slug = Str::slug($request->username);
+        $user->email = $email;
+        $user->password = $pass;
+        $user->save();
+
+        $user->role()->sync($adminOperatorRole);
+
+        $operator->nama = $nama;
+        if ($request->unit_id != $request->unit_id) {
+            $operator->unit_id = $request->unit_id;
+        } else {
+            $operator->unit_id = $unit_id;
+        }
+        $operator->user_id = $user->id;
+        $operator->save();
+        DB::commit();
+        return redirect()->route('operator.index')->with('message', 'Operator berhasil diubah')->with('Class', 'success');
         try {
-            DB::commit();
-
-            $adminOperatorRole = Role::where('slug', 'operator')->first();
-            $pass = bcrypt(request()->input('password'));
-            $user = User::find($operator->user_id);
-            $user->name = $username;
-            $user->username = $request->username;
-            $user->slug = Str::slug($request->username);
-            $user->email = $email;
-            $user->password = $pass;
-            $user->save();
-
-            $user->role()->sync($adminOperatorRole);
-
-            $operator->nama = $nama;
-            if ($request->unit_id != $request->unit_id) {
-                $operator->unit_id = $request->unit_id;
-            } else {
-                $operator->unit_id = $unit_id;
-            }
-            $operator->user_id = $user->id;
-            $operator->save();
-            return redirect()->route('operator.index')->with('message', 'Operator berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
             User::where('username', $username)->delete();
