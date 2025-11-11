@@ -67,47 +67,67 @@
                 </div>
             </div>
             <div class="col-xl-4 col-md-4">
+                {{-- Pengunjung CKAN --}}
                 <div class="card card-box">
                     <div class="card-header d-block">
-                        <h6>
-                            <b>
-                                RECENT TRANSCATIONS
-                            </b>
+                        <h6 class="mb-2">
+                            <b>Pengunjung CKAN</b>
                         </h6>
-                        <span>Projects where development work is on completion</span>
-
-
+                        <span>Ringkasan kunjungan CKAN berdasarkan periode</span>
                     </div>
                     <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    @foreach ($dataUnit as $item)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-middle">
-                                                    <div class="d-inline-block">
-                                                        <h6 class="mb-1">{{ $item->nama }}</h6>
-                                                        <p class="mb-0 tx-13 text-muted">{{ $item->total_element }} Element
-                                                            Kategori </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-right">
-                                                <div class="d-inline-block">
-                                                    <h6 class="mb-2 tx-15 font-weight-semibold">
-                                                        {{ $item->nilai_terakhir }}</h6>
-                                                    <p class="mb-0 tx-11 text-muted">
-                                                        {{ tanggal_indonesia_waktu($item->updated_at) }}</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </table>
+                        @php
+                            $ckanPeriodLabels = [
+                                'daily' => 'Per Hari',
+                                'monthly' => 'Per Bulan',
+                                'yearly' => 'Per Tahun',
+                            ];
+                        @endphp
+                        @foreach ($ckanPeriodLabels as $key => $label)
+                            <div class="ckan-section mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">{{ $label }}</h6>
+                                    <span class="badge badge-success">
+                                        Total {{ number_format(optional($ckanVisitors[$key])->sum('count') ?? 0) }}
+                                    </span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 20%;">IID</th>
+                                                <th>URL</th>
+                                                <th class="text-right" style="width: 20%;">Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($ckanVisitors[$key] ?? collect() as $row)
+                                                <tr>
+                                                    <td>{{ data_get($row, 'iid', '-') }}</td>
+                                                    <td class="ckan-url">
+                                                        @if (!empty(data_get($row, 'url')))
+                                                            <a href="{{ data_get($row, 'url') }}" target="_blank"
+                                                                rel="noopener noreferrer">{{ data_get($row, 'url') }}</a>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-right">{{ number_format(data_get($row, 'count', 0)) }}
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-3">
+                                                        Data belum tersedia
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
-
                 </div>
             </div>
 
@@ -151,6 +171,10 @@
             text-align: left;
             vertical-align: middle;
             top: 50%;
+        }
+
+        .ckan-section .ckan-url {
+            word-break: break-word;
         }
     </style>
     <link rel="stylesheet" href="http://radmin.test/plugins/owl.carousel/dist/assets/owl.carousel.min.css">

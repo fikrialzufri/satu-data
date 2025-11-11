@@ -2,16 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Element;
 use App\Models\Group;
 use App\Models\JenisUnit;
-use App\Models\SubElement;
 use App\Models\Unit;
-use Auth;
+use App\Services\CkanService;
 use Carbon\Carbon;
 
 class HomeController extends Controller
 {
+
+    private CkanService $ckanService;
+
+    public function __construct(CkanService $ckanService)
+    {
+        $this->ckanService = $ckanService;
+    }
 
 
     /**
@@ -65,6 +70,8 @@ class HomeController extends Controller
         $pekerjaanCount = 0;
         $rekananCount = 0;
 
+        $ckanVisitors = $this->ckanService->getVisitorStats();
+
         return view('home.index', compact(
             'title',
             'pegawai',
@@ -76,7 +83,8 @@ class HomeController extends Controller
             'anggota',
             'aduanCount',
             'rapat',
-            'jenisRapat'
+            'jenisRapat',
+            'ckanVisitors'
         ));
     }
 }

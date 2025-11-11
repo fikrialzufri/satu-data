@@ -30,4 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ckan' => [
+        'visitor_endpoint' => env('CKAN_VISITOR_ENDPOINT'),
+        'api_key' => env('CKAN_API_KEY'),
+        'timeout' => env('CKAN_TIMEOUT', 10),
+        'shared_secret' => env('CKAN_SHARED_SECRET'),
+    ],
+
 ];
