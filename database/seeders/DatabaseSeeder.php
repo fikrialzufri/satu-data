@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             JenisUnitSeeder::class,
             LegendaSeeder::class,
             SatuanSeeder::class,
+            UnitElementSubSeeder::class,
         ]);
     }
 }

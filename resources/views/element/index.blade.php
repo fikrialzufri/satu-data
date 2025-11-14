@@ -20,19 +20,20 @@
                                 </a>
                             @endcan
 
-                            @canany(['download-' . $route])
-                                <a href="{{ route($route . '.download') }}?unit_id={{ $unit_id }}"
-                                    class="btn btn-sm btn-danger float-right text-light mr-5">
-                                    <i class="fa fa-file"></i> Download
-                                </a>
-                            @endcan
-
-                            @canany(['create-' . $route])
-                                <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
-                                    class="btn btn-sm btn-primary float-right text-light">
-                                    <i class="fa fa-plus"></i> Tambah Data
-                                </a>
-                            @endcan
+                            @if ($unit_id)
+                                @canany(['download-' . $route])
+                                    <a href="{{ route($route . '.download') }}?unit_id={{ $unit_id }}"
+                                        class="btn btn-sm btn-danger float-right text-light mr-5">
+                                        <i class="fa fa-file"></i> Download
+                                    </a>
+                                @endcan
+                                @canany(['create-' . $route])
+                                    <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
+                                        class="btn btn-sm btn-primary float-right text-light">
+                                        <i class="fa fa-plus"></i> Tambah Data
+                                    </a>
+                                @endcan
+                            @endif
                         </div>
                     </div>
                     <!-- /.card-header -->
@@ -87,10 +88,9 @@
                                             {{ $index + 1 + ($data->CurrentPage() - 1) * $data->PerPage() }}</td>
                                         <td>
                                             <a @auth
-                                                    href="{{ route('sub_element.index') }}?element_id={{ $item->id }}"
-                                                    @endauth @guest
-                                                    href="{{ route('kategorielement') }}?element_id={{ $item->id }}"
-                                                @endguest>
+href="{{ route('sub_element.index') }}?element_id={{ $item->id }}" @endauth
+                                                @guest
+href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
 
                                                 <div style='background-color:#19b159; color:white; width:100%; '
                                                     class="badge badge-pill mb-1 d-flex justify-content-between">

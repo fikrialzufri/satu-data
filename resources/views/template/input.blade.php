@@ -160,12 +160,63 @@
 @if ($store == 'update'){{ $data[$item['name']] }}@else{{ old($item['name']) }}@endif
 </textarea>
     @endif
+    @if ($item['input'] == 'row-data')
+        @php
+            $rowDataValues = [];
+            if ($store == 'update' && isset($data[$item['name']])) {
+                $rowDataValues = $data[$item['name']];
+            } elseif (old($item['name'])) {
+                $rowDataValues = old($item['name']);
+            } elseif (isset($item['value']) && is_array($item['value'])) {
+                $rowDataValues = $item['value'];
+            }
 
-    @if ($item['input'] == 'text' ||
-        $item['input'] == 'number' ||
-        $item['input'] == 'email' ||
-        $item['input'] == 'password' ||
-        $item['input'] == 'time')
+            if (is_string($rowDataValues)) {
+                $decoded = json_decode($rowDataValues, true);
+                $rowDataValues = is_array($decoded) ? $decoded : [];
+            }
+
+            if (!is_array($rowDataValues) || empty($rowDataValues)) {
+                $rowDataValues = [['field' => '', 'value' => '']];
+            }
+        @endphp
+        <div class="row-data-wrapper border rounded p-3" id="rowData{{ $item['name'] }}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="font-weight-bold">{{ $item['alias'] ?? 'Row Data' }}</span>
+                <button type="button" class="btn btn-primary btn-sm" id="addRowData{{ $item['name'] }}">
+                    Tambah Field
+                </button>
+            </div>
+            <div class="row-data-items">
+                @foreach ($rowDataValues as $index => $row)
+                    <div class="row row-data-item mb-2" data-index="{{ $index }}">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control"
+                                name="{{ $item['name'] }}[{{ $index }}][field]" placeholder="Nama field"
+                                value="{{ $row['field'] ?? '' }}">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control"
+                                name="{{ $item['name'] }}[{{ $index }}][value]" placeholder="Value"
+                                value="{{ $row['value'] ?? '' }}">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center mt-2 mt-md-0">
+                            <button type="button" class="btn btn-danger btn-sm remove-row-data">
+                                Hapus
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    @if (
+        $item['input'] == 'text' ||
+            $item['input'] == 'number' ||
+            $item['input'] == 'email' ||
+            $item['input'] == 'password' ||
+            $item['input'] == 'time')
         <div>
             <input type="{{ $item['input'] }}" name="{{ $item['name'] }}" id="{{ $item['name'] }}"
                 @if (isset($item['required'])) {{ $item['required'] === true ? 'required' : '' }} @endif
@@ -411,6 +462,40 @@
                 $('.close').on('click', function() {
                     $('#image_{{ $item['name'] }}').remove();
                 });
+            </script>
+        @endif
+        @if ($item['input'] == 'row-data')
+            <script>
+                (function() {
+                    const container = $("#rowData{{ $item['name'] }}");
+                    if (!container.length) {
+                        return;
+                    }
+
+                    let index = container.find(".row-data-item").length;
+
+                    $("#addRowData{{ $item['name'] }}").on("click", function() {
+                        const newRow = `
+                            <div class="row row-data-item mb-2" data-index="${index}">
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="{{ $item['name'] }}[${index}][field]" placeholder="Nama field">
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" name="{{ $item['name'] }}[${index}][value]" placeholder="Value">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center mt-2 mt-md-0">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-data">Hapus</button>
+                                </div>
+                            </div>`;
+
+                        container.find(".row-data-items").append(newRow);
+                        index++;
+                    });
+
+                    container.on("click", ".remove-row-data", function() {
+                        $(this).closest(".row-data-item").remove();
+                    });
+                })();
             </script>
         @endif
     @endif

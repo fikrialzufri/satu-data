@@ -71,6 +71,9 @@ class HomeController extends Controller
         $rekananCount = 0;
 
         $ckanVisitors = $this->ckanService->getVisitorStats();
+        $ckanVisitorTotals = collect($ckanVisitors)->map(function ($items) {
+            return optional($items)->sum('count') ?? 0;
+        })->all();
 
         return view('home.index', compact(
             'title',
@@ -84,7 +87,8 @@ class HomeController extends Controller
             'aduanCount',
             'rapat',
             'jenisRapat',
-            'ckanVisitors'
+            'ckanVisitors',
+            'ckanVisitorTotals'
         ));
     }
 }

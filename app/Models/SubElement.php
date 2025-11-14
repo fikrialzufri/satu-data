@@ -21,9 +21,14 @@ class SubElement extends Model
         'sumber_data',
         'metode_perhitungan',
         'meta_data',
+        'lokasi_data',
         'satuan_id',
         'element_id',
         'user_id',
+    ];
+
+    protected $casts = [
+        'lokasi_data' => 'array',
     ];
 
     public function setNamaAttribute($value)

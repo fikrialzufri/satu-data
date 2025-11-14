@@ -141,6 +141,7 @@ class SubElementController extends Controller
                     'input'    => 'textarea',
                     'alias'    => 'Metode Perhitungan',
                 ],
+                
                 [
                     'name'    => 'meta_data',
                     'input'    => 'textarea',
@@ -152,6 +153,12 @@ class SubElementController extends Controller
                     'alias'    => 'element_id',
                     'value' => $Element_id,
                 ],
+                [
+                    'name'    => 'lokasi_data',
+                    'input'    => 'row-data',
+                    'alias'    => 'Lokasi Data',
+                ],
+                
             ];
         } else {
             return [
@@ -197,10 +204,16 @@ class SubElementController extends Controller
                     'input'    => 'textarea',
                     'alias'    => 'Meta Data',
                 ],
+                
                 [
                     'name'    => 'metode_perhitungan',
                     'input'    => 'textarea',
                     'alias'    => 'Metode Perhitungan',
+                ],
+                [
+                    'name'    => 'lokasi_data',
+                    'input'    => 'row-data',
+                    'alias'    => 'Lokasi Data',
                 ],
             ];
         }
@@ -481,6 +494,7 @@ class SubElementController extends Controller
             $subElement->sumber_data = $request->sumber_data;
             $subElement->metode_perhitungan = $request->metode_perhitungan;
             $subElement->meta_data = $request->meta_data;
+            $subElement->lokasi_data = $this->normalizeLokasiData($request->lokasi_data ?? []);
             $subElement->element_id = $element_id;
             $subElement->satuan_id = $request->satuan_id;
             $subElement->user_id = $user_id;
@@ -525,6 +539,7 @@ class SubElementController extends Controller
         $subElement->sumber_data = $request->sumber_data;
         $subElement->metode_perhitungan = $request->metode_perhitungan;
         $subElement->meta_data = $request->meta_data;
+        $subElement->lokasi_data = $this->normalizeLokasiData($request->lokasi_data ?? []);
         $subElement->element_id =  $element_id;
         $subElement->satuan_id = $request->satuan_id;
         $subElement->user_id = $user_id;
@@ -926,5 +941,26 @@ class SubElementController extends Controller
     public function model()
     {
         return new SubElement();
+    }
+
+    protected function normalizeLokasiData($rows)
+    {
+        if (!is_array($rows)) {
+            return null;
+        }
+
+        $normalized = collect($rows)->map(function ($row) {
+            $field = isset($row['field']) ? trim($row['field']) : '';
+            $value = isset($row['value']) ? trim($row['value']) : '';
+
+            return [
+                'field' => $field,
+                'value' => $value,
+            ];
+        })->filter(function ($row) {
+            return $row['field'] !== '' || $row['value'] !== '';
+        })->values()->all();
+
+        return empty($normalized) ? null : $normalized;
     }
 }
