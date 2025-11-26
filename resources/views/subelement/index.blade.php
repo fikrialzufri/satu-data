@@ -475,13 +475,15 @@
             // Format lokasi data
             let lokasiHtml = '';
             if (lokasiData && Array.isArray(lokasiData) && lokasiData.length > 0) {
-                lokasiHtml = '<ul style="margin-bottom: 0; padding-left: 20px;">';
+                lokasiHtml = '<ol style="margin-bottom: 0; padding-left: 20px;">';
                 lokasiData.forEach(function(item) {
                     if (item.field && item.value) {
-                        lokasiHtml += '<li><strong>' + item.field + ':</strong> ' + item.value + '</li>';
+                        lokasiHtml += '<li><strong>' + item.field + ', </strong><br> Lokasi :' + item
+                            .value +
+                            '</li>';
                     }
                 });
-                lokasiHtml += '</ul>';
+                lokasiHtml += '</ol>';
             } else {
                 lokasiHtml = '-';
             }
