@@ -142,7 +142,7 @@ href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
                                             @endif
                                         @endforeach
 
-                                        @canany(['edit-' . $route, 'delete-' . $route])
+                                        @canany(['edit-' . $route, 'delete-' . $route, 'create-' . $route])
                                             <td class="text-center">
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
@@ -167,6 +167,16 @@ href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
                                                         title="Hapus" onclick=deleteconf("{{ $item->id }}")>
                                                         <i class="fa fa-trash"></i>
                                                     </button>
+                                                @endcan
+                                                @can('create-' . $route)
+                                                    @php
+                                                        // get page
+                                                        $page = request()->get('page');
+                                                    @endphp
+                                                    <a href="{{ route($route . '.ckan', $item->id) }}?page={{ $page }}"
+                                                        class="btn btn-sm btn-success text-light" data-toggle="tooltip"
+                                                        data-placement="top" title="Send CKAN">
+                                                        <i class="ik ik-send"></i></a>
                                                 @endcan
                                             </td>
                                         @endcan

@@ -52,6 +52,11 @@ Route::group(['middleware' => 'auth'], function () {
     // update nilai
     Route::post('/elementnilai', [SubElementController::class, 'nilai'])->name('elemen.update.nilai');
 
+    Route::get(
+        '/sendelmentckan/{id}',
+        [ElementController::class, 'sendckan']
+    )->name('element.ckan');
+
     // import Element
     Route::get('/elementinport', [SubElementController::class, 'import'])->name('sub-element.import');
 
@@ -60,10 +65,19 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('/sub_elementdownload', [SubElementController::class, 'download'])->name('sub-element.download');
 
+    // kirim sub element ke ckan
+    Route::get(
+        '/sendsubelmentckan/{id}',
+        [SubElementController::class, 'sendckan']
+    )->name('sub-element.ckan');
+
     Route::resource('jenis_data', JenisDataController::class);
     Route::resource('jenis_unit', JenisUnitController::class);
     Route::resource('group', GroupController::class);
+
     Route::resource('unit', UnitController::class);
+    Route::get('/sendckan/{id}', [UnitController::class, 'sendckan'])->name('unit.ckan');
+
     Route::resource('legenda', LegendaController::class);
 
 

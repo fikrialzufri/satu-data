@@ -12,6 +12,9 @@ use App\Traits\CrudTrait;
 use Illuminate\Http\Request;
 use DB;
 use Excel;
+use Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use App\Models\Satuan;
 use App\Models\Unit;
 use Carbon\Carbon;
@@ -936,6 +939,145 @@ class SubElementController extends Controller
 
         // lenght listh tahun
         return $this->sendResponse($result, "sukses", 200, $no);
+    }
+
+     /**
+     * Send CKAN.
+     *
+     * @param  \App\Models\Dinamis
+     * @return \Illuminate\Http\Response
+     */
+    public function sendckan($id)
+    {
+        $query = $this->model()::query();
+        $query = $query->where('element_id', $id);
+        $data = $query->get();
+        $checkElement = Element::find($id);
+
+        $tahun = Carbon::now()->year;
+        if (request()->get('akhir_tahun') != null) {
+            $tahun = request()->get('akhir_tahun');
+        }
+
+
+        $subtahun = Carbon::now()->subYears(1)->year;
+
+        if (request()->get('awal_tahun') != null) {
+            $subtahun = request()->get('awal_tahun');
+        }
+
+        $result = [];
+        $no = 0;
+        $listtahun = [];
+
+        $listtahun[] = [
+            'id' => 'nama',
+        ];
+        $listtahun[] = [
+            'id' => 'satuan',
+        ];
+        $listtahun[] = [
+            'id' => 'jenis',
+        ];
+        $listtahun[] = [
+            'id' => 'group',
+        ];
+
+        foreach ($data as $key => $value) {
+            $no++;
+
+            for ($i = $subtahun; $i < $tahun + 1; $i++) {
+                $result[] = [
+                    'nama' => $value->nama,
+                    'satuan' => $value->satuan,
+                    'jenis' => $value->jenis,
+                    'group' => $value->group,
+                    'tahun' => (int) $i,
+                    'nilai' => $value->hasSubElementTahun((int) $i),
+
+                ];
+                $listtahun[] = [
+                    'id' => (int) $i,
+
+                ];
+            }
+        }
+
+        // listtahun hapus data id yang sama valuesnya
+        $listtahun = array_map("unserialize", array_unique(array_map("serialize", $listtahun)));
+
+        $result = collect($result)->groupBy('nama')->map(function ($row) {
+            return $row->reduce(function ($carry, $item) {
+                $carry['nama'] = $item['nama'];
+                $carry['satuan'] = $item['satuan'];
+                $carry['jenis'] = $item['jenis'];
+                $carry['group'] = $item['group'];
+
+                $carry[$item['tahun']] = $item['tahun'];
+                $carry[$item['tahun']] = $item['nilai'];
+
+                return $carry;
+            }, []);
+        })->values()->all();
+
+        // sort result jadikan nama urutan pertama
+        $result = collect($result)->sortBy('nama')->values()->all();
+
+        $unit_id = $checkElement->unit_id;
+
+        $unit = Unit::find($unit_id);
+
+        $owner_org =  Str::slug($unit->nama_singkat);
+        $nama =  Str::slug($checkElement->nama . $owner_org);
+        $title =  $checkElement->nama;
+
+        $apiURL = env('CKAN_ENDPOINT') . '/api/action/datastore_create';
+
+        $postInput = [
+            'resource' => [
+                'package_id' => $nama,
+                'name' => $title . " " . "(" . $subtahun . " - " . $tahun . ")",
+                'format' => 'csv',
+            ],
+            'fields' => $listtahun,
+            'records' => $result,
+        ];
+
+        // Headers
+        $headers = [
+            'Authorization' => env('CKAN_AUTH'),
+            'Content-Type' => 'application/json',
+        ];
+
+        $response = Http::withHeaders($headers)->post($apiURL, $postInput);
+
+        $statusCode = $response->status();
+        $responseBody = json_decode($response->getBody(), true);
+
+        // log
+        Log::info('Response Body:', ['responseBody' => $responseBody]);
+        
+
+        if ($responseBody['success'] == false) {
+            return redirect()->route($this->route . '.index', "element_id=" . $id)->with('message', ucwords(str_replace('-', ' ', $this->title)) . ' ' . $title . ' Sudah ada di CKAN')->with('Class', 'danger')->with('icon', 'error');
+        }
+
+        if (isset($responseBody['result'])) {
+
+            $resource_id = $responseBody['result']['resource_id'];
+            $apiURLView = env('CKAN_ENDPOINT') . '/api/action/resource_view_create';
+            $postInputView = [
+                'resource_id' => $resource_id,
+                'title' => 'Tabel ' .
+                    $title . " " . "(" . $subtahun . " - " . $tahun . ")",
+                "view_type" => "recline_view"
+            ];
+            $responseView = Http::withHeaders($headers)->post($apiURLView, $postInputView);
+            $statusCode = $responseView->status();
+            $responseViewBody = json_decode($responseView->getBody(), true);
+        }
+
+        return redirect()->route($this->route . '.index', "element_id=" . $id)->with('message', ucwords(str_replace('-', ' ', $this->title)) . ' ' . $title . ' berhasil dikirim ke ckan')->with('Class', 'success')->with('icon', 'success');
     }
 
     public function model()

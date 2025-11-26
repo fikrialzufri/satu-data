@@ -26,6 +26,12 @@
                                 </a>
                             @endcan
 
+                            @canany(['send-ckan-sub-element'])
+                                <button class="btn btn-sm btn-success float-right text-light mr-5 btnSendCkan">
+                                    <i class="ik ik-send"></i> Send CKAN
+                                </button>
+                            @endcan
+
                             @canany(['create-sub-element'])
                                 <a href="{{ route('sub_element.create') }}?element_id={{ $Element_id }}"
                                     class="btn btn-sm btn-primary float-right text-light">
@@ -147,13 +153,13 @@
                                             {{ format_uang($item->hasSubElementTahun($subYear)) }}
                                         </td>
                                         @canany(['input-nilai-sub-element'])
-                                            <td >
+                                            <td>
                                                 <div class="form-group ">
-                                                   
+
                                                     <input data-id="{{ $item->id }}" data-tahun="{{ $year }}"
                                                         type="text" class="form-control numberOnly nilai"
                                                         id="tahun_{{ $item->id }}"
-                                                        style="color: {{ $item->hasLegendaWarna($year) ?? ''}}"
+                                                        style="color: {{ $item->hasLegendaWarna($year) ?? '' }}"
                                                         value="{{ format_uang($item->hasSubElementTahun($year)) }}">
                                                 </div>
                                             </td>
@@ -165,13 +171,12 @@
                                                     <select name="legenda" class="selected2 form-control cmblegenda"
                                                         id="legenda_{{ $item->id }}">
                                                         @foreach ($listLegenda as $legenda)
-                                                            <option 
+                                                            <option
                                                                 @if ($item->hasSubElementLegend($year)) {{ $item->hasSubElementLegend($year) == $legenda->id ? 'selected' : 'bebel' }}
                                                                 value="{{ $legenda->id }}"
                                                             @else
                                                             {{ $legenda->nama === 'Tetap' ? 'selected' : 'bebel' }}
-                                                            value="{{ $legenda->id }}"
-                                                            @endif>
+                                                            value="{{ $legenda->id }}" @endif>
                                                                 {{ $legenda->nama }}</option>
                                                         @endforeach
                                                     </select>
@@ -184,7 +189,9 @@
                                                 data-nama="{{ $item->nama }}" data-keterangan="{{ $item->keterangan }}"
                                                 data-satuan="{{ $item->satuan }}"
                                                 data-metode="{{ $item->metode_perhitungan }}"
-                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}"><i class="fa fa-search"></i></button>
+                                                data-meta="{{ $item->meta_data }}" data-sumber="{{ $item->sumber_data }}"
+                                                data-lokasi="{{ json_encode($item->lokasi_data) }}"><i
+                                                    class="fa fa-search"></i></button>
                                             @canany(['edit-sub-element', 'delete-sub-element'])
                                                 @if (isset($button))
                                                     @foreach ($button as $key => $val)
@@ -204,8 +211,10 @@
                                                         {{ method_field('DELETE') }}
                                                     </form>
 
-                                                    <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
-                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")><i class="fa fa-trash"></i></button>
+                                                    <button class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                                        data-placement="top" title="Hapus"
+                                                        onclick=deleteconf("{{ $item->id }}")><i
+                                                            class="fa fa-trash"></i></button>
                                                 @endcan
                                             @endcan
                                         </td>
@@ -283,14 +292,54 @@
                                         <span id="metaData"></span>
                                     </td>
                                 </tr>
-
-
+                                <tr>
+                                    <td>
+                                        Lokasi Data
+                                    </td>
+                                    <td>
+                                        <span id="lokasiData"></span>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="modal-footer">
 
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade " id="sendCkan" tabindex="-1" role="dialog" aria-labelledby="jeniDataMenuModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content ">
+                <div class="modal-header">
+                    <h5 id="sendCkanLabel">Kirim {{ ucwords(str_replace([':', '_', '*'], ' ', $title)) }} ke CKAN</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="tahun">Pilih Tahun</label>
+                        <div class="input-group input-group-danger">
+                            <input type="text" id="awal_tahun" class="form-control"
+                                placeholder="{{ $subYear }}">
+
+                            <span class="input-group-prepend ">
+                                <label class="input-group-text">s/d</label>
+                            </span>
+                            <input type="text" id="akhir_tahun" class="form-control"
+                                placeholder="{{ $year }}">
+
+                        </div>
+                        <b id="textSendCkanEror" class="text-danger"></b>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title="Kirim"
+                        id="btnSendDataCkan">Kirim <i class="ik ik-send"></i></button>
                 </div>
             </div>
         </div>
@@ -404,6 +453,18 @@
             let metodePerhitungan = $(this).data('metode');
             let metaData = $(this).data('meta');
             let sumberData = $(this).data('sumber');
+            let lokasiDataRaw = $(this).attr('data-lokasi');
+            let lokasiData = null;
+
+            // Parse JSON lokasi data
+            if (lokasiDataRaw) {
+                try {
+                    lokasiData = JSON.parse(lokasiDataRaw);
+                } catch (e) {
+                    lokasiData = null;
+                }
+            }
+
             SubElementModalLabel.innerHTML = nama;
             $('#satuan').html(satuan);
             $('#keterangan').html(keterangan);
@@ -411,6 +472,83 @@
             $('#metaData').html(metaData);
             $('#sumberData').html(sumberData);
 
+            // Format lokasi data
+            let lokasiHtml = '';
+            if (lokasiData && Array.isArray(lokasiData) && lokasiData.length > 0) {
+                lokasiHtml = '<ul style="margin-bottom: 0; padding-left: 20px;">';
+                lokasiData.forEach(function(item) {
+                    if (item.field && item.value) {
+                        lokasiHtml += '<li><strong>' + item.field + ':</strong> ' + item.value + '</li>';
+                    }
+                });
+                lokasiHtml += '</ul>';
+            } else {
+                lokasiHtml = '-';
+            }
+            $('#lokasiData').html(lokasiHtml);
+
         });
+
+        $('.btnSendCkan').on('click', function(e) {
+            $('#sendCkan').modal('show');
+        });
+    </script>
+    <script type="text/javascript" src="{{ asset('dist/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('dist/js/bootstrap-datepicker.js') }}"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $("#awal_tahun").datepicker({
+                format: " yyyy", // Notice the Extra space at the beginning
+                viewMode: "years",
+                minViewMode: "years"
+            });
+            $("#akhir_tahun").datepicker({
+                format: " yyyy", // Notice the Extra space at the beginning
+                viewMode: "years",
+                minViewMode: "years"
+            });
+
+            // clear textSendCkanEror after awal_tahun change
+            $('#awal_tahun').on('change', function(e) {
+                $('#textSendCkanEror').html('');
+            });
+            $('#akhir_tahun').on('change', function(e) {
+                $('#textSendCkanEror').html('');
+            });
+
+            // btnSendDataCkan click
+            $('#btnSendDataCkan').on('click', function(e) {
+                e.preventDefault();
+                var awal_tahun = $('#awal_tahun').val();
+                var akhir_tahun = $('#akhir_tahun').val();
+
+                // jika awal kosong
+                if (awal_tahun == '') {
+                    // textSendCkanEror
+                    $('#textSendCkanEror').html('Tahun awal tidak boleh kosong');
+                    return false;
+                }
+
+                // jika akhir kosong
+                if (akhir_tahun == '') {
+                    // textSendCkanEror
+                    $('#textSendCkanEror').html('Tahun akhir tidak boleh kosong');
+                    return false;
+                }
+
+                if (awal_tahun > akhir_tahun) {
+                    // textSendCkanEror
+                    $('#textSendCkanEror').html('Tahun awal tidak boleh lebih besar dari tahun akhir');
+                    return false;
+                }
+                // redirect to route
+                window.location.href = "{{ route('sub-element.ckan', $Element_id) }}?awal_tahun=" +
+                    awal_tahun +
+                    "&akhir_tahun=" + akhir_tahun;
+            });
+        })
     </script>
 @endpush

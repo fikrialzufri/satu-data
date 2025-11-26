@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use DB;
 use Excel;
 use Auth;
+use Str;
+use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class ElementController extends Controller
 {
@@ -576,6 +579,56 @@ class ElementController extends Controller
         }
         return Excel::download(new ExportElement($id), 'Download Element.xlsx');
     }
+
+     /**
+     * Send CKAN.
+     *
+     * @param  \App\Models\Dinamis
+     * @return \Illuminate\Http\Response
+     */
+    public function sendckan($id)
+    {
+        $data = $this->model()->find($id);
+
+        $page = request()->get('page');
+
+        $unit_id = $data->unit_id;
+
+        $unit = Unit::find($unit_id);
+
+        $owner_org =  Str::slug($unit->nama_singkat);
+        $nama =  Str::slug($data->nama . $owner_org);
+        $title =  $data->nama;
+        $notes =  $data->keterangan;
+
+        $apiURL = env('CKAN_ENDPOINT') . '/api/action/package_create';
+
+        $postInput = [
+            'name' => $nama,
+            'title' => $title,
+            'aliases' => $title,
+            'notes' => $notes,
+            'owner_org' => $owner_org,
+        ];
+
+        // Headers
+        $headers = [
+            'Authorization' => env('CKAN_AUTH'),
+            'Content-Type' => 'application/json',
+        ];
+
+        $response = Http::withHeaders($headers)->post($apiURL, $postInput);
+
+        $statusCode = $response->status();
+        $responseBody = json_decode($response->getBody(), true);
+
+        if ($responseBody['success'] == false) {
+            return redirect()->route($this->route . '.index', "unit_id=" . $unit_id)->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Sudah ada di CKAN')->with('Class', 'danger')->with('icon', 'error');
+        }
+
+        return redirect()->route($this->route . '.index', "unit_id=" . $unit_id)->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' berhasil dikirim ke ckan')->with('Class', 'success')->with('icon', 'success');
+    }
+    
     public function model()
     {
         return new Element();

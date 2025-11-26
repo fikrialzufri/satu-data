@@ -12,6 +12,8 @@ use Str;
 use Storage;
 use DB;
 use Auth;
+use Illuminate\Support\Facades\Http;
+
 use Intervention\Image\Facades\Image;
 
 class UnitController extends Controller
@@ -466,6 +468,48 @@ class UnitController extends Controller
             DB::rollback();
             return redirect()->route('unit.index')->with('message', 'Unit gagal ditambah')->with('Class', 'danger');
         }
+    }
+
+    /**
+     * Send CKAN.
+     *
+     * @param  \App\Models\Dinamis
+     * @return \Illuminate\Http\Response
+     */
+    public function sendckan($id)
+    {
+        $data = $this->model()->find($id);
+
+        $nama =  $data->nama;
+        $singkat =  $data->nama_singkat;
+        $keterangan =  $data->keterangan;
+
+        $page = request()->get('page');
+
+        $apiURL = env('CKAN_ENDPOINT') . '/api/action/organization_create';
+
+        // POST Data
+        $postInput = [
+            'name' => Str::slug($singkat),
+            'title' => $nama,
+            'description' => $keterangan,
+        ];
+
+        // Headers
+        $headers = [
+            'Authorization' => env('CKAN_AUTH'),
+            'Content-Type' => 'application/json',
+        ];
+
+        $response = Http::withHeaders($headers)->post($apiURL, $postInput);
+
+        $statusCode = $response->status();
+
+        if ($statusCode === 404) {
+            return redirect()->route($this->route . '.index', 'page=' . $page)->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Sudah ada di CKAN')->with('Class', 'danger')->with('icon', 'error');
+        }
+
+        return redirect()->route($this->route . '.index', 'page=' . $page)->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' berhasil dikirim ke ckan')->with('Class', 'success')->with('icon', 'success');
     }
 
     public function model()
