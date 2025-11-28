@@ -576,8 +576,14 @@ class ElementController extends Controller
             }
         } else {
             $id =  auth()->user()->id_unit;
+            $unit = Unit::find($id);
         }
-        return Excel::download(new ExportElement($id), 'Download Element.xlsx');
+
+        $tahun1 = request()->get('tahun1', Carbon::now()->subYears(1)->year);
+        $tahun2 = request()->get('tahun2', Carbon::now()->year);
+
+        $namaUnit = $unit->nama;
+        return Excel::download(new ExportElement($id, $tahun1, $tahun2), 'Download Element ' . $namaUnit . ' - ' . Carbon::now()->format('d-m-Y') . '.xlsx');
     }
 
      /**

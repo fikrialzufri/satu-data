@@ -22,10 +22,9 @@
 
                             @if ($unit_id)
                                 @canany(['download-' . $route])
-                                    <a href="{{ route($route . '.download') }}?unit_id={{ $unit_id }}"
-                                        class="btn btn-sm btn-danger float-right text-light mr-5">
+                                    <button class="btn btn-sm btn-danger float-right text-light mr-5 btnDownloadElement">
                                         <i class="fa fa-file"></i> Download
-                                    </a>
+                                    </button>
                                 @endcan
                                 @canany(['create-' . $route])
                                     <a href="{{ route($route . '.create') }}?unit_id={{ $unit_id }}"
@@ -201,9 +200,47 @@ href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
             <!-- Main row -->
             <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
+
+        <div class="modal fade " id="downloadElement" tabindex="-1" role="dialog"
+            aria-labelledby="downloadElementModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content ">
+                    <div class="modal-header">
+                        <h5 id="downloadElementLabel">Download {{ ucwords(str_replace([':', '_', '*'], ' ', $title)) }}
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="tahun1">Tahun Pertama</label>
+                            <div class="input-group input-group-danger">
+                                <input type="text" id="tahun1" class="form-control" placeholder="2024">
+                            </div>
+                            <b id="textDownloadElementError1" class="text-danger"></b>
+                        </div>
+                        <div class="form-group">
+                            <label for="tahun2">Tahun Kedua</label>
+                            <div class="input-group input-group-danger">
+                                <input type="text" id="tahun2" class="form-control" placeholder="2025">
+                            </div>
+                            <b id="textDownloadElementError2" class="text-danger"></b>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
+                            title="Download" id="btnDownloadDataElement">Download <i class="fa fa-file"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
+@push('head')
+    <link href="{{ asset('dist/css/bootstrap-datepicker.css') }}" rel="stylesheet" />
+@endpush
 @push('style')
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('plugins/DataTables/css/datatables.css') }}">
@@ -211,6 +248,11 @@ href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
 @push('script')
     <!-- DataTables -->
     <script src="{{ asset('plugins/DataTables/datatables.js') }}"></script>
+
+    <script src="{{ asset('plugins/select2/dist/js/select2.min.js') }}"></script>
+    <script src="{{ asset('plugins/mohithg-switchery/dist/switchery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('dist/js/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('dist/js/bootstrap-datepicker.js') }}"></script>
     <script>
         // $('#example').DataTable({
         //   "paging": true,
@@ -221,5 +263,71 @@ href="{{ route('kategorielement') }}?element_id={{ $item->id }}" @endguest>
         //   "autoWidth": true,
         //   "pageLength": 20,
         // });
+
+        $(document).ready(function() {
+            // btnDownloadElement click
+            $('.btnDownloadElement').on('click', function(e) {
+                e.preventDefault();
+                $('#downloadElement').modal('show');
+            });
+
+            // Initialize datepicker when modal is shown
+            $('#downloadElement').on('shown.bs.modal', function() {
+                // Destroy existing datepicker if any
+                if ($("#tahun1").data('datepicker')) {
+                    $("#tahun1").datepicker('destroy');
+                }
+                if ($("#tahun2").data('datepicker')) {
+                    $("#tahun2").datepicker('destroy');
+                }
+
+                // Initialize datepicker
+                $("#tahun1").datepicker({
+                    format: " yyyy", // Notice the Extra space at the beginning
+                    viewMode: "years",
+                    minViewMode: "years"
+                });
+                $("#tahun2").datepicker({
+                    format: " yyyy", // Notice the Extra space at the beginning
+                    viewMode: "years",
+                    minViewMode: "years"
+                });
+            });
+
+            // clear error after tahun change
+            $(document).on('change', '#tahun1', function(e) {
+                $('#textDownloadElementError1').html('');
+                $('#textDownloadElementError2').html('');
+            });
+            $(document).on('change', '#tahun2', function(e) {
+                $('#textDownloadElementError1').html('');
+                $('#textDownloadElementError2').html('');
+            });
+
+            // btnDownloadDataElement click
+            $('#btnDownloadDataElement').on('click', function(e) {
+                e.preventDefault();
+                var tahun1 = $('#tahun1').val();
+                var tahun2 = $('#tahun2').val();
+
+                // jika tahun1 kosong
+                if (tahun1 == '') {
+                    $('#textDownloadElementError1').html('Tahun pertama tidak boleh kosong');
+                    return false;
+                }
+
+                // jika tahun2 kosong
+                if (tahun2 == '') {
+                    $('#textDownloadElementError2').html('Tahun kedua tidak boleh kosong');
+                    return false;
+                }
+
+                // redirect to route
+                window.location.href =
+                    "{{ route($route . '.download') }}?unit_id={{ $unit_id }}&tahun1=" +
+                    tahun1 +
+                    "&tahun2=" + tahun2;
+            });
+        })
     </script>
 @endpush
