@@ -1,150 +1,211 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
 use App\Http\Controllers\Controller;
-use App\Models\Karyawan;
-use App\Models\Rekanan;
-use Illuminate\Http\Request;
-use Auth;
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * @OA\Server(
+ *     url=L5_SWAGGER_CONST_HOST,
+ *     description="API Server"
+ * )
+ */
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('cors');
+    }
 
+    /**
+     * @OA\Post(
+     *     path="/auth/login",
+     *     tags={"Auth"},
+     *     operationId="login",
+     *     summary="Login",
+     *     description="Login untuk mendapatkan token JWT menggunakan email atau username",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"username","password"},
+     *             @OA\Property(property="username", type="string", description="Username atau email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Login berhasil",
+     *         @OA\JsonContent(
+     *             example={
+     *                 "success": true,
+     *                 "message": "Login berhasil",
+     *                 "data": {
+     *                     "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+     *                     "user": {
+     *                         "id": "1",
+     *                         "name": "John Doe",
+     *                         "email": "user@example.com",
+     *                         "username": "johndoe",
+     *                         "nik": "123456"
+     *                     }
+     *                 }
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Login gagal",
+     *         @OA\JsonContent(
+     *             example={
+     *                 "success": false,
+     *                 "message": "Email/username atau password salah"
+     *             }
+     *         )
+     *     )
+     * )
+     */
     public function login(Request $request)
     {
-        $this->validate($request, [
-            'username'    => 'required',
-            'password' => 'required',
-        ]);
+        try {
+            $credentials = $request->only(['username', 'password']);
 
-        $login_type = filter_var($request->input('username'), FILTER_VALIDATE_EMAIL)
-            ? 'email'
-            : 'username';
+            if (!auth()->attempt($credentials)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email/username atau password salah'
+                ], 401);
+            }
 
-        $request->merge([
-            $login_type => $request->input('username')
-        ]);
+            $user = auth()->user();
 
-        $dataRole = [];
-        $dataPermission = [];
-        $profile = [];
+            // Hapus token lama jika ada untuk menghindari konflik
+            $user->tokens()->delete();
 
-        if (Auth::attempt($request->only($login_type, 'password'))) {
-            $user =  Auth::user();
-            $token = $user->createToken("access_token")
-                ->plainTextToken;
-            $role = $user->role;
-            foreach ($role as $key => $value) {
-                $dataRole[$key] = $value->slug;
-                foreach ($value->permissions as $index => $item) {
-                    $dataPermission[$key][$index] = $item->slug;
+            // get token dengan retry mechanism
+            $maxRetries = 3;
+            $token = null;
+
+            for ($i = 0; $i < $maxRetries; $i++) {
+                try {
+                    $token = $user->createToken('auth_token')->plainTextToken;
+                    break;
+                } catch (\Exception $e) {
+                    if ($i === $maxRetries - 1) {
+                        throw $e;
+                    }
+                    // Tunggu sebentar sebelum retry
+                    usleep(100000); // 100ms
                 }
             }
-            $data = [
-                "id" => $user->id,
-                "username" => $user->username,
-                "name" => $user->name,
-                "email" => $user->email,
-            ];
 
-            $karyawan = Karyawan::where('user_id', $user->id)->first();
-            $rekanan = Rekanan::where('user_id', $user->id)->first();
-
-            if ($karyawan) {
-                $profile = [
-                    "id" => $karyawan->id,
-                    "nama" => $karyawan->nama,
-                    "nik" => $karyawan->nik,
-                    "nip" => $karyawan->nip,
-                    "jabatan" => $karyawan->nama_jabatan,
-                    "divisi" => $karyawan->divisi,
-                    "departemen" => $karyawan->departemen,
-                ];
-            }
-            if ($rekanan) {
-                $profile = [
-                    "id" => $rekanan->id,
-                    "nama" => $rekanan->nama,
-                    "nama_penanggung_jawab" => $rekanan->nama_penangung_jawab,
-                    "nik" => $rekanan->nik,
-                    "no_hp" => $rekanan->no_hp,
-                    "alamat" => $rekanan->alamat,
-                ];
-            }
-
-
-            $result = [
-                'user' => $data,
-                'profile' => $profile,
-                'role' => $dataRole,
-                'permission' => $dataPermission,
-                'token' => $token
-            ];
-
-            $message = 'user dan password betul';
-            return $this->sendResponse($result, $message, 200);
-        } else {
-            $error = 'user dan password salah';
-            $errorMessages = "";
-            return $this->sendError($error, $errorMessages, 401);
+            return response()->json([
+                'success' => true,
+                'message' => 'Login berhasil',
+                'data' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'username' => $user->username,
+                        'nik' => $user->nik,
+                        'token' => $token
+                    ]
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 401);
         }
     }
 
-    public function logout()
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     tags={"Auth"},
+     *     operationId="logout",
+     *     summary="Logout",
+     *     description="Logout dan menghapus token",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response="200",
+     *         description="Logout berhasil",
+     *         @OA\JsonContent(
+     *             example={
+     *                 "success": true,
+     *                 "message": "Logout berhasil"
+     *             }
+     *         )
+     *     )
+     * )
+     */
+    public function logout(Request $request)
     {
-        Auth::user()->tokens()->where('id', Auth::user()->currentAccessToken()->id)->delete();
+        try {
+            $request->user()->currentAccessToken()->delete();
 
-        $result = '';
-
-        $message = 'anda berhasil keluar';
-
-        return $this->sendResponse($result, $message, 200);
-    }
-
-    public function me()
-    {
-        $user = Auth::user()->id;
-        $role = Auth::user()->role;
-
-        $dataRole = [];
-        $dataPermission = [];
-
-        foreach ($role as $key => $value) {
-            $dataRole[$key] = $value->slug;
-            foreach ($value->permissions as $index => $item) {
-                $dataPermission[$index] = $item->slug;
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout berhasil'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        $result = [
-            'user' => $user,
-            'role' => $dataRole,
-            'permissions' => $dataPermission,
-        ];
-
-        $message = 'profile data';
-        return $this->sendResponse($result, $message, 200);
     }
 
-    public function refresh()
+    /**
+     * @OA\Get(
+     *     path="/api/auth/user",
+     *     tags={"Auth"},
+     *     operationId="getUser",
+     *     summary="Get User",
+     *     description="Mendapatkan data user yang sedang login",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response="200",
+     *         description="Berhasil mendapatkan data user",
+     *         @OA\JsonContent(
+     *             example={
+     *                 "success": true,
+     *                 "message": "Berhasil mendapatkan data user",
+     *                 "data": {
+     *                     "id": "1",
+     *                     "name": "John Doe",
+     *                     "email": "user@example.com",
+     *                     "nik": "123456"
+     *                 }
+     *             }
+     *         )
+     *     )
+     * )
+     */
+    public function user(Request $request)
     {
-        $user =  Auth::user();
-        $user->tokens()->delete();
-
-        $token = $user->createToken("access_token")
-            ->plainTextToken;
-
-        $result = [
-            'token' => $token
-        ];
-
-        $message = 'refresh token';
-        return $this->sendResponse($result, $message, 200);
-    }
-
-    public function user()
-    {
-        return Auth::user()->with('role')->with('permissions');
+        try {
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mendapatkan data user',
+                'data' => [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'nik' => $request->user()->nik
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -1043,6 +1043,9 @@ class SubElementController extends Controller
             'records' => $result,
         ];
 
+        Log::info('Post Input:', ['postInput' => $postInput]);
+
+
         // Headers
         $headers = [
             'Authorization' => env('CKAN_AUTH'),
