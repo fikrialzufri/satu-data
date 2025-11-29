@@ -64,8 +64,20 @@ trait CrudTrait
     //btn-tambah
     private $tambah = 'true';
 
+    //btn-edit
+    private $edit = 'true';
+
+    //btn-hapus
+    private $hapus = 'true';
+
     //btn-upload
     private $upload = 'false';
+
+    //plural
+    private $plural = 'false';
+
+    // create template
+    private $createTemplate = '';
 
     // validation rule harus pkai object
     // tentukan jumlah col-sm boostrap
@@ -78,19 +90,21 @@ trait CrudTrait
     {
         //nama title
         if (!isset($this->title)) {
-            $title =  ucwords($this->route);
+            $title = ucwords($this->route);
         } else {
-            $title =  ucwords($this->title);
+            $title = ucwords($this->title);
         }
 
         //nama route
-        $route =  $this->route;
+        $route = $this->route;
+        $edit = $this->edit;
+        $hapus = $this->hapus;
 
         //nama relation
-        $relations =  $this->relations;
+        $relations = $this->relations;
 
         //nama jumlah pagination
-        $paginate =  $this->paginate;
+        $paginate = $this->paginate;
 
         //declare nilai serch pertama
         $search = null;
@@ -118,75 +132,79 @@ trait CrudTrait
         //mulai pencarian --------------------------------
         $searches = $this->configSearch();
         $searchValues = [];
+        $hasilSearch = [];
         $n = 0;
         $countAll = 0;
         $queryArray = [];
         $queryRaw = '';
-        foreach ($searches as $key => $val) {
-            $search[$key] = request()->input($val['name']);
-            $hasilSearch[$val['name']] = $search[$key];
+        if (isset($searches)) {
+            # code...
+            foreach ($searches as $key => $val) {
+                $search[$key] = request()->input($val['name']);
+                $hasilSearch[$val['name']] = $search[$key];
 
-            if ($search[$key]) {
-                if ($val['input'] != 'daterange') {
-                    # code...
-                    $searchValues[$key] = preg_split('/\s+/', $search[$key], -1, PREG_SPLIT_NO_EMPTY);
+                if ($search[$key]) {
+                    if ($val['input'] != 'daterange') {
+                        # code...
+                        $searchValues[$key] = preg_split('/\s+/', $search[$key], -1, PREG_SPLIT_NO_EMPTY);
 
-                    if (count($searchValues[$key]) == 1) {
-                        foreach ($searchValues[$key] as $index => $value) {
-                            $query->where($val['name'], 'like', "%{$value}%");
-                            $countAll = $countAll + 1;
-                        }
-                    } else {
-                        $lastquery = '';
+                        if (count($searchValues[$key]) == 1) {
+                            foreach ($searchValues[$key] as $index => $value) {
+                                $query->where($val['name'], 'like', "%{$value}%");
+                                $countAll = $countAll + 1;
+                            }
+                        } else {
+                            $lastquery = '';
 
-                        foreach ($searchValues[$key] as $index => $word) {
-                            if (preg_match("/^[a-zA-Z0-9]+$/", $word) == 1) {
+                            foreach ($searchValues[$key] as $index => $word) {
+                                if (preg_match("/^[a-zA-Z0-9]+$/", $word) == 1) {
 
-                                if ($queryRaw) {
-                                    $count =  $this->model()->whereRaw(rtrim($queryRaw, " and"))->count();
-                                    if ($count > 0) {
-                                        $countAll = $countAll + 1;
-                                        $lastquery = $queryRaw;
+                                    if ($queryRaw) {
+                                        $count = $this->model()->whereRaw(rtrim($queryRaw, " and"))->count();
+                                        if ($count > 0) {
+                                            $countAll = $countAll + 1;
+                                            $lastquery = $queryRaw;
 
-                                        $queryRaw .= $val['name'] . ' LIKE "%' . $word . '%" and ';
-                                        if ($this->model()->whereRaw(rtrim($queryRaw, " and"))->count() == 0) {
-                                            $queryRaw = $lastquery;
+                                            $queryRaw .= $val['name'] . ' LIKE "%' . $word . '%" and ';
+                                            if ($this->model()->whereRaw(rtrim($queryRaw, " and"))->count() == 0) {
+                                                $queryRaw = $lastquery;
+                                            }
                                         }
-                                    }
-                                } else {
-                                    $count =  $this->model()->where($val['name'], 'like', "%{$word}%")->count();
-                                    if ($count > 0) {
-                                        $countAll = $countAll + 1;
+                                    } else {
+                                        $count = $this->model()->where($val['name'], 'like', "%{$word}%")->count();
+                                        if ($count > 0) {
+                                            $countAll = $countAll + 1;
 
-                                        $queryRaw .= $val['name'] . ' LIKE "%' . $word . '%" and ';
-                                        continue;
+                                            $queryRaw .= $val['name'] . ' LIKE "%' . $word . '%" and ';
+                                            continue;
+                                        }
                                     }
                                 }
                             }
                         }
+
+                        if ($queryRaw) {
+                            $query->whereRaw(rtrim($queryRaw, " and "));
+                        }
+                        if (count($queryArray) > 0) {
+                            $query->where($queryArray);
+                        }
+                    } else {
+                        $date = explode(' - ', request()->input($val['name']));
+                        $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
+                        $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
+                        $query = $query->whereBetween(DB::raw('DATE(' . $val['name'] . ')'), array($start, $end));
+
+                        $export .= 'from=' . $start . '&to=' . $end;
+                        $countAll = $countAll + 1;
                     }
 
-                    if ($queryRaw) {
-                        $query->whereRaw(rtrim($queryRaw, " and "));
+                    if ($countAll == 0) {
+                        $query->where('id', "");
                     }
-                    if (count($queryArray) > 0) {
-                        $query->where($queryArray);
-                    }
-                } else {
-                    $date = explode(' - ', request()->input($val['name']));
-                    $start = Carbon::parse($date[0])->format('Y-m-d') . ' 00:00:01';
-                    $end = Carbon::parse($date[1])->format('Y-m-d') . ' 23:59:59';
-                    $query = $query->whereBetween(DB::raw('DATE(' . $val['name'] . ')'), array($start, $end));
-
-                    $export .= 'from=' . $start . '&to=' . $end;
-                    $countAll = $countAll + 1;
                 }
-
-                if ($countAll == 0) {
-                    $query->where('id',  "");
-                }
+                $export .= $val['name'] . '=' . $search[$key] . '&';
             }
-            $export .= $val['name'] . '=' . $search[$key] . '&';
         }
 
         // return $ayam;
@@ -220,19 +238,24 @@ trait CrudTrait
         }
         // return  $data;
 
-        return view($template,  compact(
-            "title",
-            "data",
-            'searches',
-            'hasilSearch',
-            'button',
-            'tambah',
-            'upload',
-            'search',
-            'export',
-            'configHeaders',
-            'route'
-        ));
+        return view(
+            $template,
+            compact(
+                "title",
+                "data",
+                'searches',
+                'hasilSearch',
+                'button',
+                'tambah',
+                'upload',
+                'search',
+                'export',
+                'configHeaders',
+                'edit',
+                'hapus',
+                'route'
+            )
+        );
     }
 
 
@@ -245,14 +268,14 @@ trait CrudTrait
     {
         //nama title
         if (!isset($this->title)) {
-            $title =  "Tambah " . ucwords($this->route);
+            $title = "Tambah " . ucwords($this->route);
         } else {
-            $title =  "Tambah " . ucwords($this->title);
+            $title = "Tambah " . ucwords($this->title);
         }
 
         //nama route dan action route
-        $route =  $this->route;
-        $store =  "store";
+        $route = $this->route;
+        $store = "store";
 
         //memanggil config form
         $form = $this->configform();
@@ -264,17 +287,25 @@ trait CrudTrait
         $countColom = $this->countColom($count);
         $countColomFooter = $this->countColomFooter($count);
         // $hasValue = $this->hasValue;
+        $createTemplate = "template.form";
+        if ($this->createTemplate != '') {
+            $createTemplate = $this->createTemplate;
+        }
 
-        return view('template.form', compact(
-            'title',
-            'form',
-            'countColom',
-            'colomField',
-            'countColomFooter',
-            'store',
-            'route'
-            // 'hasValue'
-        ));
+
+        return view(
+            $createTemplate,
+            compact(
+                'title',
+                'form',
+                'countColom',
+                'colomField',
+                'countColomFooter',
+                'store',
+                'route'
+                // 'hasValue'
+            )
+        );
     }
 
     /**
@@ -303,15 +334,20 @@ trait CrudTrait
         $relationModels = '';
         $id_relatioan = '';
         DB::beginTransaction();
+        // $hasRalation;
+        //redirect
+        $title = $this->route;
+
+        if (isset($this->title)) {
+            $title = $this->title;
+        }
         try {
-            //open model
-            DB::commit();
             $data = $this->model();
             if (isset($relation)) {
                 $firstColumn = [];
-                $manyToMany  = null;
-                $manyRelation  = null;
-                $valueMany  = null;
+                $manyToMany = null;
+                $manyRelation = null;
+                $valueMany = null;
                 foreach ($relation as $key => $value) {
                     $relationModels = '\\App\Models\\' . ucfirst($key);
                     $relationModels = new $relationModels;
@@ -351,8 +387,8 @@ trait CrudTrait
                     }
                 }
                 if (preg_match("/-image/i", $index)) {
-                    $route =  $this->route;
-                    $file =  str_replace("-image", "", $index);
+                    $route = $this->route;
+                    $file = str_replace("-image", "", $index);
                     if ($request->hasFile($file)) {
                         # code...
                         $nama_gambar = Str::slug($route) . '-' . Str::Random(15) . '.' . $request->file($file)->getClientOriginalExtension();
@@ -370,7 +406,7 @@ trait CrudTrait
                         Storage::disk('public')->put($route . '/' . $nama_gambar, $gambar_original);
 
 
-                        $thumbnail = Image::make($request->file($file))->resize(360, 360)->save($path);
+                        $thumbnail = Image::make($request->file($file))->save($path);
                         Storage::disk('public')->put($route . '/thumbnail' . '/' . $nama_gambar, $thumbnail);
 
                         $data->$file = $nama_gambar;
@@ -388,10 +424,11 @@ trait CrudTrait
             }
             $data->save();
 
+
             if (isset($this->manyToMany)) {
                 if (!isset($this->extraFrom)) {
-                    return $this->manyToMany;
-                    foreach ($this->manyToMany as  $value) {
+
+                    foreach ($this->manyToMany as $value) {
                         $hasRalation = 'has' . ucfirst($value);
                         $valueField = $data->$hasRalation()->attach($form[$value]);
                     }
@@ -404,35 +441,16 @@ trait CrudTrait
                     $valueField = $data->$hasRalation()->attach($form[$idRelation]);
                 }
             }
-            // $hasRalation;
-            //redirect
-            return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Berhasil Ditambahkan')->with('Class', 'success');
-        } catch (\Throwable $th) {
-            DB::rollback();
+            DB::commit();
 
-            if (isset($relation)) {
-                foreach ($relation as $key => $value) {
-                    $relationModels = '\\App\Models\\' . ucfirst($key);
-                    $relationModels = $relationModels->find($id_relatioan)->delete();
-                }
-            }
-            if (isset($this->manyToMany)) {
-                if (!isset($this->extraFrom)) {
-                    return $this->manyToMany;
-                    foreach ($this->manyToMany as  $value) {
-                        $hasRalation = 'has' . ucfirst($value);
-                        $valueField = $data->$hasRalation()->detach($form[$value]);
-                    }
-                }
-            }
-            if (isset($this->oneToMany)) {
-                foreach ($this->oneToMany as $index => $value) {
-                    $hasRalation = 'has' . ucfirst($value);
-                    $idRelation = $value . '_id';
-                    $valueField = $data->$hasRalation()->detach($form[$idRelation]);
-                }
-            }
-            return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' gagal Ditambahkan')->with('Class', 'success');
+
+            return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $title)) . ' Berhasil Ditambahkan')->with('Class', 'success');
+            //open model
+
+        } catch (\Throwable $th) {
+
+            DB::rollback();
+            return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $title)) . ' gagal Ditambahkan')->with('Class', 'warning');
         }
     }
 
@@ -457,9 +475,9 @@ trait CrudTrait
     {
         $data = $this->model()->find($id);
         if (!isset($this->title)) {
-            $title =  "Ubah " . ucwords(str_replace('-', ' ', $this->route)) . ' - : ' . $data->nama;
+            $title = "Ubah " . ucwords(str_replace('-', ' ', $this->route)) . ' - : ' . $data->nama;
         } else {
-            $title =  "Ubah " . ucwords(str_replace('-', ' ', $this->title)) . ' - : ' . $data->nama;
+            $title = "Ubah " . ucwords(str_replace('-', ' ', $this->title)) . ' - : ' . $data->nama;
         }
 
         if (isset($this->manyToMany)) {
@@ -467,7 +485,7 @@ trait CrudTrait
                 if (isset($this->relations)) {
                     foreach ($this->relations as $item) {
                         $hasRalation = 'has' . ucfirst($item);
-                        foreach ($this->manyToMany as  $value) {
+                        foreach ($this->manyToMany as $value) {
                             try {
                                 $field = $value . '_id';
                                 $valueField = $data->$hasRalation->$value()->first()->id;
@@ -498,8 +516,8 @@ trait CrudTrait
         }
 
         //nama route dan action route
-        $route =  $this->route;
-        $store =  "update";
+        $route = $this->route;
+        $store = "update";
 
         $form = $this->configform();
         $count = count($form);
@@ -509,16 +527,19 @@ trait CrudTrait
         $countColom = $this->countColom($count);
         $countColomFooter = $this->countColomFooter($count);
 
-        return view('template.form', compact(
-            'route',
-            'store',
-            'colomField',
-            'countColom',
-            'countColomFooter',
-            'title',
-            'form',
-            'data'
-        ));
+        return view(
+            'template.form',
+            compact(
+                'route',
+                'store',
+                'colomField',
+                'countColom',
+                'countColomFooter',
+                'title',
+                'form',
+                'data'
+            )
+        );
     }
 
     /**
@@ -556,13 +577,19 @@ trait CrudTrait
             $validation,
             $messages
         );
+
+        $title = $this->route;
+
+        if (isset($this->title)) {
+            $title = $this->title;
+        }
         //post ke model
         // $this->model()->transaction();
         foreach ($form as $index => $item) {
 
             if (preg_match("/-image/i", $index)) {
-                $route =  $this->route;
-                $file =  str_replace("-image", "", $index);
+                $route = $this->route;
+                $file = str_replace("-image", "", $index);
                 if ($request->hasFile($file)) {
                     $nama_gambar = Str::slug($route) . '-' . Str::Random(15) . '.' . $request->file($file)->getClientOriginalExtension();
 
@@ -587,7 +614,7 @@ trait CrudTrait
                     if (Storage::disk('public')->exists($route . '/thumbnail' . '/' . $data->$file)) {
                         Storage::disk('public')->delete($route . '/thumbnail' . '/' . $data->$file);
                     }
-                    $thumbnail = Image::make($request->file($file))->resize(720, 720)->save($path);
+                    $thumbnail = Image::make($request->file($file))->save($path);
                     Storage::disk('public')->put($route . '/thumbnail' . '/' . $nama_gambar, $thumbnail);
 
                     $data->$file = $nama_gambar;
@@ -648,7 +675,7 @@ trait CrudTrait
 
         if (isset($this->manyToMany)) {
             if (!isset($this->extraFrom)) {
-                foreach ($this->manyToMany as  $value) {
+                foreach ($this->manyToMany as $value) {
                     $hasRalation = 'has' . ucfirst($value);
                     $valueField = $data->$hasRalation()->sync($form[$value]);
                 }
@@ -664,7 +691,7 @@ trait CrudTrait
             }
         }
 
-        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' Berhasil diubah')->with('Class', 'primary');
+        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $title)) . ' Berhasil diubah')->with('Class', 'primary');
     }
 
     /**
@@ -678,10 +705,16 @@ trait CrudTrait
         $data = $this->model()->find($id);
         $data->delete();
 
+        $title = $this->route;
+
+        if (isset($this->title)) {
+            $title = $this->title;
+        }
+
         if (isset($this->manyToMany)) {
 
             if (!isset($this->extraFrom)) {
-                foreach ($this->manyToMany as  $value) {
+                foreach ($this->manyToMany as $value) {
                     $hasRalation = 'has' . ucfirst($value);
                     $valueField = $data->$hasRalation()->detach();
                 }
@@ -690,11 +723,15 @@ trait CrudTrait
 
         if ($this->relations) {
             foreach ($this->relations as $key => $value) {
-                $relationsFields = $value . '_id';
-                $relationModels = '\\App\Models\\' . ucfirst($value);
-                $relationModels = new $relationModels;
-                $relationModels = $relationModels->find($data->$relationsFields);
-                $relationModels->delete();
+                try {
+                    //code...
+                    $relationsFields = $value . '_id';
+                    $relationModels = '\\App\Models\\' . ucfirst($value);
+                    $relationModels = new $relationModels;
+                    $relationModels = $relationModels->find($data->$relationsFields);
+                    $relationModels->delete();
+                } catch (\Throwable $th) {
+                }
             }
         }
         if (isset($this->oneToMany)) {
@@ -703,7 +740,7 @@ trait CrudTrait
                 $valueField = $data->$hasRalation()->detach();
             }
         }
-        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $this->route)) . ' berhasil dihapus')->with('Class', 'success');
+        return redirect()->route($this->route . '.index')->with('message', ucwords(str_replace('-', ' ', $title)) . ' berhasil dihapus')->with('Class', 'success');
     }
 
 
@@ -726,8 +763,9 @@ trait CrudTrait
         $relation = [];
 
 
-        foreach ($this->configForm() as $index =>  $value) {
-            if (isset($value['extraForm'])) { }
+        foreach ($this->configForm() as $index => $value) {
+            if (isset($value['extraForm'])) {
+            }
 
             if (isset($value['validasi'])) {
                 $validasi = $value['validasi'];
@@ -746,7 +784,7 @@ trait CrudTrait
                         if ($item === 'unique') {
                             if ($id) {
 
-                                $unique = $tabelUnique  . ',' . $value['name'] . ',' . $id;
+                                $unique = $tabelUnique . ',' . $value['name'] . ',' . $id;
                             } else {
                                 $unique = $tabelUnique . ',' . $value['name'];
                             }
@@ -769,7 +807,7 @@ trait CrudTrait
                 // $validation[$value['name']] =  $validasi;
 
                 //untuk menjadikan satu dari array
-                $validation[$value['name']] =  implode("|",  $validasi);
+                $validation[$value['name']] = implode("|", $validasi);
             }
 
             if (!isset($value['extraForm'])) {
@@ -778,6 +816,10 @@ trait CrudTrait
                         $form[$value['name']] = str_replace(".", "", $request->input($value['name']));
                     } else if ($value['input'] === "image") {
                         $form[$value['name'] . '-image'] = 'image';
+                    } else if ($value['input'] === "disabled") {
+                        continue;
+                    } else if ($value['input'] === "readonly") {
+                        continue;
                     } else {
 
                         $form[$value['name']] = $request->input($value['name']);
@@ -850,9 +892,9 @@ trait CrudTrait
         foreach ($relationData as $key => $item) {
 
             if ($hasRelation) {
-                $nama = ucfirst($table) . ' : ' . $item->nama . " | " . ucfirst($hasRelation)  . " : " .  $item->$hasColom;
+                $nama = ucfirst($table) . ' : ' . $item->nama . " | " . ucfirst($hasRelation) . " : " . $item->$hasColom;
                 if (!$nama) {
-                    $nama = ucfirst($table) . ' : ' . $item->name . " | " . ucfirst($hasRelation) . " : " .  $item->$hasColom;
+                    $nama = ucfirst($table) . ' : ' . $item->name . " | " . ucfirst($hasRelation) . " : " . $item->$hasColom;
                 }
             } else {
                 $nama = $item->nama;
@@ -863,17 +905,17 @@ trait CrudTrait
             $array = [];
             if (isset($arrayColom)) {
                 foreach ($arrayColom as $value) {
-                    $rplcs = str_replace("_", " ",  $value);
+                    $rplcs = str_replace("_", " ", $value);
                     $array[$value] = ucwords($rplcs) . ' : ' . $item->$value . ' | ';
                 }
                 $listdata = implode(" ", $array);
                 $nama = $nama . ' | ' . $listdata;
-                $nama =  rtrim($nama, ' | ');
+                $nama = rtrim($nama, ' | ');
             }
 
             $data[$key] = [
-                'id'    => $item->id,
-                'value'    => $nama,
+                'id' => $item->id,
+                'value' => $nama,
             ];
         }
 
@@ -922,7 +964,7 @@ trait CrudTrait
             $jumlahsebelumnya = 0;
             if ($key >= 2) {
                 $keysebelumya = $key - 1;
-                $jumlahsebelumnya =  $sebelum[$keysebelumya];
+                $jumlahsebelumnya = $sebelum[$keysebelumya];
             }
             $sebelum[$key] = $value;
             $dataKedua[$key] = $jumlahsebelumnya . ',' . $value;

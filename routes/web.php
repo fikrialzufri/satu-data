@@ -13,6 +13,7 @@ use App\Http\Controllers\SubElementController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BannerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -79,7 +80,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/sendckan/{id}', [UnitController::class, 'sendckan'])->name('unit.ckan');
 
     Route::resource('legenda', LegendaController::class);
-
+    Route::resource('banner', BannerController::class);
 
 
     // ubah profile

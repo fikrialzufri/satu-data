@@ -19,7 +19,6 @@ class BannerController extends Controller
     {
         $this->route = 'banner';
         $this->title = 'Banner';
-        $this->hapus = 'false';
         $this->tambah = 'false';
         $this->middleware('permission:view-' . $this->route, ['only' => ['show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);

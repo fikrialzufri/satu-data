@@ -25,39 +25,44 @@
                                     <i class="fa fa-file"></i> Download
                                 </a>
                             @endcan --}}
-                            @canany(['create-' . str_replace('_', '-', $route)])
-                                <a href="{{ route($route . '.create') }}" class="btn btn-sm btn-primary float-right text-light">
-                                    <i class="fa fa-plus"></i> Tambah Data
-                                </a>
-                            @endcan
+                            @if ($tambah == 'true')
+                                @canany(['create-' . str_replace('_', '-', $route)])
+                                    <a href="{{ route($route . '.create') }}"
+                                        class="btn btn-sm btn-primary float-right text-light">
+                                        <i class="fa fa-plus"></i> Tambah Data
+                                    </a>
+                                @endcan
+                            @endif
 
                         </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <form action="" role="form" id="form" enctype="multipart/form-data">
-                            <div class="row">
-                                @foreach ($searches as $key => $item)
-                                    <div class="col-lg-2">
+                        @if ($searches)
+                            <form action="" role="form" id="form" enctype="multipart/form-data">
+                                <div class="row">
+                                    @foreach ($searches as $key => $item)
+                                        <div class="col-lg-2">
 
-                                        <label for="{{ $item['name'] }}">{{ ucfirst($item['alias']) }}</label>
-                                        @include('template.formsearch')
-                                    </div>
-                                @endforeach
+                                            <label for="{{ $item['name'] }}">{{ ucfirst($item['alias']) }}</label>
+                                            @include('template.formsearch')
+                                        </div>
+                                    @endforeach
 
-                                <div class="col-lg-3">
-                                    <label for="">Aksi</label>
-                                    <div class="input-group">
+                                    <div class="col-lg-3">
+                                        <label for="">Aksi</label>
+                                        <div class="input-group">
 
 
-                                        <button type="submit" class="btn btn-warning">
-                                            <span class="fa fa-search"></span>
-                                            Cari
-                                        </button>
+                                            <button type="submit" class="btn btn-warning">
+                                                <span class="fa fa-search"></span>
+                                                Cari
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        @endif
                         <br>
                         <table class="table table-bordered " id="example">
                             <thead>
@@ -91,6 +96,15 @@
                                                             class="badge badge-pill mb-1">
                                                             {{ $item[$header['name']] }}</span>
                                                     </td>
+                                                @elseif ($header['input'] == 'image')
+                                                    <td width="10%">
+                                                        @if ($item[$header['name']] != null || $item[$header['name']] != '')
+                                                            <img class=" img-responsive image" width="50%"
+                                                                src="{{ asset('storage/' . $route . '/thumbnail/' . $item[$header['name']]) }}"
+                                                                data-image={{ asset('storage/' . $route . '/' . $item[$header['name']]) }}>
+                                                        @endif
+
+                                                    </td>
                                                 @elseif ($header['input'] == 'date')
                                                     <td>
                                                         @if ($item[$header['name']] != null || $item[$header['name']] != '')
@@ -102,34 +116,41 @@
                                                 <td>{{ $item[$header['name']] }}</td>
                                             @endif
                                         @endforeach
-                                        @canany(['edit-' . $route, 'delete-' . $route])
-                                            <td class="text-center">
-                                                @if (isset($button))
-                                                    @foreach ($button as $key => $val)
-                                                        @include('template.button')
-                                                    @endforeach
-                                                @endif
-                                                @can('edit-' . $route)
-                                                    <a href="{{ route($route . '.edit', $item->id) }}"
-                                                        class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
-                                                        data-placement="top" title="Edit">
-                                                        <i class="ik ik-edit-2"></i></a>
-                                                @endcan
-                                                @can('delete-' . $route)
-                                                    <form id="form-{{ $item->id }}"
-                                                        action="{{ route($route . '.destroy', $item->id) }}" method="POST"
-                                                        style="display: none;">
-                                                        {{ csrf_field() }}
-                                                        {{ method_field('DELETE') }}
-                                                    </form>
+                                        @if ($edit != 'false' || $hapus != 'false')
+                                            @canany(['edit-' . $route, 'delete-' . $route])
+                                                <td class="text-center">
+                                                    @if (isset($button))
+                                                        @foreach ($button as $key => $val)
+                                                            @include('template.button')
+                                                        @endforeach
+                                                    @endif
+                                                    @if ($edit != 'false')
+                                                        @can('edit-' . $route)
+                                                            <a href="{{ route($route . '.edit', $item->id) }}"
+                                                                class="btn btn-sm btn-warning text-light" data-toggle="tooltip"
+                                                                data-placement="top" title="Edit">
+                                                                <i class="nav-icon fas fa-edit"></i> Ubah</a>
+                                                        @endcan
+                                                    @endif
+                                                    @if ($hapus != 'false')
+                                                        @can('delete-' . $route)
+                                                            <form id="form-{{ $item->id }}"
+                                                                action="{{ route($route . '.destroy', $item->id) }}" method="POST"
+                                                                style="display: none;">
+                                                                {{ csrf_field() }}
+                                                                {{ method_field('DELETE') }}
+                                                            </form>
 
-                                                    <button class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
-                                                        title="Hapus" onclick=deleteconf("{{ $item->id }}")>
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
-                                                @endcan
-                                            </td>
-                                        @endcan
+                                                            <button class="btn btn-danger btn-sm" data-toggle="tooltip"
+                                                                data-placement="top" title="Hapus"
+                                                                onclick=deleteconf("{{ $item->id }}")>
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </button>
+                                                        @endcan
+                                                    @endif
+                                                </td>
+                                            @endcan
+                                        @endif
                                     </tr>
                                 @empty
                                     <tr>
@@ -152,6 +173,17 @@
             <!-- /.row (main row) -->
         </div><!-- /.container-fluid -->
     </div>
+    <div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" data-dismiss="modal">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                            class="sr-only">Close</span></button>
+                    <img src="" id="imagepreview" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('style')
@@ -171,5 +203,12 @@
         //   "autoWidth": true,
         //   "pageLength": 20,
         // });
+        $(function() {
+            $('.image').on('click', function() {
+                let image = $(this).attr('data-image');
+                $('#imagepreview').attr('src', image);
+                $('#imagemodal').modal('show');
+            });
+        });
     </script>
 @endpush
