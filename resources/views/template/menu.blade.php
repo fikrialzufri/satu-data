@@ -102,6 +102,15 @@
 
 
                     @endcan
+                    @canany('view-banner')
+                        <div class="nav-lavel">{{ __('banner') }} </div>
+                        <div class="nav-item {{ $segment1 == 'banner' ? 'active' : '' }}">
+                            <a href="{{ route('banner.index') }}">
+                                <i class="ik ik-image"></i>
+                                <span>{{ __('Banner') }}</span>
+                            </a>
+                        </div>
+                    @endcan
                     @canany(['view-user', 'view-roles'])
                         <div class="nav-lavel">{{ __('User') }} </div>
                         <div
