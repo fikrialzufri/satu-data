@@ -136,7 +136,7 @@
                                             <td class="text-right">
                                                 <div class="d-inline-block">
                                                     <h6 class="mb-2 tx-15 font-weight-semibold">
-                                                        {{ $item->nilai_terakhir }}</h6>
+                                                        {{ format_uang($item->nilai_terakhir) }}</h6>
                                                     <p class="mb-0 tx-11 text-muted">
                                                         {{ tanggal_indonesia_waktu($item->updated_at) }}</p>
                                                 </div>
@@ -154,6 +154,26 @@
 
         </div>
     </div>
+    @if ($imageBanner != '')
+        <div class="modal fade transparent-modal" id="transparentModal" tabindex="-1" role="dialog"
+            aria-labelledby="transparentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                <div class="modal-content-iklan">
+                    <div class="modal-header-iklan text-right">
+                        <button type="button" class="btn btn-light rounded-pill text-right" data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Replace the image source with your desired image -->
+                        <img src=" {{ asset('storage/banner/' . $imageBanner) }}" alt="Modal Image" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
 @stop
 
 @push('chart')
@@ -191,6 +211,34 @@
             text-align: left;
             vertical-align: middle;
             top: 50%;
+        }
+
+        .transparent-modal .modal-content-iklan {
+            background: transparent !important;
+            border: none;
+        }
+
+        .transparent-modal .modal-dialog {
+            max-width: 80%;
+            margin: 1.75rem auto;
+        }
+
+        .transparent-modal .modal-header-iklan {
+            border: none;
+        }
+
+
+        .transparent-modal .close:hover {
+            background-color: #ccc;
+        }
+
+        /* modal body iklan center img */
+        .transparent-modal .modal-body-iklan {
+            padding: 0;
+        }
+
+        .modal-body-iklan img {
+            width: 10%;
         }
     </style>
     <link rel="stylesheet" href="http://radmin.test/plugins/owl.carousel/dist/assets/owl.carousel.min.css">
@@ -274,6 +322,10 @@
                 e.preventDefault(), $($(this).parents(".owl-container").find(".owl-carousel"))
                     .owlCarousel().trigger("next.owl.carousel", [300])
             }));
+        });
+
+        $(window).on('load', function() {
+            $('#transparentModal').modal('show');
         });
     </script>
 @endpush

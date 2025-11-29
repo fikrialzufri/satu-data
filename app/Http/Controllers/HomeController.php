@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\Group;
 use App\Models\JenisUnit;
 use App\Models\Unit;
@@ -75,6 +76,13 @@ class HomeController extends Controller
             return optional($items)->sum('count') ?? 0;
         })->all();
 
+        // Get banner image
+        $imageBanner = '';
+        $banner = Banner::inRandomOrder()->first();
+        if ($banner && $banner->banner) {
+            $imageBanner = $banner->banner;
+        }
+
         return view('home.index', compact(
             'title',
             'pegawai',
@@ -88,7 +96,8 @@ class HomeController extends Controller
             'rapat',
             'jenisRapat',
             'ckanVisitors',
-            'ckanVisitorTotals'
+            'ckanVisitorTotals',
+            'imageBanner'
         ));
     }
 }
