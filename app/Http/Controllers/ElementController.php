@@ -573,6 +573,9 @@ class ElementController extends Controller
                 if ($unit) {
                     $id = $unit->id;
                 }
+            }else{
+                // back dengan message mohon pilih unit
+                return redirect()->back()->with('message', 'Mohon pilih unit')->with('Class', 'danger');
             }
         } else {
             $id =  auth()->user()->id_unit;
