@@ -49,6 +49,8 @@ class CkanVisitorController extends Controller
 
         return response()->json([
             'status' => 'success',
+            'message' => 'Data berhasil disimpan',
+            'data' => $payload
         ], Response::HTTP_CREATED);
     }
 

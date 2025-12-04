@@ -19,7 +19,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('cors');
+        // $this->middleware('cors');
     }
 
     /**
@@ -112,7 +112,6 @@ class AuthController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'username' => $user->username,
-                        'nik' => $user->nik,
                         'token' => $token
                     ]
                 ]
@@ -191,14 +190,24 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized - Token tidak valid atau sudah kadaluarsa'
+                ], 401);
+            }
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mendapatkan data user',
                 'data' => [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'nik' => $request->user()->nik
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'username' => $user->username,
+                    'nik' => $user->nik
                 ]
             ]);
         } catch (\Exception $e) {

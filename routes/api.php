@@ -13,12 +13,16 @@ Route::get('/kelompokelement', [SubElementController::class, 'apikategorielement
 
 Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'auth'], function () {
+        // Public routes (no authentication required)
         Route::post('/login', [AuthController::class, 'login']);
-        // logout
-        Route::post('/logout', [AuthController::class, 'logout']);
-        // user
-        Route::get('/user', [AuthController::class, 'user']);
+        
+        // Protected routes (authentication required)
+        Route::group(['middleware' => ['auth:sanctum']], function () {
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::get('/user', [AuthController::class, 'user']);
+        });
     });
+    
     Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/ckan/visitors', [CkanVisitorController::class, 'store'])->name('ckan.visitors.store');
     });
