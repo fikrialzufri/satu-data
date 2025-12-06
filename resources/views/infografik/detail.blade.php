@@ -10,7 +10,7 @@
                         <span class="text-muted mr-3">{{ $infografik->created_at->format('d F Y') }}</span>
                         <span class="text-muted mr-3">|</span>
                         <span class="text-muted">
-                            <i class="fa fa-eye"></i> {{ number_format(rand(1000, 10000), 0, ',', '.') }}
+                            <i class="fa fa-eye"></i> {{ number_format($infografik->viewer ?? 0, 0, ',', '.') }}
                         </span>
                     </div>
                     <div class="d-flex align-items-center">

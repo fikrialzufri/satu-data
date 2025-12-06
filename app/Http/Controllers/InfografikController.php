@@ -203,6 +203,7 @@ class InfografikController extends Controller
             ->firstOrFail();
 
         $infografik->increment('viewer');
+        $infografik->refresh();
 
         $kategoriInfografik = $infografik->kategoriInfografik()->first();
         $title = $infografik->judul;
