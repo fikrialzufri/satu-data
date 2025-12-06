@@ -24,6 +24,12 @@
                         <span>{{ __('Dashboard') }}</span>
                     </a>
                 </div>
+                <div class="nav-item {{ $segment1 == 'infografik' ? 'active' : '' }}">
+                    <a href="{{ route('infografik.index') }}">
+                        <i class="ik ik-image"></i>
+                        <span>{{ __('Infografik') }}</span>
+                    </a>
+                </div>
                 {{-- if auth --}}
                 @auth
 
@@ -111,6 +117,17 @@
                             </a>
                         </div>
                     @endcan
+                    {{-- Gellery --}}
+                    @canany('view-gallery')
+                        <div class="nav-lavel">{{ __('Gallery') }} </div>
+                        <div class="nav-item {{ $segment1 == 'gallery' ? 'active' : '' }}">
+                            <a href="{{ route('gallery.index') }}">
+                                <i class="ik ik-image"></i>
+                                <span>{{ __('Gallery') }}</span>
+                            </a>
+                        </div>
+                    @endcan
+
                     @canany(['view-user', 'view-roles'])
                         <div class="nav-lavel">{{ __('User') }} </div>
                         <div

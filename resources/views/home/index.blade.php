@@ -53,6 +53,43 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-xl-12 col-xl-12 mb-10">
+                    <div class="owl-container">
+                        <div class="owl-carousel basic">
+
+                            @foreach ($infografikTerbaru as $infografik)
+                                <div class="card custom-card" style="cursor: pointer;"
+                                    onclick="window.location.href='{{ route('infografik.detail', $infografik->slug) }}'">
+                                    <div class="card-body p-0">
+                                        @if ($infografik->thumbnail)
+                                            <img src="{{ asset('storage/gallery/' . $infografik->thumbnail) }}"
+                                                class="card-img-top" alt="{{ $infografik->judul }}"
+                                                style="height: 150px; object-fit: cover; border-radius: 4px 4px 0 0;">
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                                style="height: 150px; border-radius: 4px 4px 0 0;">
+                                                <i class="fa fa-image fa-2x text-muted"></i>
+                                            </div>
+                                        @endif
+                                        <div class="p-3">
+                                            <span class="tx-13 mb-2 text-muted">INFOGRAFIK TERBARU</span>
+                                            <h6 class="card-text mb-2" style="font-size: 0.95rem; line-height: 1.3;">
+                                                {{ Str::limit($infografik->judul, 50) }}
+                                            </h6>
+                                            @if ($infografik->kategoriInfografik && is_object($infografik->kategoriInfografik))
+                                                <span class="badge badge-primary badge-sm">
+                                                    {{ $infografik->kategoriInfografik->nama ?? 'Umum' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-12 col-xl-12">
                     <div class="card sale-card">
                         <div class="card-header d-block">
@@ -65,6 +102,7 @@
 
                     </div>
                 </div>
+
             </div>
             <div class="col-xl-4 col-md-4">
                 {{-- Pengunjung CKAN --}}
@@ -185,6 +223,15 @@
             top: 0;
         }
 
+        .card[style*="cursor: pointer"] {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card[style*="cursor: pointer"]:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
         @media (max-width: 500px) {
             #perda {
                 height: 52px;
@@ -239,6 +286,37 @@
 
         .modal-body-iklan img {
             width: 10%;
+        }
+
+        .kategori-infografik-nav {
+            margin-bottom: 0;
+        }
+
+        .kategori-infografik-nav .nav-item {
+            margin-bottom: 0;
+            width: auto;
+        }
+
+        .kategori-infografik-nav .nav-link {
+            white-space: nowrap;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-bottom: 2px solid transparent;
+            display: block;
+        }
+
+        .kategori-infografik-nav .nav-link:hover {
+            border-bottom-color: #dee2e6;
+        }
+
+        .kategori-infografik-nav .nav-link.active {
+            border-bottom-color: #007bff;
+            color: #007bff;
+            background-color: transparent;
+        }
+
+        .owl-container .kategori-infografik-nav {
+            border-bottom: 1px solid #dee2e6;
         }
     </style>
     <link rel="stylesheet" href="http://radmin.test/plugins/owl.carousel/dist/assets/owl.carousel.min.css">
@@ -302,6 +380,25 @@
                     },
                     1000: {
                         items: 3
+                    }
+                }
+            }).data("owl.carousel").onResize(), $(".owl-carousel.kategori-infografik-nav").length > 0 && $(
+                ".owl-carousel.kategori-infografik-nav").owlCarousel({
+                margin: 5,
+                stagePadding: 10,
+                loop: false,
+                autoplay: false,
+                dots: false,
+                nav: false,
+                responsive: {
+                    0: {
+                        items: 2
+                    },
+                    600: {
+                        items: 4
+                    },
+                    1000: {
+                        items: 6
                     }
                 }
             }).data("owl.carousel").onResize(), $(".owl-carousel.single").length > 0 && $(

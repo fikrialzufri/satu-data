@@ -99,9 +99,20 @@
                                                 @elseif ($header['input'] == 'image')
                                                     <td width="10%">
                                                         @if ($item[$header['name']] != null || $item[$header['name']] != '')
+                                                            @php
+                                                                $imagePath =
+                                                                    $route . '/thumbnail/' . $item[$header['name']];
+                                                                if (
+                                                                    $route == 'infografik' &&
+                                                                    $header['name'] == 'thumbnail'
+                                                                ) {
+                                                                    $imagePath =
+                                                                        'gallery/thumbnail/' . $item[$header['name']];
+                                                                }
+                                                            @endphp
                                                             <img class=" img-responsive image" width="50%"
-                                                                src="{{ asset('storage/' . $route . '/thumbnail/' . $item[$header['name']]) }}"
-                                                                data-image={{ asset('storage/' . $route . '/' . $item[$header['name']]) }}>
+                                                                src="{{ asset('storage/' . $imagePath) }}"
+                                                                data-image={{ asset('storage/' . str_replace('/thumbnail', '', $imagePath)) }}>
                                                         @endif
 
                                                     </td>

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             LegendaSeeder::class,
             SatuanSeeder::class,
             UnitElementSubSeeder::class,
+            InfografikSeeder::class,
         ]);
     }
 }

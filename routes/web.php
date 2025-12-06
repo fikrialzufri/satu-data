@@ -14,8 +14,11 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\KategoriInfografikController;
+use App\Http\Controllers\InfografikController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/infografik', [InfografikController::class, 'index'])->name('infografik.index');
 
 Auth::routes();
 
@@ -81,8 +85,12 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::resource('legenda', LegendaController::class);
     Route::resource('banner', BannerController::class);
-
-
+    Route::resource('gallery', GalleryController::class);
+    Route::get('/api/galleries', [GalleryController::class, 'apiIndex'])->name('galleries.api');
+    Route::post('/api/galleries/upload', [GalleryController::class, 'apiUpload'])->name('galleries.upload');
+    Route::resource('kategori-infografik', KategoriInfografikController::class);
+    
+    
     // ubah profile
     Route::get('/ubahuser', [UserController::class, 'ubah'])->name('user.ubah');
     Route::put('/simpanuser', [UserController::class, 'simpan'])->name('user.simpan');
@@ -90,6 +98,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/user-notification', [UserController::class, 'notification'])->name('user.notification');
 });
 
+Route::resource('infografik', InfografikController::class);
 // jenis data getDetail
 Route::get('/jenisdetail', [JenisDataController::class, 'detail'])->name('jenisdata.detail');
 
@@ -99,3 +108,7 @@ Route::get('/kelompokelement', [SubElementController::class, 'kelompokelement'])
 Route::resource('element', ElementController::class);
 
 Route::resource('sub_element', SubElementController::class);
+
+// detail infografik
+Route::get('/infografiks/{slug}', [InfografikController::class, 'detail'])->name('infografik.detail');
+Route::get('/sendinfografikckan/{id}', [InfografikController::class, 'sendckan'])->name('infografik.ckan');
