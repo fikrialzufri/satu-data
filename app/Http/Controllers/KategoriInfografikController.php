@@ -17,12 +17,12 @@ class KategoriInfografikController extends Controller
 
     public function __construct()
     {
-        $this->route = 'kategori-infografik';
+        $this->route = 'kategori_infografik';
         $this->title = 'Kategori Infografik';
         $this->middleware('permission:view-' . $this->route, ['only' => ['index', 'show']]);
         $this->middleware('permission:create-' . $this->route, ['only' => ['create', 'store']]);
         $this->middleware('permission:edit-' . $this->route, ['only' => ['edit', 'update']]);
-        $this->middleware('permission:delete-' . $this->route, ['only' => ['delete']]);
+        $this->middleware('permission:delete-' . $this->route, ['only' => ['destroy']]);
     }
 
     public function configHeaders()
@@ -54,9 +54,8 @@ class KategoriInfografikController extends Controller
                 'name'    => 'nama',
                 'input'    => 'text',
                 'alias'    => 'Nama Kategori',
-                'validasi'    => ['required', 'min:1'],
+                'validasi'    => ['required', 'unique', 'min:1'],
             ],
         ];
     }
 }
-

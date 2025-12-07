@@ -88,7 +88,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('gallery', GalleryController::class);
     Route::get('/api/galleries', [GalleryController::class, 'apiIndex'])->name('galleries.api');
     Route::post('/api/galleries/upload', [GalleryController::class, 'apiUpload'])->name('galleries.upload');
-    Route::resource('kategori-infografik', KategoriInfografikController::class);
+    Route::resource('kategori_infografik', KategoriInfografikController::class);
     
     
     // ubah profile

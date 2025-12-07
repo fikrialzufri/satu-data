@@ -288,16 +288,16 @@
             width: 10%;
         }
 
-        .kategori-infografik-nav {
+        .kategori_infografik-nav {
             margin-bottom: 0;
         }
 
-        .kategori-infografik-nav .nav-item {
+        .kategori_infografik-nav .nav-item {
             margin-bottom: 0;
             width: auto;
         }
 
-        .kategori-infografik-nav .nav-link {
+        .kategori_infografik-nav .nav-link {
             white-space: nowrap;
             padding: 0.75rem 1rem;
             border: none;
@@ -305,17 +305,17 @@
             display: block;
         }
 
-        .kategori-infografik-nav .nav-link:hover {
+        .kategori_infografik-nav .nav-link:hover {
             border-bottom-color: #dee2e6;
         }
 
-        .kategori-infografik-nav .nav-link.active {
+        .kategori_infografik-nav .nav-link.active {
             border-bottom-color: #007bff;
             color: #007bff;
             background-color: transparent;
         }
 
-        .owl-container .kategori-infografik-nav {
+        .owl-container .kategori_infografik-nav {
             border-bottom: 1px solid #dee2e6;
         }
     </style>
@@ -382,8 +382,8 @@
                         items: 3
                     }
                 }
-            }).data("owl.carousel").onResize(), $(".owl-carousel.kategori-infografik-nav").length > 0 && $(
-                ".owl-carousel.kategori-infografik-nav").owlCarousel({
+            }).data("owl.carousel").onResize(), $(".owl-carousel.kategori_infografik-nav").length > 0 && $(
+                ".owl-carousel.kategori_infografik-nav").owlCarousel({
                 margin: 5,
                 stagePadding: 10,
                 loop: false,

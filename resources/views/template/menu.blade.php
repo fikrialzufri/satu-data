@@ -118,12 +118,19 @@
                         </div>
                     @endcan
                     {{-- Gellery --}}
-                    @canany('view-gallery')
-                        <div class="nav-lavel">{{ __('Gallery') }} </div>
+                    @canany(['view-gallery', 'view-kategori_infografik'])
+                        <div class="nav-lavel">{{ __('Master Data') }} </div>
                         <div class="nav-item {{ $segment1 == 'gallery' ? 'active' : '' }}">
                             <a href="{{ route('gallery.index') }}">
                                 <i class="ik ik-image"></i>
                                 <span>{{ __('Gallery') }}</span>
+                            </a>
+                        </div>
+                        {{-- Katego Infografik --}}
+                        <div class="nav-item {{ $segment1 == 'kategori_infografik' ? 'active' : '' }}">
+                            <a href="{{ route('kategori_infografik.index') }}">
+                                <i class="ik ik-image"></i>
+                                <span>{{ __('Kategori Infografik') }}</span>
                             </a>
                         </div>
                     @endcan

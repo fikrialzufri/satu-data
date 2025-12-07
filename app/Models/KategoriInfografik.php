@@ -29,4 +29,3 @@ class KategoriInfografik extends Model
         return $this->hasMany(Infografik::class, 'kategori_infografik_id');
     }
 }
-
