@@ -4,9 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SubElementController;
 use App\Http\Controllers\Api\CkanVisitorController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\InfografikController;
 
 
 Route::get('/kelompokelement', [SubElementController::class, 'apikategorielement'])->name('kelompokelement.api');
+Route::get('/infografik', [InfografikController::class, 'apiIndex'])->name('infografik.api');
 
 
 

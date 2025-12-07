@@ -273,4 +273,65 @@ class InfografikController extends Controller
 
         return redirect()->route('infografik.detail', $infografik->slug)->with('message', 'Infografik berhasil dikirim ke CKAN')->with('Class', 'success')->with('icon', 'success');
     }
+
+    public function apiIndex()
+    {
+        $query = $this->model()->with(['kategoriInfografik', 'thumbnail', 'hasGallery']);
+
+        $search = request()->get('judul', '');
+        $kategoriId = request()->get('kategori_infografik_id', '');
+        $sort = request()->get('sort', 'terbaru');
+
+        if ($search) {
+            $query->where('judul', 'like', '%' . $search . '%');
+        }
+
+        if ($kategoriId) {
+            $query->where('kategori_infografik_id', $kategoriId);
+        }
+
+        match ($sort) {
+            'terbaru' => $query->orderBy('created_at', 'desc'),
+            'terlama' => $query->orderBy('created_at', 'asc'),
+            'a-z' => $query->orderBy('judul', 'asc'),
+            'z-a' => $query->orderBy('judul', 'desc'),
+            default => $query->orderBy('created_at', 'desc'),
+        };
+
+        $data = $query->get();
+        $result = [];
+
+        foreach ($data as $infografik) {
+            $thumbnailUrl = '';
+            if ($infografik->thumbnail) {
+                $thumbnailUrl = asset('storage/gallery/' . $infografik->thumbnail);
+            }
+
+            $gallery = [];
+            if ($infografik->hasGallery && $infografik->hasGallery->count() > 0) {
+                foreach ($infografik->hasGallery as $galleryItem) {
+                    $gallery[] = [
+                        'linkurl' => asset('storage/gallery/' . $galleryItem->gambar)
+                    ];
+                }
+            }
+
+            $kategori = $infografik->kategoriInfografik ? $infografik->kategoriInfografik : 'Umum';
+            $urlSismut = route('infografik.detail', $infografik->slug);
+
+            $result[] = [
+                'Judul' => $infografik->judul,
+                'Isi' => $infografik->isi_infografik ?? '',
+                'slug' => $infografik->slug,
+                'thumbnai' => $thumbnailUrl,
+                'gallery' => $gallery,
+                'Kategori' => $kategori,
+                'DisusunOleh' => 'Jabar Digital Service',
+                'Viewer' => $infografik->viewer ?? 0,
+                'url_sismut' => $urlSismut,
+            ];
+        }
+
+        return $this->sendResponse($result, 'sukses', 200, count($result));
+    }
 }

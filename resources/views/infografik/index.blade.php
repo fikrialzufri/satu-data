@@ -5,6 +5,24 @@
     <div class="container-fluid">
         <div class="row mb-4">
             <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-body bg-success">
+                        <div class="d-block">
+                            <div class="">
+                                <b>
+                                    URL
+                                </b>
+                                <br>
+                                <code id="urlapi">{{ route('infografik.api') }}</code>
+                                <br>
+                                <button class="btn btn-xs btn-dark" id="buttonCopy" data-toggle="tooltip" type="button"
+                                    data-original-title="Copy to clipboard"><i class="fa fa-copy"></i>
+                                    Copy API Url</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <p class="text-muted mb-0">Temukan informasi dan data dalam bentuk grafik yang mudah dipahami.</p>
@@ -160,3 +178,17 @@
         @endif
     </div>
 @endsection
+
+
+@push('script')
+    <script>
+        $('#buttonCopy').on('click', function() {
+            var copyText = $('#urlapi').text();
+            var $temp = $("<input>");
+            $("body").append($temp);
+            $temp.val(copyText).select();
+            document.execCommand("copy");
+            $temp.remove();
+        });
+    </script>
+@endpush
