@@ -19,6 +19,7 @@ use App\Http\Controllers\KategoriInfografikController;
 use App\Http\Controllers\InfografikController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,7 +33,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/infografik', [InfografikController::class, 'index'])->name('infografik.index');
-
+URL::forceScheme('https');
 Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () {
