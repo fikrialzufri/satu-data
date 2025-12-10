@@ -503,7 +503,9 @@ class SubElementController extends Controller
 
             DB::commit();
 
-            $this->sendToCkan($element_id);
+            if (env('CKAN_AUTO') === 'ON') {
+                $this->sendToCkan($element_id);
+            }
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
@@ -553,7 +555,9 @@ class SubElementController extends Controller
 
             DB::commit();
 
-            $this->sendToCkan($element_id);
+            if (env('CKAN_AUTO') === 'ON') {
+                $this->sendToCkan($element_id);
+            }
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
