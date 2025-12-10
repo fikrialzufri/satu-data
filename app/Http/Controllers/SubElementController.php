@@ -488,8 +488,6 @@ class SubElementController extends Controller
 
         DB::beginTransaction();
         try {
-
-            DB::commit();
             $subElement = new SubElement();
             $subElement->kode = $request->kode;
             $subElement->nama = $request->nama;
@@ -502,6 +500,10 @@ class SubElementController extends Controller
             $subElement->satuan_id = $request->satuan_id;
             $subElement->user_id = $user_id;
             $subElement->save();
+
+            DB::commit();
+
+            $this->sendToCkan($element_id);
 
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
@@ -535,21 +537,24 @@ class SubElementController extends Controller
 
 
         DB::beginTransaction();
-        $subElement = SubElement::find($id);
-        $subElement->kode =  $request->kode;
-        $subElement->nama = $request->nama;
-        $subElement->keterangan = $request->keterangan;
-        $subElement->sumber_data = $request->sumber_data;
-        $subElement->metode_perhitungan = $request->metode_perhitungan;
-        $subElement->meta_data = $request->meta_data;
-        $subElement->lokasi_data = $this->normalizeLokasiData($request->lokasi_data ?? []);
-        $subElement->element_id =  $element_id;
-        $subElement->satuan_id = $request->satuan_id;
-        $subElement->user_id = $user_id;
-        $subElement->save();
         try {
+            $subElement = SubElement::find($id);
+            $subElement->kode =  $request->kode;
+            $subElement->nama = $request->nama;
+            $subElement->keterangan = $request->keterangan;
+            $subElement->sumber_data = $request->sumber_data;
+            $subElement->metode_perhitungan = $request->metode_perhitungan;
+            $subElement->meta_data = $request->meta_data;
+            $subElement->lokasi_data = $this->normalizeLokasiData($request->lokasi_data ?? []);
+            $subElement->element_id =  $element_id;
+            $subElement->satuan_id = $request->satuan_id;
+            $subElement->user_id = $user_id;
+            $subElement->save();
 
             DB::commit();
+
+            $this->sendToCkan($element_id);
+
             return redirect()->route('sub_element.index', "element_id=" . $request->element_id)->with('message', 'Element berhasil diubah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
@@ -1081,6 +1086,152 @@ class SubElementController extends Controller
         }
 
         return redirect()->route($this->route . '.index', "element_id=" . $id)->with('message', ucwords(str_replace('-', ' ', $this->title)) . ' ' . $title . ' berhasil dikirim ke ckan')->with('Class', 'success')->with('icon', 'success');
+    }
+
+    private function sendToCkan(int $elementId): void
+    {
+        try {
+            $query = $this->model()::query();
+            $query = $query->where('element_id', $elementId);
+            $data = $query->get();
+            $checkElement = Element::find($elementId);
+
+            if (!$checkElement) {
+                Log::warning('Element tidak ditemukan untuk CKAN', ['element_id' => $elementId]);
+                return;
+            }
+
+            $tahun = Carbon::now()->year;
+            if (request()->get('akhir_tahun') != null) {
+                $tahun = request()->get('akhir_tahun');
+            }
+
+            $subtahun = Carbon::now()->subYears(1)->year;
+            if (request()->get('awal_tahun') != null) {
+                $subtahun = request()->get('awal_tahun');
+            }
+
+            $result = [];
+            $no = 0;
+            $listtahun = [];
+
+            $listtahun[] = [
+                'id' => 'nama',
+            ];
+            $listtahun[] = [
+                'id' => 'satuan',
+            ];
+            $listtahun[] = [
+                'id' => 'jenis',
+            ];
+            $listtahun[] = [
+                'id' => 'group',
+            ];
+
+            foreach ($data as $key => $value) {
+                $no++;
+
+                for ($i = $subtahun; $i < $tahun + 1; $i++) {
+                    $result[] = [
+                        'nama' => $value->nama,
+                        'satuan' => $value->satuan,
+                        'jenis' => $value->jenis,
+                        'group' => $value->group,
+                        'tahun' => (int) $i,
+                        'nilai' => $value->hasSubElementTahun((int) $i),
+                    ];
+                    $listtahun[] = [
+                        'id' => (int) $i,
+                    ];
+                }
+            }
+
+            $listtahun = array_map("unserialize", array_unique(array_map("serialize", $listtahun)));
+
+            $result = collect($result)->groupBy('nama')->map(function ($row) {
+                return $row->reduce(function ($carry, $item) {
+                    $carry['nama'] = $item['nama'];
+                    $carry['satuan'] = $item['satuan'];
+                    $carry['jenis'] = $item['jenis'];
+                    $carry['group'] = $item['group'];
+
+                    $carry[$item['tahun']] = $item['tahun'];
+                    $carry[$item['tahun']] = $item['nilai'];
+
+                    return $carry;
+                }, []);
+            })->values()->all();
+
+            $result = collect($result)->sortBy('nama')->values()->all();
+
+            $unit_id = $checkElement->unit_id;
+            $unit = Unit::find($unit_id);
+
+            if (!$unit) {
+                Log::warning('Unit tidak ditemukan untuk CKAN', ['unit_id' => $unit_id]);
+                return;
+            }
+
+            $owner_org = Str::slug($unit->nama_singkat);
+            $nama = Str::slug($checkElement->nama . $owner_org);
+            $title = $checkElement->nama;
+
+            $apiURL = env('CKAN_ENDPOINT') . '/api/action/datastore_create';
+
+            $postInput = [
+                'resource' => [
+                    'package_id' => $nama,
+                    'name' => $title . " " . "(" . $subtahun . " - " . $tahun . ")",
+                    'format' => 'csv',
+                ],
+                'fields' => $listtahun,
+                'records' => $result,
+            ];
+
+            Log::info('Post Input CKAN:', ['postInput' => $postInput]);
+
+            $headers = [
+                'Authorization' => env('CKAN_AUTH'),
+                'Content-Type' => 'application/json',
+            ];
+
+            $response = Http::withHeaders($headers)->post($apiURL, $postInput);
+
+            $statusCode = $response->status();
+            $responseBody = json_decode($response->getBody(), true);
+
+            Log::info('Response Body CKAN:', ['responseBody' => $responseBody]);
+
+            if ($responseBody['success'] == false) {
+                Log::warning('Pengiriman ke CKAN gagal', [
+                    'element_id' => $elementId,
+                    'response' => $responseBody
+                ]);
+                return;
+            }
+
+            if (isset($responseBody['result'])) {
+                $resource_id = $responseBody['result']['resource_id'];
+                $apiURLView = env('CKAN_ENDPOINT') . '/api/action/resource_view_create';
+                $postInputView = [
+                    'resource_id' => $resource_id,
+                    'title' => 'Tabel ' . $title . " " . "(" . $subtahun . " - " . $tahun . ")",
+                    "view_type" => "recline_view"
+                ];
+                $responseView = Http::withHeaders($headers)->post($apiURLView, $postInputView);
+                $statusCode = $responseView->status();
+                $responseViewBody = json_decode($responseView->getBody(), true);
+                Log::info('Resource View CKAN:', ['responseViewBody' => $responseViewBody]);
+            }
+
+            Log::info('Data berhasil dikirim ke CKAN', ['element_id' => $elementId]);
+        } catch (\Throwable $th) {
+            Log::error('Error saat mengirim ke CKAN', [
+                'element_id' => $elementId,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+        }
     }
 
     public function model()
