@@ -35,11 +35,19 @@ class ExportElement implements FromView
         $tahun1 = $this->tahun1;
         $tahun2 = $this->tahun2;
 
+        $tahunList = [];
+        if ($tahun1 && $tahun2) {
+            for ($i = (int) $tahun1; $i <= (int) $tahun2; $i++) {
+                $tahunList[] = $i;
+            }
+        }
+
         return view('element.export', compact(
             'data',
             'unit',
             'tahun1',
-            'tahun2'
+            'tahun2',
+            'tahunList'
         ));
     }
 }
