@@ -703,7 +703,6 @@ trait CrudTrait
                             $existingIds = $data->$hasRalation()->pluck('id')->toArray();
                             
                             $toAttach = array_diff($galleryIds, $existingIds);
-                            $toDetach = array_diff($existingIds, $galleryIds);
                             
                             if (!empty($toAttach)) {
                                 $toAttach = array_values(array_unique($toAttach));
@@ -720,15 +719,7 @@ trait CrudTrait
                                     }
                                 }
                             }
-                            
-                            if (!empty($toDetach)) {
-                                $data->$hasRalation()->detach($toDetach);
-                            }
-                        } else {
-                            $data->$hasRalation()->sync([]);
                         }
-                    } else {
-                        $data->$hasRalation()->sync([]);
                     }
                 }
             }
