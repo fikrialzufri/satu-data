@@ -430,9 +430,16 @@ trait CrudTrait
                 foreach ($this->manyToMany as $value) {
                     if (isset($form[$value]) && !empty($form[$value])) {
                         $hasRalation = 'has' . ucfirst($value);
-                        $galleryIds = is_array($form[$value]) ? array_unique(array_filter($form[$value])) : [$form[$value]];
+                        $galleryIds = is_array($form[$value]) ? $form[$value] : [$form[$value]];
+                        $galleryIds = array_values(array_unique(array_filter($galleryIds, function($id) {
+                            return !empty($id);
+                        })));
                         if (!empty($galleryIds)) {
-                            $valueField = $data->$hasRalation()->attach($galleryIds);
+                            $existingIds = $data->$hasRalation()->pluck('id')->toArray();
+                            $newIds = array_diff($galleryIds, $existingIds);
+                            if (!empty($newIds)) {
+                                $valueField = $data->$hasRalation()->attach($newIds);
+                            }
                         }
                     }
                 }
@@ -685,7 +692,10 @@ trait CrudTrait
                 foreach ($this->manyToMany as $value) {
                     if (isset($form[$value])) {
                         $hasRalation = 'has' . ucfirst($value);
-                        $galleryIds = is_array($form[$value]) ? array_unique(array_filter($form[$value])) : ($form[$value] ? [$form[$value]] : []);
+                        $galleryIds = is_array($form[$value]) ? $form[$value] : ($form[$value] ? [$form[$value]] : []);
+                        $galleryIds = array_values(array_unique(array_filter($galleryIds, function($id) {
+                            return !empty($id);
+                        })));
                         $valueField = $data->$hasRalation()->sync($galleryIds);
                     }
                 }
