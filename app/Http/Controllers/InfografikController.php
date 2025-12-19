@@ -326,9 +326,11 @@ class InfografikController extends Controller
                 'thumbnai' => $thumbnailUrl,
                 'gallery' => $gallery,
                 'Kategori' => $kategori,
-                'DisusunOleh' => 'Jabar Digital Service',
+                'DisusunOleh' => $infografik->createdBy->name ?? 'Admin Sismut',
                 'Viewer' => $infografik->viewer ?? 0,
                 'url_sismut' => $urlSismut,
+                'created_by' => $infografik->createdBy->name ?? 'Admin Sismut',
+                'updated_by' => $infografik->updatedBy->name ?? 'Admin Sismut',
             ];
         }
 
