@@ -93,7 +93,18 @@
                         </div>
                         <div>
                             <strong>Disusun oleh:</strong>
-                            <span class="text-muted">Jabar Digital Service</span>
+                            <span class="text-muted">
+                                @if ($infografik->created_by && $infografik->updated_by && $infografik->created_by === $infografik->updated_by)
+                                    {{ $infografik->createdBy->name ?? 'Admin Sismut' }}
+                                @elseif($infografik->created_by && $infografik->updated_by)
+                                    {{ $infografik->createdBy->name ?? 'Admin Sismut' }} | Diperbarui oleh:
+                                    {{ $infografik->updatedBy->name ?? 'Admin Sismut' }}
+                                @elseif($infografik->created_by)
+                                    {{ $infografik->createdBy->name ?? 'Admin Sismut' }}
+                                @else
+                                    Admin Sismut
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -199,7 +199,7 @@ class InfografikController extends Controller
     public function detail($slug)
     {
         $infografik = $this->model()->where('slug', $slug)
-            ->with(['kategoriInfografik', 'thumbnail', 'hasGallery'])
+            ->with(['kategoriInfografik', 'thumbnail', 'hasGallery', 'createdBy', 'updatedBy'])
             ->firstOrFail();
 
         $infografik->increment('viewer');

@@ -20,7 +20,27 @@ class Infografik extends Model
         'thumbnail_id',
         'isi_infografik',
         'viewer',
+        'created_by',
+        'updated_by',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($infografik) {
+            if (auth()->check()) {
+                $infografik->created_by = auth()->id();
+                $infografik->updated_by = auth()->id();
+            }
+        });
+
+        static::updating(function ($infografik) {
+            if (auth()->check()) {
+                $infografik->updated_by = auth()->id();
+            }
+        });
+    }
 
     public function setJudulAttribute($value)
     {
@@ -70,5 +90,15 @@ class Infografik extends Model
     public function hasGallery()
     {
         return $this->belongsToMany(Gallery::class, 'gallery_infografik', 'infografik_id', 'gallery_id')->withTimestamps();
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }
