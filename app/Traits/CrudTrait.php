@@ -430,7 +430,10 @@ trait CrudTrait
                 foreach ($this->manyToMany as $value) {
                     if (isset($form[$value]) && !empty($form[$value])) {
                         $hasRalation = 'has' . ucfirst($value);
-                        $valueField = $data->$hasRalation()->attach($form[$value]);
+                        $galleryIds = is_array($form[$value]) ? array_unique(array_filter($form[$value])) : [$form[$value]];
+                        if (!empty($galleryIds)) {
+                            $valueField = $data->$hasRalation()->attach($galleryIds);
+                        }
                     }
                 }
             }
@@ -682,7 +685,8 @@ trait CrudTrait
                 foreach ($this->manyToMany as $value) {
                     if (isset($form[$value])) {
                         $hasRalation = 'has' . ucfirst($value);
-                        $valueField = $data->$hasRalation()->sync($form[$value] ?? []);
+                        $galleryIds = is_array($form[$value]) ? array_unique(array_filter($form[$value])) : ($form[$value] ? [$form[$value]] : []);
+                        $valueField = $data->$hasRalation()->sync($galleryIds);
                     }
                 }
             }
@@ -828,6 +832,15 @@ trait CrudTrait
                         continue;
                     } else if ($value['input'] === "readonly") {
                         continue;
+                    } else if ($value['input'] === "gallery-modal" && isset($value['multiple']) && $value['multiple'] === true) {
+                        $inputValue = $request->input($value['name']);
+                        if (is_string($inputValue) && !empty($inputValue)) {
+                            $form[$value['name']] = array_unique(array_filter(explode(',', $inputValue)));
+                        } else if (is_array($inputValue)) {
+                            $form[$value['name']] = array_unique(array_filter($inputValue));
+                        } else {
+                            $form[$value['name']] = [];
+                        }
                     } else {
 
                         $form[$value['name']] = $request->input($value['name']);
