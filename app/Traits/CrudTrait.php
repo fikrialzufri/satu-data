@@ -438,7 +438,7 @@ trait CrudTrait
                             $existingIds = $data->$hasRalation()->pluck('id')->toArray();
                             $newIds = array_diff($galleryIds, $existingIds);
                             if (!empty($newIds)) {
-                                $valueField = $data->$hasRalation()->attach($newIds);
+                                $valueField = $data->$hasRalation()->sync($newIds);
                             }
                         }
                     }
@@ -450,7 +450,7 @@ trait CrudTrait
                 $hasRalation = 'has' . ucfirst($value);
                 $idRelation = $value . '_id';
                 if (isset($form[$idRelation]) && !empty($form[$idRelation])) {
-                    $valueField = $data->$hasRalation()->attach($form[$idRelation]);
+                    $valueField = $data->$hasRalation()->sync($form[$idRelation]);
                 }
             }
         }
@@ -690,13 +690,26 @@ trait CrudTrait
         if (isset($this->manyToMany)) {
             if (!isset($this->extraFrom)) {
                 foreach ($this->manyToMany as $value) {
-                    if (isset($form[$value])) {
-                        $hasRalation = 'has' . ucfirst($value);
-                        $galleryIds = is_array($form[$value]) ? $form[$value] : ($form[$value] ? [$form[$value]] : []);
+                    $hasRalation = 'has' . ucfirst($value);
+                    if (isset($form[$value]) && !empty($form[$value])) {
+                        $galleryIds = is_array($form[$value]) ? $form[$value] : [$form[$value]];
                         $galleryIds = array_values(array_unique(array_filter($galleryIds, function($id) {
                             return !empty($id);
                         })));
-                        $valueField = $data->$hasRalation()->sync($galleryIds);
+                        if (!empty($galleryIds)) {
+                            $existingIds = $data->$hasRalation()->pluck('id')->toArray();
+                            $toAttach = array_diff($galleryIds, $existingIds);
+                            $toDetach = array_diff($existingIds, $galleryIds);
+                            
+                            if (!empty($toAttach)) {
+                                $data->$hasRalation()->attach($toAttach);
+                            }
+                            if (!empty($toDetach)) {
+                                $data->$hasRalation()->detach($toDetach);
+                            }
+                        }
+                    } else {
+                        $data->$hasRalation()->sync([]);
                     }
                 }
             }
