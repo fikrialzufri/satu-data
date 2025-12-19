@@ -693,20 +693,39 @@ trait CrudTrait
                     $hasRalation = 'has' . ucfirst($value);
                     if (isset($form[$value]) && !empty($form[$value])) {
                         $galleryIds = is_array($form[$value]) ? $form[$value] : [$form[$value]];
-                        $galleryIds = array_values(array_unique(array_filter($galleryIds, function($id) {
-                            return !empty($id);
-                        })));
+                        $galleryIds = array_filter($galleryIds, function($id) {
+                            return !empty($id) && is_string($id);
+                        });
+                        $galleryIds = array_values(array_unique($galleryIds));
+                        
                         if (!empty($galleryIds)) {
+                            $data->refresh();
                             $existingIds = $data->$hasRalation()->pluck('id')->toArray();
+                            
                             $toAttach = array_diff($galleryIds, $existingIds);
                             $toDetach = array_diff($existingIds, $galleryIds);
                             
                             if (!empty($toAttach)) {
-                                $data->$hasRalation()->attach($toAttach);
+                                $toAttach = array_values(array_unique($toAttach));
+                                foreach ($toAttach as $attachId) {
+                                    if (!in_array($attachId, $existingIds)) {
+                                        try {
+                                            $data->$hasRalation()->attach($attachId);
+                                            $existingIds[] = $attachId;
+                                        } catch (\Illuminate\Database\QueryException $e) {
+                                            if ($e->getCode() != 23000) {
+                                                throw $e;
+                                            }
+                                        }
+                                    }
+                                }
                             }
+                            
                             if (!empty($toDetach)) {
                                 $data->$hasRalation()->detach($toDetach);
                             }
+                        } else {
+                            $data->$hasRalation()->sync([]);
                         }
                     } else {
                         $data->$hasRalation()->sync([]);
@@ -858,9 +877,9 @@ trait CrudTrait
                     } else if ($value['input'] === "gallery-modal" && isset($value['multiple']) && $value['multiple'] === true) {
                         $inputValue = $request->input($value['name']);
                         if (is_string($inputValue) && !empty($inputValue)) {
-                            $form[$value['name']] = array_unique(array_filter(explode(',', $inputValue)));
+                            $form[$value['name']] = array_values(array_unique(array_filter(explode(',', $inputValue))));
                         } else if (is_array($inputValue)) {
-                            $form[$value['name']] = array_unique(array_filter($inputValue));
+                            $form[$value['name']] = array_values(array_unique(array_filter($inputValue)));
                         } else {
                             $form[$value['name']] = [];
                         }
