@@ -428,8 +428,10 @@ trait CrudTrait
             if (!isset($this->extraFrom)) {
 
                 foreach ($this->manyToMany as $value) {
-                    $hasRalation = 'has' . ucfirst($value);
-                    $valueField = $data->$hasRalation()->attach($form[$value]);
+                    if (isset($form[$value]) && !empty($form[$value])) {
+                        $hasRalation = 'has' . ucfirst($value);
+                        $valueField = $data->$hasRalation()->attach($form[$value]);
+                    }
                 }
             }
         }
@@ -437,7 +439,9 @@ trait CrudTrait
             foreach ($this->oneToMany as $index => $value) {
                 $hasRalation = 'has' . ucfirst($value);
                 $idRelation = $value . '_id';
-                $valueField = $data->$hasRalation()->attach($form[$idRelation]);
+                if (isset($form[$idRelation]) && !empty($form[$idRelation])) {
+                    $valueField = $data->$hasRalation()->attach($form[$idRelation]);
+                }
             }
         }
         try {
@@ -676,8 +680,10 @@ trait CrudTrait
         if (isset($this->manyToMany)) {
             if (!isset($this->extraFrom)) {
                 foreach ($this->manyToMany as $value) {
-                    $hasRalation = 'has' . ucfirst($value);
-                    $valueField = $data->$hasRalation()->sync($form[$value]);
+                    if (isset($form[$value])) {
+                        $hasRalation = 'has' . ucfirst($value);
+                        $valueField = $data->$hasRalation()->sync($form[$value] ?? []);
+                    }
                 }
             }
         }
@@ -687,7 +693,9 @@ trait CrudTrait
                 $hasRalation = 'has' . ucfirst($value);
                 $idRelation = $value . '_id';
 
-                $valueField = $data->$hasRalation()->sync($form[$idRelation]);
+                if (isset($form[$idRelation])) {
+                    $valueField = $data->$hasRalation()->sync($form[$idRelation] ?? []);
+                }
             }
         }
 
