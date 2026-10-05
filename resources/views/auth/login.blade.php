@@ -87,7 +87,7 @@
                             @enderror
 
                             <div class="sign-btn text-center">
-                                <button class="btn btn-custom">Sign In</button>
+                                <button type="submit" class="btn btn-custom">Sign In</button>
                             </div>
 
                         </form>
