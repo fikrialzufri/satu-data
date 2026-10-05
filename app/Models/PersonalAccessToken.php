@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\UsesUuid;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
 class PersonalAccessToken extends SanctumPersonalAccessToken
 {
-    use UsesUuid;
+    use SoftDeletes, UsesUuid;
     public $incrementing = true;
 
     // protected $primaryKey = "id";

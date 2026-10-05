@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Traits\UsesUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Str;
 use Auth;
 
 class Group extends Model
 {
-    use HasFactory, UsesUuid;
+    use HasFactory, SoftDeletes, UsesUuid;
 
     protected $table = 'group';
     protected $guarded = ['id'];

@@ -7,13 +7,14 @@ use App\Traits\UsesUuid;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\Sanctum;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, UsesUuid, HasPermissionsTrait;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, UsesUuid, HasPermissionsTrait;
 
     /**
      * The attributes that are mass assignable.
