@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -58,10 +61,55 @@ class LoginController extends Controller
     {
         $messages = [
             'username.exists' => 'nik atau username tidak terdaftar',
+            'g-recaptcha-response.required' => 'Verifikasi keamanan gagal. Silakan coba lagi.',
         ];
 
-        $request->validate([
+        $rules = [
             'username' => 'string|exists:users',
-        ], $messages);
+        ];
+
+        $secretKey = config('services.recaptcha.secret_key');
+
+        if (!empty($secretKey)) {
+            $rules['g-recaptcha-response'] = 'required|string';
+        }
+
+        $request->validate($rules, $messages);
+
+        if (!empty($secretKey)) {
+            $this->validateRecaptcha($request, $secretKey);
+        }
+    }
+
+    /**
+     * Validate the reCAPTCHA v3 token with Google's verification endpoint.
+     */
+    protected function validateRecaptcha(Request $request, string $secretKey): void
+    {
+        try {
+            $response = Http::asForm()
+                ->timeout(5)
+                ->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret' => $secretKey,
+                    'response' => $request->input('g-recaptcha-response'),
+                    'remoteip' => $request->ip(),
+                ]);
+        } catch (ConnectionException $exception) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi keamanan tidak dapat dilakukan. Silakan coba lagi.',
+            ]);
+        }
+
+        $result = $response->json();
+        $isValid = $response->successful()
+            && ($result['success'] ?? false) === true
+            && ($result['action'] ?? null) === 'login'
+            && (float) ($result['score'] ?? 0) >= (float) config('services.recaptcha.score_threshold', 0.5);
+
+        if (!$isValid) {
+            throw ValidationException::withMessages([
+                'g-recaptcha-response' => 'Verifikasi keamanan gagal. Silakan coba lagi.',
+            ]);
+        }
     }
 }

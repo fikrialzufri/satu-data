@@ -57,7 +57,7 @@
                                     alt="RADMIN"></a>
                         </div>
                         <p>Welcome back! </p>
-                        <form method="POST" action="{{ route('login') }}">
+                        <form id="login-form" method="POST" action="{{ route('login') }}">
                             @csrf
                             <div class="form-group">
                                 <input id="username" type="text" placeholder="username"
@@ -81,6 +81,10 @@
                                     </span>
                                 @enderror
                             </div>
+                            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                            @error('g-recaptcha-response')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
 
                             <div class="sign-btn text-center">
                                 <button class="btn btn-custom">Sign In</button>
@@ -98,6 +102,30 @@
     <script src="{{ asset('plugins/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('plugins/perfect-scrollbar/dist/perfect-scrollbar.min.js') }}"></script>
     <script src="{{ asset('plugins/screenfull/dist/screenfull.js') }}"></script>
+    @if (config('services.recaptcha.site_key'))
+        <script src="https://www.google.com/recaptcha/api.js?render={{ urlencode(config('services.recaptcha.site_key')) }}"></script>
+        <script>
+            document.getElementById('login-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const form = this;
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(@json(config('services.recaptcha.site_key')), { action: 'login' })
+                        .then(function(token) {
+                            document.getElementById('g-recaptcha-response').value = token;
+                            form.submit();
+                        })
+                        .catch(function() {
+                            submitButton.disabled = false;
+                            alert('Verifikasi keamanan gagal. Silakan coba lagi.');
+                        });
+                });
+            });
+        </script>
+    @endif
     {{-- Firebase --}}
     <script type="module">
         // Import the functions you need from the SDKs you need
