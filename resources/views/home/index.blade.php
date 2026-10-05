@@ -340,8 +340,6 @@
     <script src="{{ asset('js/dashboard-charts.js') }}"></script>
     <script>
         let grafikGroup = @json($grafikGroup);
-
-        console.log(grafikGroup);
         var chart = AmCharts.makeChart("line_chart", {
             "type": "serial",
             "dataProvider": grafikGroup,

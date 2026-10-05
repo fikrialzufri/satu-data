@@ -38,7 +38,7 @@
         }
     };
     // sale-diff
-    var chart = AmCharts.makeChart("sale-diff", {
+    var chart = document.getElementById("sale-diff") ? AmCharts.makeChart("sale-diff", {
         "type": "serial",
         "theme": "light",
         "dataDateFormat": "YYYY-MM-DD",
@@ -123,10 +123,14 @@
             "sales1": 9,
             "sales2": 6
         }]
-    });
+    }) : null;
 
     //real-time update
     $(function() {
+        if (!$("#realtime-profit").length) {
+            return;
+        }
+
         // We use an inline data source in the example, usually data would
         // be fetched from a server
         var data = [],
@@ -226,8 +230,13 @@
         update();
     });
     $(function() {
+        if (!$("#sec-ecommerce-chart-line, #sec-ecommerce-chart-bar").length) {
+            return;
+        }
+
         // sale start
-        $.plot($("#sec-ecommerce-chart-line"), [{
+        if ($("#sec-ecommerce-chart-line").length) {
+            $.plot($("#sec-ecommerce-chart-line"), [{
             data: [
                 [0, 18],
                 [1, 10],
@@ -260,8 +269,10 @@
             curvedLines: {
                 apply: false,
             }
-        }], options);
-        $.plot($("#sec-ecommerce-chart-bar"), [{
+            }], options);
+        }
+        if ($("#sec-ecommerce-chart-bar").length) {
+            $.plot($("#sec-ecommerce-chart-bar"), [{
             data: [
                 [0, 18],
                 [1, 10],
@@ -298,6 +309,7 @@
             points: {
                 show: false
             },
-        }], options);
+            }], options);
+        }
     });
 })(jQuery);

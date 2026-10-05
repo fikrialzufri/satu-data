@@ -9,15 +9,24 @@ $(document).ready(function () {
             floatchart();
         }, 700);
     });
-    var ps = new PerfectScrollbar(".scroll-widget", {
-        wheelSpeed: 10,
-        wheelPropagation: true,
-        minScrollbarLength: 5,
-    });
+    var scrollWidget = document.querySelector(".scroll-widget");
+    if (scrollWidget) {
+        new PerfectScrollbar(scrollWidget, {
+            wheelSpeed: 10,
+            wheelPropagation: true,
+            minScrollbarLength: 5,
+        });
+    }
 });
 
 function floatchart() {
     $(function () {
+        // This script is shared by several pages. Do not initialize Flot
+        // charts when the current page does not contain their placeholders.
+        if (!$("#app-sale1, #app-sale2, #app-sale3, #app-sale4").length) {
+            return;
+        }
+
         //flot options
         var options = {
             legend: {
