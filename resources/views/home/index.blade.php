@@ -62,7 +62,7 @@
                                     onclick="window.location.href='{{ route('infografik.detail', $infografik->slug) }}'">
                                     <div class="card-body p-0">
                                         @if ($infografik->thumbnail)
-                                            <img src="{{ asset('storage/gallery/' . $infografik->thumbnail) }}"
+                                            <img src="{{ asset('storage/gallery/thumbnail/' . $infografik->thumbnail) }}"
                                                 class="card-img-top" alt="{{ $infografik->judul }}"
                                                 style="height: 150px; object-fit: cover; border-radius: 4px 4px 0 0;">
                                         @else
@@ -324,20 +324,9 @@
 @endpush
 @push('script')
     <script src="{{ asset('plugins/owl.carousel/dist/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('plugins/chartist/dist/chartist.min.js') }}"></script>
-    <script src="{{ asset('plugins/flot-charts/jquery.flot.js') }}"></script>
-    <script src="{{ asset('plugins/flot-charts/jquery.flot.categories.js') }}"></script>
-    <script src="{{ asset('plugins/flot-charts/curvedLines.js') }}"></script>
-    <script src="{{ asset('plugins/flot-charts/jquery.flot.tooltip.min.js') }}"></script>
-
     <script src="{{ asset('plugins/amcharts/amcharts.js') }}"></script>
     <script src="{{ asset('plugins/amcharts/serial.js') }}"></script>
     <script src="{{ asset('plugins/amcharts/themes/light.js') }}"></script>
-
-
-    <script src="{{ asset('js/widget-statistic.js') }}"></script>
-    <script src="{{ asset('js/widget-data.js') }}"></script>
-    <script src="{{ asset('js/dashboard-charts.js') }}"></script>
     <script>
         let grafikGroup = @json($grafikGroup);
         var chart = AmCharts.makeChart("line_chart", {
