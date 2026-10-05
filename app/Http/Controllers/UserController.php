@@ -217,30 +217,41 @@ class UserController extends Controller
         $messages = [
             'required' => ':attribute tidak boleh kosong',
             'unique' => ':attribute tidak boleh sama',
-            'min' => ':attribute harus lebih dari :min ',
-            'same' => ':attribute password dan confrim password harus sama',
+            'passwordNew.required' => 'Password baru tidak boleh kosong',
+            'passwordNew.min' => 'Password baru minimal 8 karakter',
+            'passwordNew.regex' => 'Password harus memiliki huruf kecil, huruf besar, angka, dan karakter khusus',
+            'passwordConfrim.required' => 'Konfirmasi password tidak boleh kosong',
+            'passwordConfrim.same' => 'Konfirmasi password harus sama dengan password baru',
         ];
 
-        $this->validate(request(), [
+        $rules = [
             'name' => 'required|unique:users,name,' . $user->id,
             'email' => 'required|unique:users,email,' . $user->id,
-            'passwordNew' => 'required|min:6',
-            'passwordConfrim' => 'required|same:passwordNew|min:6',
-        ], $messages);
-        $name = request()->input('name');
-        if (request()->input('passwordNew')) {
-            # code...
-            $pass = bcrypt(request()->input('passwordNew'));
-            $user->password = $pass;
-            $this->validate(request(), [
-                'email' => 'required|unique:users,email,' . $user->id,
-                'passwordNew' => 'required|min:6',
-                'passwordConfrim' => 'required|same:passwordNew|min:6',
-            ], $messages);
+        ];
+
+        // Password hanya divalidasi jika pengguna memang ingin menggantinya.
+        if ($request->filled('passwordNew') || $request->filled('passwordConfrim')) {
+            $rules['passwordNew'] = [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[^A-Za-z0-9]/',
+            ];
+            $rules['passwordConfrim'] = ['required', 'same:passwordNew'];
         }
 
-        $user->name = $name;
-        $user->email = request()->input('email');
+        $this->validate($request, $rules, $messages);
+
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+
+        if ($request->filled('passwordNew')) {
+            $user->password = bcrypt($request->input('passwordNew'));
+        }
+
         $user->update();
 
         return redirect()->route('home')->with('message', 'User berhasil diubah');

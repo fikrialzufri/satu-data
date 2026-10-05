@@ -33,7 +33,9 @@ use Illuminate\Support\Facades\URL;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/infografik', [InfografikController::class, 'index'])->name('infografik.index');
-URL::forceScheme('https');
+if (app()->environment('production')) {
+    URL::forceScheme('https');
+}
 Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () {
