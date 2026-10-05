@@ -185,7 +185,9 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $task->permissions()->delete();
+        $task->permissions()->get()->each(function (Permission $permission) {
+            $permission->delete();
+        });
         $task->delete();
 
         return redirect()->route('task.index')->with('message', 'Task Berhasil Dihapus')->with('Class', 'danger');

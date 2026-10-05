@@ -192,7 +192,9 @@ class OperatorController extends Controller
             return redirect()->route('operator.index')->with('message', 'Operator berhasil ditambah')->with('Class', 'success');
         } catch (\Throwable $th) {
             DB::rollback();
-            User::where('username', $username)->delete();
+            User::where('username', $username)->get()->each(function (User $user) {
+                $user->delete();
+            });
 
             return redirect()->route('operator.index')->with('message', 'operator gagal ditambah')->with('Class', 'danger');
         }
@@ -254,7 +256,9 @@ class OperatorController extends Controller
         try {
         } catch (\Throwable $th) {
             DB::rollback();
-            User::where('username', $username)->delete();
+            User::where('username', $username)->get()->each(function (User $user) {
+                $user->delete();
+            });
 
             return redirect()->route('operator.index')->with('message', 'operator gagal diubah')->with('Class', 'danger');
         }
